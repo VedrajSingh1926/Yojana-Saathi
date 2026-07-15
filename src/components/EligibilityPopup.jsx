@@ -1,0 +1,156 @@
+import React, { useState } from 'react';
+import { HelpCircle, ChevronUp, ChevronDown, CheckCircle2, Sparkles } from 'lucide-react';
+import { SCHEMES_DB } from '../data/schemes';
+
+export default function EligibilityPopup({ onRegisterLead }) {
+  const [expanded, setExpanded] = useState(false);
+  
+  // Form State
+  const [age, setAge] = useState('');
+  const [income, setIncome] = useState('');
+  const [state, setState] = useState('Rajasthan');
+  const [occupation, setOccupation] = useState('Farmer');
+
+  const [matches, setMatches] = useState(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!age || !income) return;
+
+    const parsedAge = parseInt(age);
+    const parsedIncome = parseInt(income);
+
+    // Matching logic
+    const matchedSchemes = SCHEMES_DB.filter(scheme => {
+      // Age checks
+      if (scheme.id === 'atal-pension' && (parsedAge < 18 || parsedAge > 40)) return false;
+      if (scheme.id === 'disability-pension' && (parsedAge < 18 || parsedAge > 79)) return false;
+      if (scheme.id === 'ladli-behna' && (parsedAge < 21 || parsedAge > 60)) return false;
+
+      // Income limits
+      if (scheme.id === 'pm-awas' && parsedIncome > 300000) return false;
+      if (scheme.id === 'mukhya-awas' && parsedIncome > 250000) return false;
+      if (scheme.id === 'scholarship' && parsedIncome > 250000) return false;
+      if (scheme.id === 'ladli-behna' && parsedIncome > 250000) return false;
+
+      // Occupation limits
+      if (scheme.category === 'Farmer' && occupation !== 'Farmer') return false;
+      if (scheme.category === 'Student' && occupation !== 'Student') return false;
+      if (scheme.category === 'Senior Citizen' && parsedAge < 60) return false;
+
+      return true;
+    });
+
+    setMatches(matchedSchemes);
+  };
+
+  const handleReset = () => {
+    setAge('');
+    setIncome('');
+    setState('Rajasthan');
+    setOccupation('Farmer');
+    setMatches(null);
+  };
+
+  const handleCreateAccount = () => {
+    onRegisterLead();
+    setExpanded(false);
+  };
+
+  return (
+    <div className={`eligibility-popup ${expanded ? 'expanded' : ''}`}>
+      {/* Collapsed Header click toggler */}
+      <div className="popup-collapsed-header" onClick={() => setExpanded(!expanded)}>
+        <div className="popup-title">
+          <span className="popup-pulse"></span>
+          <HelpCircle size={16} className="text-gold" /> Check Your Eligibility
+        </div>
+        {expanded ? <ChevronDown size={14} className="popup-arrow" /> : <ChevronUp size={14} className="popup-arrow" />}
+      </div>
+
+      {/* Expanded body content */}
+      {expanded && (
+        <div className="popup-expanded-content">
+          {!matches ? (
+            <>
+              <p className="text-sm text-muted mb-3">Answer 4 quick questions to see your eligible government schemes. No login required.</p>
+              <form onSubmit={handleSubmit}>
+                <div className="form-group-sm">
+                  <label>Age</label>
+                  <input 
+                    type="number" 
+                    required 
+                    placeholder="e.g. 42" 
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                  />
+                </div>
+                <div className="form-group-sm">
+                  <label>Annual Income (₹)</label>
+                  <input 
+                    type="number" 
+                    required 
+                    placeholder="e.g. 240000" 
+                    value={income}
+                    onChange={(e) => setIncome(e.target.value)}
+                  />
+                </div>
+                <div className="form-group-sm">
+                  <label>Domicile State</label>
+                  <select value={state} onChange={(e) => setState(e.target.value)}>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                  </select>
+                </div>
+                <div className="form-group-sm">
+                  <label>Occupation</label>
+                  <select value={occupation} onChange={(e) => setOccupation(e.target.value)}>
+                    <option value="Farmer">Farmer</option>
+                    <option value="Student">Student</option>
+                    <option value="Business">Business/Shopkeeper</option>
+                    <option value="Unemployed">Unemployed</option>
+                    <option value="Salaried">Salaried Employee</option>
+                    <option value="Retired">Retired Senior Citizen</option>
+                  </select>
+                </div>
+                <button type="submit" className="btn btn-primary btn-sm w-full mt-3">
+                  Scan Eligibility
+                </button>
+              </form>
+            </>
+          ) : (
+            <div className="popup-results text-center">
+              <CheckCircle2 size={36} className="text-success" style={{ margin: '0 auto 0.5rem' }} />
+              <h3>Found {matches.length} Matching Schemes!</h3>
+              <p className="text-sm text-muted mt-2">You qualify for direct benefits: <strong>{matches.map(m => m.emoji).join(' ')}</strong></p>
+
+              <div className="mb-3 mt-3 text-left" style={{ background: 'rgba(255,255,255,0.02)', padding: '0.5rem 0.75rem', borderRadius: 'var(--border-radius-sm)' }}>
+                {matches.slice(0, 3).map((m, idx) => (
+                  <div key={idx} className="text-xs font-semibold mb-1" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>{m.name.split('(')[0]}</span>
+                    <span className="text-gold">{m.benefit.split(' ')[0]}</span>
+                  </div>
+                ))}
+                {matches.length > 3 && (
+                  <div className="text-center text-xs text-muted font-bold">+ {matches.length - 3} more schemes</div>
+                )}
+              </div>
+
+              <p className="text-xs text-muted mb-3">Want complete verified household analysis & auto-fill applications?</p>
+              <button className="btn btn-primary btn-sm w-full mb-2" onClick={handleCreateAccount}>
+                Create Free Account
+              </button>
+              <button className="btn btn-text btn-sm w-full" onClick={handleReset}>
+                Check Again
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

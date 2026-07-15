@@ -1,0 +1,258 @@
+import React, { useState, useEffect } from 'react';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import AuthModal from './components/AuthModal';
+import CompareModal from './components/CompareModal';
+import EligibilityPopup from './components/EligibilityPopup';
+
+// Pages
+import Home from './pages/Home';
+import Schemes from './pages/Schemes';
+import SchemeDetail from './pages/SchemeDetail';
+import AIPlanner from './pages/AIPlanner';
+import Family from './pages/Family';
+import ScamShield from './pages/ScamShield';
+
+export default function App() {
+  const [activeView, setActiveView] = useState('home');
+  const [detailSchemeId, setDetailSchemeId] = useState(null);
+  const [plannerPrompt, setPlannerPrompt] = useState('');
+  const [catalogCategory, setCatalogCategory] = useState('all');
+
+  // Global App States
+  const [lang, setLang] = useState('en');
+  const [stateLocation, setStateLocation] = useState('Rajasthan');
+  const [compareList, setCompareList] = useState([]);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
+  
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: "PM Awas Yojana Update", text: "Your application verification step 2 is complete. Local officer will visit for geotagging.", time: "2 hrs ago", read: false },
+    { id: 2, title: "PM Kisan Installment Released", text: "₹2,000 has been successfully credited to SBI ***4912.", time: "1 day ago", read: false },
+    { id: 3, title: "Alert: New Scheme Launched", text: "State Government launched 'Mahila Udyami Grants' for self-help groups. Check eligibility.", time: "2 days ago", read: true }
+  ]);
+
+  const [user, setUser] = useState(null);
+
+  // Auto-route on hash change
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (['home', 'planner', 'schemes', 'family', 'scam-shield'].includes(hash)) {
+        setActiveView(hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const handleNavigate = (view, params = {}) => {
+    setActiveView(view);
+    window.location.hash = view;
+    
+    if (view === 'detail') {
+      setDetailSchemeId(params.schemeId);
+    }
+    if (view === 'planner') {
+      setPlannerPrompt(params.defaultPrompt || '');
+    }
+    if (view === 'schemes' && params.category) {
+      setCatalogCategory(params.category);
+    } else {
+      setCatalogCategory('all');
+    }
+  };
+
+  const handleToggleCompare = (schemeId) => {
+    if (compareList.includes(schemeId)) {
+      setCompareList(compareList.filter(id => id !== schemeId));
+    } else {
+      if (compareList.length >= 3) {
+        alert("You can compare a maximum of 3 schemes side-by-side.");
+        return;
+      }
+      setCompareList([...compareList, schemeId]);
+    }
+  };
+
+  const handleLoginSuccess = () => {
+    // Load default Ramesh Kumar demo profile matching standard specs
+    setUser({
+      name: "Ramesh Kumar",
+      relation: "Head",
+      age: 42,
+      occupation: "Farmer",
+      income: 240000,
+      family: [
+        { name: "Ramesh Kumar", relation: "Head", age: 42, occupation: "Farmer", income: 240000, status: "Verified" },
+        { name: "Pooja Kumar", relation: "Spouse", age: 38, occupation: "Housewife", income: 0, status: "Verified" },
+        { name: "Amit Kumar", relation: "Son", age: 19, occupation: "Student", income: 0, status: "Verified" },
+        { name: "Mohan Kumar", relation: "Father", age: 62, occupation: "Retired", income: 0, status: "Verified" }
+      ],
+      documents: [
+        { name: "Aadhaar Card", verified: true },
+        { name: "Income Certificate", verified: true },
+        { name: "SBI Passbook", verified: true },
+        { name: "Land Registry Copy", verified: true }
+      ],
+      events: [
+        { date: "Jun 2026", title: "Amit joined College (Education)", desc: "Triggered recommendations for central post-matric higher education grants." },
+        { date: "Mar 2026", title: "Applied for PM Awas (Housing)", desc: "Document checklist completed. Application registered with rural development office." },
+        { date: "Jan 2024", title: "Mohan Kumar turned 60 (Senior)", desc: "Triggered Old Age Pension claim and registration for Senior Medical Health Cards." }
+      ]
+    });
+    
+    // Send notification
+    setNotifications(prev => [
+      { id: Date.now(), title: "Welfare Passport Activated", text: "Welcome Ramesh Kumar! Your household details have been verified.", time: "Just now", read: false },
+      ...prev
+    ]);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setCompareList([]);
+    alert("Logged out successfully.");
+  };
+
+  const handleAddMember = (member) => {
+    if (!user) return;
+    setUser(prev => ({
+      ...prev,
+      family: [...prev.family, member]
+    }));
+    setNotifications(prev => [
+      { id: Date.now(), title: "Member Registry Update", text: `${member.name} has been added. Initializing verification APIs.`, time: "Just now", read: false },
+      ...prev
+    ]);
+  };
+
+  const handleUploadDoc = (docName) => {
+    if (!user) return;
+    setUser(prev => ({
+      ...prev,
+      documents: [...prev.documents, { name: docName.split('.')[0], verified: false }]
+    }));
+    setNotifications(prev => [
+      { id: Date.now(), title: "Locker File Uploaded", text: `"${docName}" uploaded securely. Verification is in progress.`, time: "Just now", read: false },
+      ...prev
+    ]);
+  };
+
+  const handleSaveScheme = (scheme) => {
+    setNotifications(prev => [
+      { id: Date.now(), title: "Welfare Saved", text: `"${scheme.name}" saved to your target timelines checklist.`, time: "Just now", read: false },
+      ...prev
+    ]);
+    alert(`"${scheme.name}" saved to your welfare profiles tracker!`);
+  };
+
+  const handleNavigateToPlannerFromCompare = (promptText) => {
+    handleNavigate('planner', { defaultPrompt: promptText });
+  };
+
+  const handleClearNoti = () => {
+    setNotifications([]);
+  };
+
+  const handleMarkNotiRead = (id) => {
+    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
+  };
+
+  return (
+    <div className="app-shell">
+      {/* Background Glowing Ambient Orbs */}
+      <div className="glowing-orb orb-primary"></div>
+      <div className="glowing-orb orb-secondary"></div>
+      <div className="glowing-orb orb-tertiary"></div>
+
+      {/* Floating Navbar */}
+      <Navbar 
+        activeView={activeView}
+        onNavigate={handleNavigate}
+        lang={lang}
+        onChangeLang={setLang}
+        stateLocation={stateLocation}
+        onChangeState={setStateLocation}
+        notifications={notifications}
+        onClearNoti={handleClearNoti}
+        onMarkNotiRead={handleMarkNotiRead}
+        user={user}
+        onLogout={handleLogout}
+        onTriggerAuth={() => setIsAuthOpen(true)}
+      />
+
+      {/* Main Container */}
+      <main className="main-content">
+        {activeView === 'home' && (
+          <Home 
+            onNavigate={handleNavigate}
+            onTriggerAuth={setIsAuthOpen}
+          />
+        )}
+        
+        {activeView === 'schemes' && (
+          <Schemes 
+            onNavigate={handleNavigate}
+            compareList={compareList}
+            onToggleCompare={handleToggleCompare}
+            initialCategory={catalogCategory}
+            onTriggerCompare={() => setIsCompareOpen(true)}
+          />
+        )}
+
+        {activeView === 'detail' && (
+          <SchemeDetail 
+            schemeId={detailSchemeId}
+            onBack={() => handleNavigate('schemes')}
+            onNavigate={handleNavigate}
+            onSaveScheme={handleSaveScheme}
+          />
+        )}
+
+        {activeView === 'planner' && (
+          <AIPlanner 
+            initialPrompt={plannerPrompt}
+          />
+        )}
+
+        {activeView === 'family' && (
+          <Family 
+            user={user}
+            onAddMember={handleAddMember}
+            onUploadDoc={handleUploadDoc}
+            onTriggerAuth={() => setIsAuthOpen(true)}
+          />
+        )}
+
+        {activeView === 'scam-shield' && (
+          <ScamShield />
+        )}
+      </main>
+
+      {/* Bottom Sticky Footer */}
+      <Footer 
+        onNavigate={handleNavigate}
+        onTriggerAuth={setIsAuthOpen}
+      />
+
+      {/* Modals & Overlays */}
+      <AuthModal 
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
+      <CompareModal 
+        isOpen={isCompareOpen}
+        onClose={() => setIsCompareOpen(false)}
+        compareList={compareList}
+        onNavigateToPlanner={handleNavigateToPlannerFromCompare}
+      />
+
+      <EligibilityPopup 
+        onRegisterLead={() => setIsAuthOpen(true)}
+      />
+    </div>
+  );
+}
