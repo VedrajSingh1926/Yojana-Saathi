@@ -35,11 +35,7 @@ export default function Navbar({
         {/* Left: Logo */}
         <a href="#" className="logo-container" onClick={(e) => { e.preventDefault(); onNavigate('home'); }}>
           <div className="logo-icon" style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/Logo.png" alt="Yojana Saathi Logo" style={{ height: '70px', width: 'auto', maxWidth: '250px', objectFit: 'contain' }} />
-          </div>
-          <div className="logo-text">
-            <span className="logo-title">Yojana Saathi</span>
-            <span className="logo-tagline">India's AI Welfare OS</span>
+            <img src="/Logo.png" alt="Yojana Saathi Logo" style={{ height: '60px', width: 'auto', maxWidth: '180px', objectFit: 'contain' }} />
           </div>
         </a>
 
