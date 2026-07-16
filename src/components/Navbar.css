@@ -36,9 +36,10 @@
   max-width: 1440px;
   margin: 0 auto;
   padding: 0 40px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  gap: 2rem;
   height: 100%;
 }
 
@@ -415,9 +416,42 @@
 }
 
 /* Responsive */
+@media (max-width: 1440px) {
+  .lux-container {
+    padding: 0 20px;
+    gap: 1rem;
+  }
+  .lux-nav-links {
+    gap: 20px;
+  }
+  .lux-brand {
+    gap: 12px;
+  }
+  .lux-actions {
+    gap: 10px;
+  }
+  .lux-pill, .lux-cta-btn {
+    padding: 0 16px;
+  }
+  .lux-nav-link {
+    font-size: 15px;
+  }
+}
+
 @media (max-width: 1280px) {
   .lux-container {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+@media (max-width: 1100px) {
+  .lux-nav-links {
+    display: none;
+  }
+  .lux-mobile-toggle {
+    display: block;
   }
 }
 
@@ -428,11 +462,8 @@
   .lux-container {
     padding: 0 32px;
   }
-  .lux-nav-links, .lux-login-btn {
+  .lux-login-btn {
     display: none;
-  }
-  .lux-mobile-toggle {
-    display: block;
   }
 }
 
