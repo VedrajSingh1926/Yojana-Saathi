@@ -10,7 +10,7 @@ export default function Footer({ onNavigate, onTriggerAuth }) {
         <div className="footer-brand">
           <a href="#" className="logo-container mb-3" onClick={(e) => { e.preventDefault(); onNavigate('home'); }}>
             <div className="logo-icon" style={{ display: 'flex', alignItems: 'center' }}>
-              <img src="/Logo.png" alt="Yojana Saathi Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+              <img src="/Logo.png" alt="Yojana Saathi Logo" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
             </div>
             <div className="logo-text">
               <span className="logo-title">Yojana Saathi</span>
