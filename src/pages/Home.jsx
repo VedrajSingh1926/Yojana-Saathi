@@ -174,11 +174,11 @@ export default function Home({ onNavigate, onTriggerAuth }) {
           <span className="partner-tagline">BUILDING THE FUTURE OF WELFARE WITH INDIA'S BEST</span>
           <div className="partner-logos">
             <div className="logo-box"><span className="logo-text">⚡ Slashy</span><span className="sub-logo">Automation</span></div>
-            <div className="logo-box"><span className="logo-text">🎯 Keploy</span><span class="sub-logo">API Testing</span></div>
+            <div className="logo-box"><span className="logo-text">🎯 Keploy</span><span className="sub-logo">API Testing</span></div>
             <div className="logo-box"><span className="logo-text">🗣️ Gnani.ai</span><span className="sub-logo">Voice AI</span></div>
             <div className="logo-box"><span className="logo-text">🧠 Mem0</span><span className="sub-logo">AI Memory</span></div>
             <div className="logo-box"><span className="logo-text">🧬 Alchemyst AI</span><span className="sub-logo">AI Agents</span></div>
-            <div className="logo-box"><span className="logo-text">🔵 Outlier</span><span class="sub-logo">AI Research</span></div>
+            <div className="logo-box"><span className="logo-text">🔵 Outlier</span><span className="sub-logo">AI Research</span></div>
             <div className="logo-box"><span className="logo-text">🤝 GenzDealz.ai</span><span className="sub-logo">Partner</span></div>
           </div>
         </div>

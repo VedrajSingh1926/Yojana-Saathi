@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Languages, MapPin, Bell, Landmark, User, LogOut, ChevronDown, Menu, X } from 'lucide-react';
-
+import { Languages, MapPin, Bell, Landmark, User, LogOut, ChevronDown, Menu, X, Sparkles } from 'lucide-react';
 export default function Navbar({ 
   activeView, 
   onNavigate, 
@@ -152,39 +151,35 @@ export default function Navbar({
           </div>
 
           {/* Profile Circle or Login CTA */}
-          {!user ? (
-            <div className="auth-buttons-container">
-              <button className="btn btn-text" onClick={() => onTriggerAuth(false)}>Login</button>
-              <button className="btn btn-primary" onClick={() => onTriggerAuth(true)}>Get Started</button>
-            </div>
-          ) : (
-            <div className="profile-dropdown-wrapper">
-              <button className="profile-trigger" onClick={() => setProfileOpen(!profileOpen)}>
-                <div className="profile-avatar">
-                  <span>{user.name.split(' ').map(n=>n[0]).join('')}</span>
-                </div>
-                <ChevronDown size={12} className="trigger-chevron" />
-              </button>
-              {profileOpen && (
-                <div className="dropdown-menu right-aligned">
-                  <div className="user-summary">
-                    <span className="user-name">{user.name}</span>
-                    <span className="user-role">Household Head</span>
+          <div className="auth-buttons-container">
+            {!user ? (
+              <>
+                <button className="btn btn-text" onClick={() => onTriggerAuth(false)}>Login</button>
+                <button className="btn btn-primary" onClick={() => onTriggerAuth(true)}>Get Started</button>
+              </>
+            ) : (
+              <div className="profile-dropdown-wrapper">
+                <button className="profile-trigger" onClick={() => setProfileOpen(!profileOpen)}>
+                  <div className="profile-avatar">{user.name.charAt(0)}</div>
+                </button>
+                {profileOpen && (
+                  <div className="dropdown-menu right-aligned">
+                    <div className="user-summary">
+                      <span className="user-name">{user.name}</span>
+                      <span className="user-role">Welfare Passport</span>
+                    </div>
+                    <hr className="menu-divider" />
+                    <div className="dropdown-item" onClick={() => { setProfileOpen(false); onNavigate('family'); }}>
+                      <User size={16} /> My Profile
+                    </div>
+                    <div className="dropdown-item" onClick={() => { setProfileOpen(false); onLogout(); }}>
+                      <LogOut size={16} /> Logout
+                    </div>
                   </div>
-                  <hr className="menu-divider" />
-                  <div className="dropdown-item" onClick={() => { onNavigate('family'); setProfileOpen(false); }}>
-                    <User size={14} style={{ marginRight: '8px', display: 'inline' }} /> Welfare Passport
-                  </div>
-                  <div className="dropdown-item" onClick={() => { onNavigate('planner'); setProfileOpen(false); }}>
-                    <Sparkles size={14} style={{ marginRight: '8px', display: 'inline' }} /> My AI Plan
-                  </div>
-                  <div className="dropdown-item" onClick={() => { onLogout(); setProfileOpen(false); }}>
-                    <LogOut size={14} style={{ marginRight: '8px', display: 'inline' }} /> Logout
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
 
         </div>
 

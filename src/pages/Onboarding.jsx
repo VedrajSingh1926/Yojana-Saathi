@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, ChevronRight, User, Home, FileText, Upload, Target, Sparkles, Loader2 } from 'lucide-react';
+import { Check, ChevronRight, User, Home, FileText, Upload, Target, Sparkles, Loader2, Plus, X } from 'lucide-react';
 
 export default function Onboarding({ onComplete }) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    personal: { name: '', phone: '', email: '', age: '', gender: '', state: '', district: '' },
+    personal: { name: '', phone: '', email: '', age: '', gender: 'Male', state: '', district: '' },
     household: { isHead: 'Yes', familyType: 'Nuclear', members: [] },
     details: { houseType: 'Own', area: 'Urban', category: 'General', farmer: 'No', bpl: 'No', bank: 'Yes', land: 'None' },
     goals: []
   });
 
   const [loadingMsg, setLoadingMsg] = useState('');
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [newMember, setNewMember] = useState({ name: '', age: '', gender: 'Male', relation: '', occupation: '', education: '', income: '', marital: 'Single', disability: 'No' });
 
   const nextStep = () => setStep(s => s + 1);
   const prevStep = () => setStep(s => s - 1);
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     setStep(6);
     const messages = [
       "Creating Household Profile...",
@@ -27,6 +29,18 @@ export default function Onboarding({ onComplete }) {
     ];
     let i = 0;
     setLoadingMsg(messages[i]);
+    
+    // Save to MongoDB in background
+    try {
+      await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+    } catch (err) {
+      console.error("Failed to save profile", err);
+    }
+
     const interval = setInterval(() => {
       i++;
       if (i < messages.length) {
@@ -38,6 +52,27 @@ export default function Onboarding({ onComplete }) {
         }, 1500);
       }
     }, 1200);
+  };
+
+  const handleAddMember = () => {
+    setFormData(prev => ({
+      ...prev,
+      household: {
+        ...prev.household,
+        members: [...prev.household.members, newMember]
+      }
+    }));
+    setShowAddMember(false);
+    setNewMember({ name: '', age: '', gender: 'Male', relation: '', occupation: '', education: '', income: '', marital: 'Single', disability: 'No' });
+  };
+
+  const toggleGoal = (goal) => {
+    setFormData(prev => ({
+      ...prev,
+      goals: prev.goals.includes(goal) 
+        ? prev.goals.filter(g => g !== goal) 
+        : [...prev.goals, goal]
+    }));
   };
 
   const renderStepIcon = (num) => {
@@ -69,9 +104,10 @@ export default function Onboarding({ onComplete }) {
       <div className="glass-card" style={{ padding: '2.5rem', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
         {step === 1 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>
-              <User size={24} /> Step 1: Personal Information
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
+              <User size={24} /> Step 1 — Personal Information
             </h2>
+            <p className="text-muted mb-4">Basic details</p>
             <div className="grid-2-col" style={{ gap: '1.5rem' }}>
               <div className="form-group">
                 <label>Full Name</label>
@@ -113,10 +149,10 @@ export default function Onboarding({ onComplete }) {
         {step === 2 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <Home size={24} /> Step 2: Household Information
+              <Home size={24} /> Step 2 — Household Information
             </h2>
             <p className="text-muted mb-4">Tell us about your family</p>
-            <div className="grid-2-col" style={{ gap: '1.5rem' }}>
+            <div className="grid-2-col" style={{ gap: '1.5rem', marginBottom: '2rem' }}>
               <div className="form-group">
                 <label>Are you the Family Head?</label>
                 <select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}>
@@ -130,10 +166,47 @@ export default function Onboarding({ onComplete }) {
                 </select>
               </div>
             </div>
-            <div style={{ marginTop: '1.5rem' }}>
-              <button className="btn btn-outline btn-sm mb-3">+ Add Family Member</button>
-              <div className="text-sm text-muted">You can add detailed information for each member here.</div>
-            </div>
+
+            {/* Added Members List */}
+            {formData.household.members.length > 0 && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <h4 style={{ marginBottom: '0.5rem' }}>Family Members ({formData.household.members.length})</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {formData.household.members.map((m, idx) => (
+                    <div key={idx} style={{ padding: '0.75rem', background: 'var(--bg-darker)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div><strong>{m.name}</strong> <span className="text-muted">({m.relation})</span> - {m.age} yrs, {m.gender}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Add Member Form */}
+            {showAddMember ? (
+              <div style={{ padding: '1.5rem', background: 'rgba(0,0,0,0.02)', border: '1px dashed var(--border-color)', borderRadius: '12px', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <h4>Add Family Member</h4>
+                  <button className="icon-btn" onClick={() => setShowAddMember(false)} style={{ width: '28px', height: '28px' }}><X size={14}/></button>
+                </div>
+                <div className="grid-2-col" style={{ gap: '1rem' }}>
+                  <div className="form-group"><label>Name</label><input type="text" className="form-input" value={newMember.name} onChange={e=>setNewMember({...newMember, name: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
+                  <div className="form-group"><label>Age</label><input type="number" className="form-input" value={newMember.age} onChange={e=>setNewMember({...newMember, age: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
+                  <div className="form-group"><label>Gender</label><select className="form-input" value={newMember.gender} onChange={e=>setNewMember({...newMember, gender: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>Male</option><option>Female</option><option>Other</option></select></div>
+                  <div className="form-group"><label>Relation</label><input type="text" className="form-input" placeholder="e.g. Son, Wife" value={newMember.relation} onChange={e=>setNewMember({...newMember, relation: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
+                  <div className="form-group"><label>Occupation</label><input type="text" className="form-input" value={newMember.occupation} onChange={e=>setNewMember({...newMember, occupation: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
+                  <div className="form-group"><label>Education</label><input type="text" className="form-input" value={newMember.education} onChange={e=>setNewMember({...newMember, education: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
+                  <div className="form-group"><label>Annual Income</label><input type="number" className="form-input" value={newMember.income} onChange={e=>setNewMember({...newMember, income: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
+                  <div className="form-group"><label>Marital Status</label><select className="form-input" value={newMember.marital} onChange={e=>setNewMember({...newMember, marital: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>Single</option><option>Married</option><option>Widowed</option></select></div>
+                  <div className="form-group"><label>Disability (Yes/No)</label><select className="form-input" value={newMember.disability} onChange={e=>setNewMember({...newMember, disability: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>No</option><option>Yes</option></select></div>
+                </div>
+                <button className="btn btn-primary btn-sm mt-3" onClick={handleAddMember}>Save Member</button>
+              </div>
+            ) : (
+              <button className="btn btn-outline btn-sm mb-3" onClick={() => setShowAddMember(true)}>
+                <Plus size={14} /> Add Family Members (Unlimited)
+              </button>
+            )}
+
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
               <button className="btn btn-text" onClick={prevStep}>Back</button>
               <button className="btn btn-primary" onClick={nextStep}>Next <ChevronRight size={18} /></button>
@@ -144,7 +217,7 @@ export default function Onboarding({ onComplete }) {
         {step === 3 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <FileText size={24} /> Step 3: Household Details
+              <FileText size={24} /> Step 3 — Household Details
             </h2>
             <p className="text-muted mb-4">Information to identify eligible schemes</p>
             <div className="grid-2-col" style={{ gap: '1.5rem' }}>
@@ -166,16 +239,26 @@ export default function Onboarding({ onComplete }) {
         {step === 4 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <Upload size={24} /> Step 4: Documents (Optional)
+              <Upload size={24} /> Step 4 — Documents (Optional)
             </h2>
-            <p className="text-muted mb-4">Upload if available (optional for this demo)</p>
-            <div style={{ background: 'rgba(0,0,0,0.03)', padding: '1rem', borderRadius: '8px', border: '1px dashed var(--border-color)', textAlign: 'center', marginBottom: '1.5rem' }}>
-              <p className="text-sm">Click to browse or drag and drop files here.</p>
-              <p className="text-xs text-muted mt-1">Aadhaar Card, Income Certificate, Ration Card, etc.</p>
+            <p className="text-muted mb-4">For Hackathon Demo - Upload if available (optional):</p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+              {['Aadhaar Card', 'Income Certificate', 'Ration Card', 'Disability Certificate', 'Caste Certificate', 'Other Supporting Documents'].map(doc => (
+                <div key={doc} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'var(--bg-darker)', border: '1px dashed var(--border-color)', borderRadius: '8px' }}>
+                  <span>{doc}</span>
+                  <button className="btn btn-outline btn-sm">Upload</button>
+                </div>
+              ))}
             </div>
+
+            <div style={{ padding: '1rem', background: 'rgba(217, 119, 54, 0.1)', borderLeft: '4px solid var(--primary)', borderRadius: '0 8px 8px 0', fontSize: '0.85rem' }}>
+              <strong>Note:</strong> Documents are optional for this demo. Government verification will happen through official APIs in the production version.
+            </div>
+
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
               <button className="btn btn-text" onClick={prevStep}>Back</button>
-              <button className="btn btn-primary" onClick={nextStep}>Skip / Next <ChevronRight size={18} /></button>
+              <button className="btn btn-primary" onClick={nextStep}>Next <ChevronRight size={18} /></button>
             </div>
           </motion.div>
         )}
@@ -183,16 +266,28 @@ export default function Onboarding({ onComplete }) {
         {step === 5 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <Target size={24} /> Step 5: Goals & Priorities
+              <Target size={24} /> Step 5 — Goals & Priorities
             </h2>
             <p className="text-muted mb-4">What would you like AI to help you with?</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
-              {['🏠 House', '🎓 Education', '💼 Employment', '💰 Business', '🌾 Agriculture', '❤️ Health', '👩 Women Welfare', '👴 Pension', '👶 Child Welfare', '♿ Disability'].map(goal => (
-                <div key={goal} style={{ padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '8px', textAlign: 'center', cursor: 'pointer', background: 'var(--bg-darkest)' }} onClick={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+              {['🏠 House', '🎓 Education', '💼 Employment', '💰 Business', '🌾 Agriculture', '❤️ Health', '👩 Women Welfare', '👴 Pension', '👶 Child Welfare', '♿ Disability Support'].map(goal => (
+                <div 
+                  key={goal} 
+                  onClick={() => toggleGoal(goal)}
+                  style={{ 
+                    padding: '1rem', border: '1px solid', borderColor: formData.goals.includes(goal) ? 'var(--primary)' : 'var(--border-color)', 
+                    borderRadius: '8px', textAlign: 'center', cursor: 'pointer', 
+                    background: formData.goals.includes(goal) ? 'var(--primary-glow)' : 'var(--bg-darkest)',
+                    transition: 'all 0.2s', fontWeight: formData.goals.includes(goal) ? '600' : '400'
+                  }}
+                >
                   {goal}
                 </div>
               ))}
             </div>
+            
+            <p className="text-sm text-muted">The AI uses these priorities to personalize recommendations.</p>
+
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
               <button className="btn btn-text" onClick={prevStep}>Back</button>
               <button className="btn btn-primary" onClick={handleFinish}>Complete Setup <Sparkles size={18} style={{ marginLeft: '6px' }}/></button>
@@ -202,10 +297,26 @@ export default function Onboarding({ onComplete }) {
 
         {step === 6 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-            <Loader2 size={48} className="text-primary" style={{ animation: 'spin 2s linear infinite', margin: '0 auto 1.5rem' }} />
+            {loadingMsg.includes("Welcome") ? (
+              <div style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>
+                <Check size={56} style={{ margin: '0 auto' }} />
+              </div>
+            ) : (
+              <Loader2 size={48} className="text-gold" style={{ animation: 'spin 2s linear infinite', margin: '0 auto 1.5rem', color: 'var(--primary)' }} />
+            )}
             <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>{loadingMsg}</h3>
-            <p className="text-muted">Welcome to Yojana Saathi 🚀</p>
+            
+            <div style={{ textAlign: 'left', maxWidth: '300px', margin: '0 auto 2rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: loadingMsg.includes("Building") || loadingMsg.includes("Welcome") || loadingMsg.includes("Priorities") || loadingMsg.includes("Schemes") || loadingMsg.includes("Passport") ? 'var(--primary)' : 'var(--text-muted)' }}><Check size={16}/> Creating Household Profile...</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: loadingMsg.includes("Priorities") || loadingMsg.includes("Welcome") || loadingMsg.includes("Schemes") || loadingMsg.includes("Passport") ? 'var(--primary)' : 'var(--text-muted)' }}><Check size={16}/> Building Family Tree...</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: loadingMsg.includes("Schemes") || loadingMsg.includes("Welcome") || loadingMsg.includes("Passport") ? 'var(--primary)' : 'var(--text-muted)' }}><Check size={16}/> Understanding Your Priorities...</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: loadingMsg.includes("Passport") || loadingMsg.includes("Welcome") ? 'var(--primary)' : 'var(--text-muted)' }}><Check size={16}/> Finding Eligible Government Schemes...</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: loadingMsg.includes("Welcome") ? 'var(--primary)' : 'var(--text-muted)' }}><Check size={16}/> Preparing Your Welfare Passport...</div>
+            </div>
+
+            {loadingMsg.includes("Welcome") && (
+              <h3 style={{ fontSize: '1.75rem', color: 'var(--text-primary)' }}>Welcome to Yojana Saathi 🚀</h3>
+            )}
           </motion.div>
         )}
       </div>
