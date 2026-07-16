@@ -23,3 +23,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.vercel
+yojana-saathi-64832-firebase-adminsdk-fbsvc-a3ac308614.json

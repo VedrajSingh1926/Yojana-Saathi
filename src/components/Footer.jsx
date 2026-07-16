@@ -9,7 +9,9 @@ export default function Footer({ onNavigate, onTriggerAuth }) {
         {/* Brand Info */}
         <div className="footer-brand">
           <a href="#" className="logo-container mb-3" onClick={(e) => { e.preventDefault(); onNavigate('home'); }}>
-            <div className="logo-icon"><Landmark size={28} /></div>
+            <div className="logo-icon" style={{ display: 'flex', alignItems: 'center' }}>
+              <img src="/Logo.png" alt="Yojana Saathi Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+            </div>
             <div className="logo-text">
               <span className="logo-title">Yojana Saathi</span>
               <span className="logo-tagline">India's AI Welfare Operating System</span>

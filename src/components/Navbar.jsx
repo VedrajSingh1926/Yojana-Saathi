@@ -34,8 +34,8 @@ export default function Navbar({
         
         {/* Left: Logo */}
         <a href="#" className="logo-container" onClick={(e) => { e.preventDefault(); onNavigate('home'); }}>
-          <div className="logo-icon">
-            <Landmark size={28} />
+          <div className="logo-icon" style={{ display: 'flex', alignItems: 'center' }}>
+            <img src="/Logo.png" alt="Yojana Saathi Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
           </div>
           <div className="logo-text">
             <span className="logo-title">Yojana Saathi</span>
