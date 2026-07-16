@@ -12,6 +12,7 @@ import SchemeDetail from './pages/SchemeDetail';
 import AIPlanner from './pages/AIPlanner';
 import Family from './pages/Family';
 import ScamShield from './pages/ScamShield';
+import Onboarding from './pages/Onboarding';
 
 export default function App() {
   const [activeView, setActiveView] = useState('home');
@@ -38,7 +39,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['home', 'planner', 'schemes', 'family', 'scam-shield'].includes(hash)) {
+      if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding'].includes(hash)) {
         setActiveView(hash);
       }
     };
@@ -179,7 +180,13 @@ export default function App() {
         onMarkNotiRead={handleMarkNotiRead}
         user={user}
         onLogout={handleLogout}
-        onTriggerAuth={() => setIsAuthOpen(true)}
+        onTriggerAuth={(isRegister) => {
+          if (isRegister) {
+            handleNavigate('onboarding');
+          } else {
+            setIsAuthOpen(true);
+          }
+        }}
       />
 
       {/* Main Container */}
@@ -187,7 +194,10 @@ export default function App() {
         {activeView === 'home' && (
           <Home 
             onNavigate={handleNavigate}
-            onTriggerAuth={setIsAuthOpen}
+            onTriggerAuth={(isRegister) => {
+              if (isRegister) handleNavigate('onboarding');
+              else setIsAuthOpen(true);
+            }}
           />
         )}
         
@@ -228,12 +238,22 @@ export default function App() {
         {activeView === 'scam-shield' && (
           <ScamShield />
         )}
+
+        {activeView === 'onboarding' && (
+          <Onboarding onComplete={(data) => {
+            handleLoginSuccess();
+            handleNavigate('home');
+          }} />
+        )}
       </main>
 
       {/* Bottom Sticky Footer */}
       <Footer 
         onNavigate={handleNavigate}
-        onTriggerAuth={setIsAuthOpen}
+        onTriggerAuth={(isRegister) => {
+          if (isRegister) handleNavigate('onboarding');
+          else setIsAuthOpen(true);
+        }}
       />
 
       {/* Modals & Overlays */}

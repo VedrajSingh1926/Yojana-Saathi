@@ -20,6 +20,7 @@ export default function Navbar({
   const [notiOpen, setNotiOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [expandedNotiId, setExpandedNotiId] = useState(null);
 
   const langMap = { en: "English", hi: "हिन्दी (Hindi)", ta: "தமிழ் (Tamil)", te: "తెలుగు (Telugu)", bn: "বাংলা (Bengali)" };
   const states = ["Rajasthan", "Maharashtra", "Uttar Pradesh", "Delhi", "Karnataka", "Tamil Nadu", "Gujarat", "Bihar"];
@@ -59,7 +60,7 @@ export default function Navbar({
         <div className="nav-actions">
           
           {/* Language Selector */}
-          <div className="dropdown-wrapper" onMouseLeave={() => setLangOpen(false)}>
+          <div className="dropdown-wrapper">
             <button className="dropdown-trigger" onClick={() => setLangOpen(!langOpen)}>
               <Languages size={16} />
               <span className="trigger-label">{langMap[lang]}</span>
@@ -81,7 +82,7 @@ export default function Navbar({
           </div>
 
           {/* State Selector */}
-          <div className="dropdown-wrapper" onMouseLeave={() => setStateOpen(false)}>
+          <div className="dropdown-wrapper">
             <button className="dropdown-trigger" onClick={() => setStateOpen(!stateOpen)}>
               <MapPin size={16} />
               <span className="trigger-label">{stateLocation}</span>
@@ -103,7 +104,7 @@ export default function Navbar({
           </div>
 
           {/* Notifications panel */}
-          <div className="notification-bell-container" onMouseLeave={() => setNotiOpen(false)}>
+          <div className="dropdown-wrapper">
             <button className="icon-btn notification-btn" onClick={() => setNotiOpen(!notiOpen)}>
               <Bell size={18} />
               {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
@@ -123,14 +124,25 @@ export default function Navbar({
                       <div 
                         key={n.id} 
                         className={`noti-item ${n.read ? 'read' : ''}`}
-                        onClick={() => { onMarkNotiRead(n.id); }}
+                        onClick={() => { 
+                          onMarkNotiRead(n.id);
+                          setExpandedNotiId(expandedNotiId === n.id ? null : n.id);
+                        }}
+                        style={{ flexDirection: 'column', alignItems: 'flex-start' }}
                       >
-                        {!n.read && <div className="noti-dot"></div>}
-                        <div className="noti-content">
-                          <h4>{n.title}</h4>
-                          <p>{n.text}</p>
-                          <span className="noti-time">{n.time}</span>
+                        <div style={{ display: 'flex', gap: '0.75rem', width: '100%' }}>
+                          {!n.read && <div className="noti-dot"></div>}
+                          <div className="noti-content">
+                            <h4>{n.title}</h4>
+                            <p>{n.text}</p>
+                            <span className="noti-time">{n.time}</span>
+                          </div>
                         </div>
+                        {expandedNotiId === n.id && (
+                          <div className="noti-brief" style={{ marginTop: '0.5rem', padding: '0.5rem', background: 'rgba(0,0,0,0.05)', borderRadius: '6px', fontSize: '0.85rem' }}>
+                            {n.brief || 'More details regarding this update will be shown here. Keep an eye on your portal to apply.'}
+                          </div>
+                        )}
                       </div>
                     ))
                   )}
@@ -146,7 +158,7 @@ export default function Navbar({
               <button className="btn btn-primary" onClick={() => onTriggerAuth(true)}>Get Started</button>
             </div>
           ) : (
-            <div className="profile-dropdown-wrapper" onMouseLeave={() => setProfileOpen(false)}>
+            <div className="profile-dropdown-wrapper">
               <button className="profile-trigger" onClick={() => setProfileOpen(!profileOpen)}>
                 <div className="profile-avatar">
                   <span>{user.name.split(' ').map(n=>n[0]).join('')}</span>

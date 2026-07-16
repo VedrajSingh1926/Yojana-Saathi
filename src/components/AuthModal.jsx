@@ -85,11 +85,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
           <div className="auth-alternative-footer">
             <p className="text-sm">
-              {isRegisterMode ? (
-                <span>Already have a household registered? <a href="#" className="text-gold" onClick={(e) => { e.preventDefault(); setIsRegisterMode(false); }}>Sign In instead</a></span>
-              ) : (
-                <span>Don't have an account? <a href="#" className="text-gold" onClick={(e) => { e.preventDefault(); setIsRegisterMode(true); }}>Register Household</a></span>
-              )}
+              <span>Don't have an account? <a href="#" className="text-gold" onClick={(e) => { e.preventDefault(); onClose(); window.location.hash = 'onboarding'; }}>Register Household</a></span>
             </p>
           </div>
         </div>

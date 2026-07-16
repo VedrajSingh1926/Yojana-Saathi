@@ -152,35 +152,50 @@ export default function AIPlanner({ initialPrompt }) {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="ai-generated-roadmap"
+                style={{
+                  background: 'var(--bg-card)',
+                  borderRadius: '16px',
+                  border: '1px solid var(--border-color)',
+                  padding: '2rem',
+                  marginTop: '1.5rem',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+                }}
               >
-                <div className="roadmap-headline">
-                  <h3 className="text-gold"><Compass size={18} style={{ display: 'inline', marginRight: '6px' }} /> Your Customized Welfare Roadmap</h3>
+                <div className="roadmap-headline" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+                  <h3 className="text-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--primary)' }}>
+                    <Compass size={24} /> Your Customized Welfare Roadmap
+                  </h3>
                   <button className="btn btn-outline btn-sm" onClick={() => alert('Roadmap PDF saved!')}>
-                    <Download size={14} /> Save Roadmap
+                    <Download size={16} /> Save PDF
                   </button>
                 </div>
 
                 <div className="mb-4">
-                  <h4 className="text-xs text-muted mb-2">TARGET PROGRAMS DETECTED:</h4>
-                  <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                  <h4 className="text-sm text-muted mb-3" style={{ fontWeight: 600, letterSpacing: '1px' }}>TARGET PROGRAMS DETECTED</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
                     {roadmap.schemes.map((s, idx) => (
-                      <div key={idx} className="glass-card" style={{ padding: '0.75rem 1rem', flexGrow: 1 }}>
-                        <strong>{s.name}</strong> ({s.status})
-                        <p className="text-xs text-gold font-semibold">{s.benefit}</p>
+                      <div key={idx} style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.25rem', position: 'relative' }}>
+                        <span style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px', background: 'var(--primary-glow)', color: 'var(--primary)', fontWeight: 'bold' }}>{s.status}</span>
+                        <h5 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', paddingRight: '4rem', color: 'var(--text-primary)' }}>{s.name}</h5>
+                        <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--success)', fontWeight: '600' }}>{s.benefit}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <h4 className="text-xs text-muted mb-2">YOUR TASK TIMELINE LOG:</h4>
-                <div className="roadmap-steps-list">
-                  {roadmap.steps.map((st, idx) => (
-                    <div key={idx} className="roadmap-step-card">
-                      <span className="roadmap-step-num">{st.num}</span>
-                      <h4>{st.name}</h4>
-                      <p>{st.desc}</p>
-                    </div>
-                  ))}
+                <div style={{ marginTop: '2rem' }}>
+                  <h4 className="text-sm text-muted mb-3" style={{ fontWeight: 600, letterSpacing: '1px' }}>YOUR TASK TIMELINE LOG</h4>
+                  <div className="roadmap-steps-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {roadmap.steps.map((st, idx) => (
+                      <div key={idx} className="roadmap-step-card" style={{ display: 'flex', gap: '1.5rem', background: 'rgba(0,0,0,0.02)', padding: '1.5rem', borderRadius: '12px', borderLeft: '4px solid var(--primary)' }}>
+                        <div style={{ flexShrink: 0, width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem' }}>{st.num}</div>
+                        <div>
+                          <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.1rem', color: 'var(--text-primary)' }}>{st.name}</h4>
+                          <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem' }}>{st.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Users, Network, IdCard, FolderOpen, Calendar, ShieldCheck, QrCode, Plus, CloudLightning } from 'lucide-react';
+import { Users, Network, IdCard, FolderOpen, Calendar, ShieldCheck, QrCode as QrCodeIcon, Plus, CloudLightning } from 'lucide-react';
+import QRCode from 'react-qr-code';
 import { motion } from 'framer-motion';
 
 export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }) {
@@ -244,42 +245,55 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
           )}
 
           {/* SUBTAB 3: Welfare Passport */}
-          {/* visual matches user requested design screenshot (simplified, no lists of claims, only head, members, unique ID, platform name, status) */}
           {subtab === 'passport' && (
-            <div className="passport-workspace animate-fade-in">
-              <div className="passport-card-entry">
-                <div className="passport-card-header">
+            <div className="passport-workspace animate-fade-in" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
+              <div className="passport-card-entry" style={{
+                background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(217,119,54,0.1) 100%)',
+                border: '1px solid var(--primary)',
+                borderRadius: '16px',
+                padding: '2rem',
+                width: '100%',
+                maxWidth: '450px',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '150px', height: '150px', background: 'var(--primary-glow)', borderRadius: '50%', filter: 'blur(30px)' }}></div>
+                
+                <div className="passport-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
                   <div className="passport-brand-block">
-                    <span className="passport-tagline">
-                      <ShieldCheck size={14} className="text-cyan" /> WELFARE PASSPORT
+                    <span className="passport-tagline" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary)', letterSpacing: '1px' }}>
+                      <ShieldCheck size={16} /> WELFARE PASSPORT
                     </span>
-                    <span className="passport-platform-title">Yojana Saathi</span>
+                    <span className="passport-platform-title" style={{ fontSize: '1.5rem', fontWeight: '800', marginTop: '0.25rem', display: 'block' }}>Yojana Saathi</span>
                   </div>
-                  <QrCode className="passport-qrcode-icon" />
+                  <div style={{ background: 'white', padding: '0.5rem', borderRadius: '8px' }}>
+                    <QRCode value={`YS-9824-${user.name}`} size={64} fgColor="#1c1c1c" />
+                  </div>
                 </div>
                 
-                <div className="passport-details-layout">
+                <div className="passport-details-layout" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   <div className="passport-field-head">
-                    <span className="passport-label">HOUSEHOLD HEAD</span>
-                    <span className="passport-value-head">{user.name.toUpperCase()}</span>
+                    <span className="passport-label" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>HOUSEHOLD HEAD</span>
+                    <span className="passport-value-head" style={{ fontSize: '1.2rem', fontWeight: '700', display: 'block', color: 'var(--text-primary)' }}>{user.name.toUpperCase()}</span>
                   </div>
                   
-                  <div className="passport-fields-row">
+                  <div className="passport-fields-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div>
-                      <span className="passport-label">MEMBERS</span>
-                      <span className="passport-value-normal">
+                      <span className="passport-label" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>MEMBERS</span>
+                      <span className="passport-value-normal" style={{ fontSize: '1rem', fontWeight: '600', display: 'block', color: 'var(--text-primary)' }}>
                         {String(user.family.length).padStart(2, '0')}
                       </span>
                     </div>
                     <div>
-                      <span className="passport-label">STATUS</span>
-                      <span className="passport-status-active">Verified</span>
+                      <span className="passport-label" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>STATUS</span>
+                      <span className="passport-status-active" style={{ fontSize: '1rem', fontWeight: '600', display: 'block', color: 'var(--success)' }}>Verified</span>
                     </div>
                   </div>
                   
                   <div>
-                    <span className="passport-label">YOJANA ID</span>
-                    <span className="passport-value-normal" style={{ letterSpacing: '1px', color: 'var(--primary)' }}>
+                    <span className="passport-label" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>YOJANA ID</span>
+                    <span className="passport-value-normal" style={{ fontSize: '1.25rem', fontWeight: '800', letterSpacing: '2px', color: 'var(--primary)', display: 'block' }}>
                       YS-9824
                     </span>
                   </div>

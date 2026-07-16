@@ -73,44 +73,9 @@ export default function Home({ onNavigate, onTriggerAuth }) {
           </p>
         </div>
 
-        {/* Hero Graphic - Interactive AI Node Network */}
+        {/* Hero Graphic - Aesthetic Image */}
         <div className="hero-graphic-container">
-          <div className="welfare-hub-vis">
-            {/* Center Ring */}
-            <div className="center-ai-node">
-              <div className="ai-pulse"></div>
-              <span className="ai-text">AI</span>
-            </div>
-            
-            {/* Outer Nodes */}
-            <div className="node-ring">
-              <div className="hub-node node-1" onClick={() => onNavigate('schemes')}>
-                <div className="node-icon"><Landmark size={20} /></div>
-                <span className="node-label">Schemes</span>
-              </div>
-              <div className="hub-node node-2" onClick={() => onNavigate('planner')}>
-                <div className="node-icon"><Brain size={20} /></div>
-                <span className="node-label">AI Planner</span>
-              </div>
-              <div className="hub-node node-3" onClick={() => onNavigate('family')}>
-                <div className="node-icon"><IdCard size={20} /></div>
-                <span className="node-label">Passport</span>
-              </div>
-              <div className="hub-node node-4" onClick={() => onNavigate('scam-shield')}>
-                <div className="node-icon"><Shield size={20} /></div>
-                <span className="node-label">Scam Shield</span>
-              </div>
-            </div>
-            
-            {/* Connection Lines (SVG) */}
-            <svg className="connection-lines" viewBox="0 0 400 400">
-              <circle cx="200" cy="200" r="120" className="orbit-path"></circle>
-              <line x1="200" y1="200" x2="200" y2="80" className="pulse-line line-1"></line>
-              <line x1="200" y1="200" x2="320" y2="200" className="pulse-line line-2"></line>
-              <line x1="200" y1="200" x2="200" y2="320" className="pulse-line line-3"></line>
-              <line x1="200" y1="200" x2="80" y2="200" className="pulse-line line-4"></line>
-            </svg>
-          </div>
+          <img src="/hero-image.png" alt="Happy Indian Family receiving welfare schemes" className="hero-image" style={{ width: '100%', maxWidth: '500px', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} />
         </div>
       </section>
 
@@ -118,8 +83,8 @@ export default function Home({ onNavigate, onTriggerAuth }) {
       <section className="section-container">
         <div className="section-header text-center">
           <span className="section-tagline">DISCOVER BY LIFE MILESTONES</span>
-          <h2 className="section-title">Welfare Tailored to Your Life Events</h2>
-          <p className="section-desc">Instead of guessing categories, select a milestone below to immediately see relevant assistance programs.</p>
+          <h2 className="section-title">Find Schemes by Life Events</h2>
+          <p className="section-desc">Choose a milestone below to instantly see helpful government programs.</p>
         </div>
         
         <div className="life-events-grid">
