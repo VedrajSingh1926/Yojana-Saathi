@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Network, IdCard, FolderOpen, Calendar, ShieldCheck, QrCode as QrCodeIcon, Plus, CloudLightning } from 'lucide-react';
+import { Users, User, Check, Network, IdCard, FolderOpen, Calendar, ShieldCheck, QrCode as QrCodeIcon, Plus, CloudLightning } from 'lucide-react';
 import QRCode from 'react-qr-code';
 import { motion } from 'framer-motion';
 
@@ -244,59 +244,136 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
             </div>
           )}
 
-          {/* SUBTAB 3: Welfare Passport */}
+          {/* SUBTAB 3: Welfare Passport (Saathi Card) */}
           {subtab === 'passport' && (
             <div className="passport-workspace animate-fade-in" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
-              <div className="passport-card-entry" style={{
-                background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(217,119,54,0.1) 100%)',
-                border: '1px solid var(--primary)',
-                borderRadius: '16px',
-                padding: '2rem',
+              
+              {/* Saathi Card Container */}
+              <div style={{
                 width: '100%',
-                maxWidth: '450px',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+                maxWidth: '650px',
+                background: '#fffcf5', // warm off-white
+                borderRadius: '24px',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
+                border: '1px solid #e5e7eb',
+                fontFamily: '"Plus Jakarta Sans", sans-serif'
               }}>
-                <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '150px', height: '150px', background: 'var(--primary-glow)', borderRadius: '50%', filter: 'blur(30px)' }}></div>
                 
-                <div className="passport-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
-                  <div className="passport-brand-block">
-                    <span className="passport-tagline" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary)', letterSpacing: '1px' }}>
-                      <ShieldCheck size={16} /> WELFARE PASSPORT
-                    </span>
-                    <span className="passport-platform-title" style={{ fontSize: '1.5rem', fontWeight: '800', marginTop: '0.25rem', display: 'block' }}>Yojana Saathi</span>
-                  </div>
-                  <div style={{ background: 'white', padding: '0.5rem', borderRadius: '8px' }}>
-                    <QRCode value={`YS-9824-${user.name}`} size={64} fgColor="#1c1c1c" />
-                  </div>
+                {/* Background Waves (Tricolor) */}
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '180px', zIndex: 0, overflow: 'hidden' }}>
+                  <svg viewBox="0 0 1440 320" preserveAspectRatio="none" style={{ position: 'absolute', bottom: '0', width: '100%', height: '100%' }}>
+                    {/* Saffron Wave */}
+                    <path fill="rgba(255, 153, 51, 0.4)" d="M0,128L48,144C96,160,192,192,288,181.3C384,171,480,117,576,96C672,75,768,85,864,117.3C960,149,1056,203,1152,213.3C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                    {/* White Layer to separate */}
+                    <path fill="rgba(255,255,255,0.7)" d="M0,160L48,170.7C96,181,192,203,288,186.7C384,171,480,117,576,106.7C672,96,768,128,864,165.3C960,203,1056,245,1152,250.7C1248,256,1344,224,1392,208L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                    {/* Green Wave */}
+                    <path fill="rgba(19, 136, 8, 0.4)" d="M0,192L48,197.3C96,203,192,213,288,197.3C384,181,480,139,576,128C672,117,768,139,864,170.7C960,203,1056,245,1152,256C1248,267,1344,245,1392,234.7L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                  </svg>
                 </div>
                 
-                <div className="passport-details-layout" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                  <div className="passport-field-head">
-                    <span className="passport-label" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>HOUSEHOLD HEAD</span>
-                    <span className="passport-value-head" style={{ fontSize: '1.2rem', fontWeight: '700', display: 'block', color: 'var(--text-primary)' }}>{user.name.toUpperCase()}</span>
+                {/* Ashoka Chakra watermark */}
+                <div style={{ position: 'absolute', top: '150px', right: '150px', opacity: 0.05, zIndex: 0 }}>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" alt="Chakra" width="300" />
+                </div>
+
+                {/* Dark Blue Footer */}
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '70px', background: '#0a1945', zIndex: 2, display: 'flex', alignItems: 'center', padding: '0 2rem', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff', fontSize: '0.85rem' }}>
+                    <ShieldCheck size={16} /> Secure. Trusted. Government of India
                   </div>
-                  
-                  <div className="passport-fields-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div>
-                      <span className="passport-label" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>MEMBERS</span>
-                      <span className="passport-value-normal" style={{ fontSize: '1rem', fontWeight: '600', display: 'block', color: 'var(--text-primary)' }}>
-                        {String(user.family.length).padStart(2, '0')}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="passport-label" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>STATUS</span>
-                      <span className="passport-status-active" style={{ fontSize: '1rem', fontWeight: '600', display: 'block', color: 'var(--success)' }}>Verified</span>
-                    </div>
-                  </div>
-                  
                   <div>
-                    <span className="passport-label" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>YOJANA ID</span>
-                    <span className="passport-value-normal" style={{ fontSize: '1.25rem', fontWeight: '800', letterSpacing: '2px', color: 'var(--primary)', display: 'block' }}>
-                      YS-9824
-                    </span>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Satyameva Jayate" height="40" style={{ filter: 'brightness(0) invert(1) opacity(0.8)' }} />
                   </div>
+                </div>
+
+                {/* Card Content (z-index 1) */}
+                <div style={{ position: 'relative', zIndex: 1, padding: '2rem 2.5rem 6rem 2.5rem' }}>
+                  
+                  {/* Top Bar */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#0a1945', fontWeight: 'bold', fontSize: '0.85rem', letterSpacing: '1px' }}>
+                      <ShieldCheck size={18} /> WELFARE PASSPORT
+                    </div>
+                    <div style={{ background: '#fff', padding: '0.5rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                      <QRCode value={`YS-9824-${user.name}`} size={80} fgColor="#0a1945" />
+                    </div>
+                  </div>
+
+                  {/* Title Area */}
+                  <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', marginBottom: '2.5rem', marginTop: '-2rem' }}>
+                    <div style={{ width: '80px', height: '80px', background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', border: '3px solid #0a1945', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}>
+                      <Users size={40} />
+                    </div>
+                    <div>
+                      <h1 style={{ margin: 0, fontSize: '3rem', fontWeight: '800', color: '#0a1945', letterSpacing: '-1px' }}>Yojana Saathi</h1>
+                      <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '1.1rem', fontWeight: '500' }}>One Platform. Every Scheme. Every Citizen.</p>
+                    </div>
+                  </div>
+
+                  {/* Grid Data */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {/* Head */}
+                    <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', background: 'rgba(255,255,255,0.6)', padding: '1rem', borderRadius: '12px' }}>
+                      <div style={{ background: '#bfdbfe', padding: '0.75rem', borderRadius: '12px', color: '#1d4ed8' }}>
+                        <User size={24} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', letterSpacing: '1px' }}>HOUSEHOLD HEAD</div>
+                        <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#0a1945' }}>{user.name.toUpperCase()}</div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                      {/* Members */}
+                      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', background: 'rgba(255,255,255,0.6)', padding: '1rem', borderRadius: '12px' }}>
+                        <div style={{ background: '#bbf7d0', padding: '0.75rem', borderRadius: '12px', color: '#15803d' }}>
+                          <Users size={20} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', letterSpacing: '1px' }}>MEMBERS</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#15803d' }}>{String(user.family.length).padStart(2, '0')}</div>
+                        </div>
+                      </div>
+
+                      {/* Status */}
+                      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', background: 'rgba(255,255,255,0.6)', padding: '1rem', borderRadius: '12px' }}>
+                        <div style={{ background: '#bbf7d0', padding: '0.75rem', borderRadius: '12px', color: '#15803d' }}>
+                          <ShieldCheck size={20} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', letterSpacing: '1px' }}>STATUS</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#15803d', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            Verified <span style={{ background: '#15803d', color: '#fff', borderRadius: '50%', padding: '2px', display: 'flex' }}><Check size={12}/></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Yojana ID */}
+                      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', background: 'rgba(255,255,255,0.6)', padding: '1rem', borderRadius: '12px' }}>
+                        <div style={{ background: '#fed7aa', padding: '0.75rem', borderRadius: '12px', color: '#c2410c' }}>
+                          <IdCard size={20} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', letterSpacing: '1px' }}>YOJANA ID</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#c2410c' }}>YS-9824</div>
+                        </div>
+                      </div>
+
+                      {/* Created On */}
+                      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', background: 'rgba(255,255,255,0.6)', padding: '1rem', borderRadius: '12px' }}>
+                        <div style={{ background: '#ddd6fe', padding: '0.75rem', borderRadius: '12px', color: '#6d28d9' }}>
+                          <Calendar size={20} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', letterSpacing: '1px' }}>SAATHI CARD</div>
+                          <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#0a1945' }}>Created on<br/>16 July 2026</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>

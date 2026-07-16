@@ -4,6 +4,9 @@ import { Check, ChevronRight, User, Home, FileText, Upload, Target, Sparkles, Lo
 
 export default function Onboarding({ onComplete }) {
   const [step, setStep] = useState(1);
+  const [otpSent, setOtpSent] = useState(false);
+  const [mobileOtp, setMobileOtp] = useState(['', '', '', '']);
+  const [emailOtp, setEmailOtp] = useState(['', '', '', '']);
   const [formData, setFormData] = useState({
     personal: { name: '', phone: '', email: '', age: '', gender: 'Male', state: '', district: '' },
     household: { isHead: 'Yes', familyType: 'Nuclear', members: [] },
@@ -19,7 +22,7 @@ export default function Onboarding({ onComplete }) {
   const prevStep = () => setStep(s => s - 1);
 
   const handleFinish = async () => {
-    setStep(6);
+    setStep(7);
     const messages = [
       "Creating Household Profile...",
       "Building Family Tree...",
@@ -32,13 +35,18 @@ export default function Onboarding({ onComplete }) {
     
     // Save to MongoDB in background
     try {
-      await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
+      if (!response.ok) {
+        console.error("Backend error:", await response.text());
+        alert("Warning: Failed to save to MongoDB. Is the backend running?");
+      }
     } catch (err) {
       console.error("Failed to save profile", err);
+      alert("Warning: Could not connect to backend server. Data will not be saved.");
     }
 
     const interval = setInterval(() => {
@@ -82,11 +90,11 @@ export default function Onboarding({ onComplete }) {
 
   return (
     <div className="view-section animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto', paddingTop: '2rem' }}>
-      {step < 6 && (
+      {step < 7 && (
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '50%', left: '0', right: '0', height: '2px', background: 'var(--border-color)', zIndex: -1 }}></div>
-          <div style={{ position: 'absolute', top: '50%', left: '0', width: `${((step - 1) / 4) * 100}%`, height: '2px', background: 'var(--primary)', zIndex: -1, transition: 'width 0.3s' }}></div>
-          {[1, 2, 3, 4, 5].map(num => (
+          <div style={{ position: 'absolute', top: '50%', left: '0', width: `${((step - 1) / 5) * 100}%`, height: '2px', background: 'var(--primary)', zIndex: -1, transition: 'width 0.3s' }}></div>
+          {[1, 2, 3, 4, 5, 6].map(num => (
             <div key={num} style={{ 
               width: '32px', height: '32px', borderRadius: '50%', 
               background: step >= num ? 'var(--primary)' : 'var(--bg-darker)',
@@ -141,7 +149,13 @@ export default function Onboarding({ onComplete }) {
               </div>
             </div>
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-              <button className="btn btn-primary" onClick={nextStep}>Next <ChevronRight size={18} /></button>
+              <button type="button" className="btn btn-primary" onClick={() => {
+                if (!formData.personal.phone || !formData.personal.email) {
+                  alert("Please enter both phone number and email for verification.");
+                  return;
+                }
+                nextStep();
+              }}>Next <ChevronRight size={18} /></button>
             </div>
           </motion.div>
         )}
@@ -149,7 +163,85 @@ export default function Onboarding({ onComplete }) {
         {step === 2 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <Home size={24} /> Step 2 — Household Information
+              <User size={24} /> Step 2 — Identity Verification
+            </h2>
+            <p className="text-muted mb-4">Verify your phone and email to secure your account</p>
+            
+            <div className="grid-2-col" style={{ gap: '2rem', marginBottom: '2rem' }}>
+              <div style={{ background: 'var(--bg-darkest)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                <h4 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Mobile OTP</h4>
+                <p className="text-sm text-muted mb-3">Sent to {formData.personal.phone}</p>
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                  {[0, 1, 2, 3].map(i => (
+                    <input 
+                      key={i} 
+                      type="text" 
+                      maxLength="1" 
+                      className="form-input" 
+                      value={mobileOtp[i]}
+                      onChange={(e) => {
+                        const newOtp = [...mobileOtp];
+                        newOtp[i] = e.target.value;
+                        setMobileOtp(newOtp);
+                        if (e.target.value && e.target.nextSibling) e.target.nextSibling.focus();
+                      }}
+                      style={{ width: '45px', height: '45px', textAlign: 'center', fontSize: '1.2rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)' }} 
+                    />
+                  ))}
+                </div>
+                {!otpSent ? (
+                  <button className="btn btn-outline btn-sm" onClick={() => setOtpSent(true)}>Send OTP</button>
+                ) : (
+                  <span className="text-success text-sm" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Check size={14}/> Sent successfully</span>
+                )}
+              </div>
+
+              <div style={{ background: 'var(--bg-darkest)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                <h4 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Email OTP</h4>
+                <p className="text-sm text-muted mb-3">Sent to {formData.personal.email}</p>
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                  {[0, 1, 2, 3].map(i => (
+                    <input 
+                      key={i} 
+                      type="text" 
+                      maxLength="1" 
+                      className="form-input" 
+                      value={emailOtp[i]}
+                      onChange={(e) => {
+                        const newOtp = [...emailOtp];
+                        newOtp[i] = e.target.value;
+                        setEmailOtp(newOtp);
+                        if (e.target.value && e.target.nextSibling) e.target.nextSibling.focus();
+                      }}
+                      style={{ width: '45px', height: '45px', textAlign: 'center', fontSize: '1.2rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)' }} 
+                    />
+                  ))}
+                </div>
+                {!otpSent ? (
+                  <button className="btn btn-outline btn-sm" onClick={() => setOtpSent(true)}>Send OTP</button>
+                ) : (
+                  <span className="text-success text-sm" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Check size={14}/> Sent successfully</span>
+                )}
+              </div>
+            </div>
+
+            <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
+              <button type="button" className="btn btn-text" onClick={prevStep}>Back</button>
+              <button type="button" className="btn btn-primary" onClick={() => {
+                if (mobileOtp.join('').length < 4 || emailOtp.join('').length < 4) {
+                  alert("Please enter the 4-digit OTPs (for demo, any 4 digits work)");
+                  return;
+                }
+                nextStep();
+              }}>Verify & Next <ChevronRight size={18} /></button>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 3 && (
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
+              <Home size={24} /> Step 3 — Household Information
             </h2>
             <p className="text-muted mb-4">Tell us about your family</p>
             <div className="grid-2-col" style={{ gap: '1.5rem', marginBottom: '2rem' }}>
@@ -208,16 +300,16 @@ export default function Onboarding({ onComplete }) {
             )}
 
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
-              <button className="btn btn-text" onClick={prevStep}>Back</button>
-              <button className="btn btn-primary" onClick={nextStep}>Next <ChevronRight size={18} /></button>
+              <button type="button" className="btn btn-text" onClick={prevStep}>Back</button>
+              <button type="button" className="btn btn-primary" onClick={nextStep}>Next <ChevronRight size={18} /></button>
             </div>
           </motion.div>
         )}
 
-        {step === 3 && (
+        {step === 4 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <FileText size={24} /> Step 3 — Household Details
+              <FileText size={24} /> Step 4 — Household Details
             </h2>
             <p className="text-muted mb-4">Information to identify eligible schemes</p>
             <div className="grid-2-col" style={{ gap: '1.5rem' }}>
@@ -230,16 +322,16 @@ export default function Onboarding({ onComplete }) {
               <div className="form-group"><label>Land Ownership</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>None</option><option>Agricultural</option><option>Residential</option></select></div>
             </div>
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
-              <button className="btn btn-text" onClick={prevStep}>Back</button>
-              <button className="btn btn-primary" onClick={nextStep}>Next <ChevronRight size={18} /></button>
+              <button type="button" className="btn btn-text" onClick={prevStep}>Back</button>
+              <button type="button" className="btn btn-primary" onClick={nextStep}>Next <ChevronRight size={18} /></button>
             </div>
           </motion.div>
         )}
 
-        {step === 4 && (
+        {step === 5 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <Upload size={24} /> Step 4 — Documents (Optional)
+              <Upload size={24} /> Step 5 — Documents (Optional)
             </h2>
             <p className="text-muted mb-4">For Hackathon Demo - Upload if available (optional):</p>
             
@@ -257,16 +349,16 @@ export default function Onboarding({ onComplete }) {
             </div>
 
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
-              <button className="btn btn-text" onClick={prevStep}>Back</button>
-              <button className="btn btn-primary" onClick={nextStep}>Next <ChevronRight size={18} /></button>
+              <button type="button" className="btn btn-text" onClick={prevStep}>Back</button>
+              <button type="button" className="btn btn-primary" onClick={nextStep}>Next <ChevronRight size={18} /></button>
             </div>
           </motion.div>
         )}
 
-        {step === 5 && (
+        {step === 6 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <Target size={24} /> Step 5 — Goals & Priorities
+              <Target size={24} /> Step 6 — Goals & Priorities
             </h2>
             <p className="text-muted mb-4">What would you like AI to help you with?</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -289,13 +381,13 @@ export default function Onboarding({ onComplete }) {
             <p className="text-sm text-muted">The AI uses these priorities to personalize recommendations.</p>
 
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
-              <button className="btn btn-text" onClick={prevStep}>Back</button>
-              <button className="btn btn-primary" onClick={handleFinish}>Complete Setup <Sparkles size={18} style={{ marginLeft: '6px' }}/></button>
+              <button type="button" className="btn btn-text" onClick={prevStep}>Back</button>
+              <button type="button" className="btn btn-primary" onClick={handleFinish}>Complete Setup <Sparkles size={18} style={{ marginLeft: '6px' }}/></button>
             </div>
           </motion.div>
         )}
 
-        {step === 6 && (
+        {step === 7 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', padding: '4rem 2rem' }}>
             {loadingMsg.includes("Welcome") ? (
               <div style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>

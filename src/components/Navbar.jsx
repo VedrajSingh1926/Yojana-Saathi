@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Languages, MapPin, Bell, Landmark, User, LogOut, ChevronDown, Menu, X, Sparkles } from 'lucide-react';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+
 export default function Navbar({ 
   activeView, 
   onNavigate, 
@@ -154,8 +156,17 @@ export default function Navbar({
           <div className="auth-buttons-container">
             {!user ? (
               <>
-                <button className="btn btn-text" onClick={() => onTriggerAuth(false)}>Login</button>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <button className="btn btn-text">Login</button>
+                  </SignInButton>
+                </SignedOut>
                 <button className="btn btn-primary" onClick={() => onTriggerAuth(true)}>Get Started</button>
+                <SignedIn>
+                  <div style={{ marginLeft: '1rem' }}>
+                    <UserButton afterSignOutUrl="/" />
+                  </div>
+                </SignedIn>
               </>
             ) : (
               <div className="profile-dropdown-wrapper">

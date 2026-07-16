@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
 :root {
-  /* Premium Warm Soft Light Theme Palette */
+  /* Premium Warm Soft Theme Palette */
   --bg-darkest: #fcf9f2; /* Softer, warmer off-white */
   --bg-darker: #f5ead8; /* Warm beige */
   --bg-dark: #ebd8bd;
@@ -17,9 +17,9 @@
   --secondary: #2b7a78; /* Teal contrast */
   --secondary-glow: rgba(43, 122, 120, 0.15);
   
-  --text-primary: #1c1c1c;
-  --text-secondary: #4a4a4a;
-  --text-muted: #757575;
+  --text-primary: #2d241f; /* Very dark warm gray */
+  --text-secondary: #574e48; /* Dark warm gray */
+  --text-muted: #857b75; /* Medium warm gray */
   --text-gold: #b35f20;
 
   --success: #2e8540;
@@ -145,8 +145,12 @@ button, input, select, textarea {
   border-radius: var(--border-radius-md);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 0.95rem;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--primary-glow);
 }
 .btn-lg {
   padding: 0.9rem 2rem;
@@ -206,16 +210,17 @@ button, input, select, textarea {
 /* Glassmorphism Cards */
 .glass-card {
   background: var(--bg-card);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-lg);
   padding: 1.5rem;
-  transition: var(--transition);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
 }
 .glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
   border-color: var(--border-color-hover);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 /* ==================== LAYOUT COMPONENTS ==================== */
@@ -261,12 +266,13 @@ button, input, select, textarea {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: var(--nav-height);
-  background: rgba(3, 7, 18, 0.85); /* Slightly darker for better contrast */
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  right: 0;
+  height: 70px;
+  background: rgba(255, 252, 245, 0.85); /* Warm off-white, semi-transparent */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 2px solid rgba(245, 158, 11, 0.3); /* Subtle saffron border */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -296,12 +302,12 @@ button, input, select, textarea {
 .logo-title {
   font-weight: 700;
   font-size: 1.25rem;
-  color: #ffffff; /* Fix: White text for visibility */
+  color: #0a1945; /* Dark blue text */
   letter-spacing: 0.5px;
 }
 .logo-tagline {
   font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.7); /* Fix: Light text for visibility */
+  color: #64748b; /* Darker muted text */
   font-weight: 500;
 }
 
@@ -312,12 +318,12 @@ button, input, select, textarea {
 .nav-link {
   font-weight: 500;
   font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.7); /* Fix: Light text */
+  color: #64748b; /* Darker muted text */
   position: relative;
   padding: 0.5rem 0;
 }
 .nav-link:hover, .nav-link.active {
-  color: #ffffff; /* Fix: White text on active/hover */
+  color: #d97736; /* Warm terracotta */
 }
 .nav-link::after {
   content: '';
@@ -344,9 +350,9 @@ button, input, select, textarea {
   position: relative;
 }
 .dropdown-trigger {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff; /* Fix: White text */
+  background: rgba(217, 119, 54, 0.1);
+  border: 1px solid rgba(217, 119, 54, 0.2);
+  color: #d97736; /* Warm terracotta text */
   padding: 0.5rem 1rem;
   border-radius: var(--border-radius-md);
   display: flex;

@@ -94,8 +94,12 @@ export default function AIPlanner({ initialPrompt }) {
         ];
       }
 
-      setChat(prev => [...prev, { id: Date.now(), sender: 'system', text: responseText }]);
-      setRoadmap({ schemes: targetSchemes, steps });
+      setChat(prev => [...prev, { 
+        id: Date.now(), 
+        sender: 'system', 
+        text: responseText,
+        roadmap: { schemes: targetSchemes, steps }
+      }]);
     }, 1200);
   };
 
@@ -131,8 +135,58 @@ export default function AIPlanner({ initialPrompt }) {
             {chat.map(msg => (
               <div key={msg.id} className={`message ${msg.sender === 'user' ? 'user-message' : 'system-message'}`}>
                 {msg.sender === 'system' && <div className="bot-avatar"><Sparkles size={16} /></div>}
-                <div className="message-bubble">
+                <div className="message-bubble" style={{ maxWidth: msg.roadmap ? '800px' : undefined }}>
                   <p>{msg.text}</p>
+                  
+                  {msg.roadmap && msg.roadmap.schemes && msg.roadmap.schemes.length > 0 && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="ai-generated-roadmap"
+                      style={{
+                        paddingTop: '1rem',
+                        marginTop: '1rem',
+                        borderTop: '1px dashed var(--border-color)'
+                      }}
+                    >
+                      <div className="roadmap-headline" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--primary)', fontSize: '1.1rem' }}>
+                          <Compass size={18} /> Recommended Action Plan
+                        </h3>
+                        <button className="btn btn-outline btn-sm" onClick={() => alert('Roadmap PDF saved!')} style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}>
+                          <Download size={14} /> Save PDF
+                        </button>
+                      </div>
+
+                      <div className="mb-4">
+                        <h4 className="text-sm mb-2" style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>TARGET PROGRAMS</h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          {msg.roadmap.schemes.map((s, idx) => (
+                            <div key={idx} style={{ padding: '0.75rem', position: 'relative' }}>
+                              <span style={{ position: 'absolute', top: '10px', right: '0', fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 'bold' }}>{s.status}</span>
+                              <h5 style={{ margin: '0 0 0.25rem 0', fontSize: '1rem', color: 'var(--text-primary)' }}>• {s.name}</h5>
+                              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--primary)', fontWeight: '500', paddingLeft: '1rem' }}>Benefit: {s.benefit}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div style={{ marginTop: '1.5rem' }}>
+                        <h4 className="text-sm mb-2" style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>TASK TIMELINE</h4>
+                        <div className="roadmap-steps-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingLeft: '0.5rem' }}>
+                          {msg.roadmap.steps.map((st, idx) => (
+                            <div key={idx} style={{ display: 'flex', gap: '1rem', padding: '0.75rem 0' }}>
+                              <div style={{ flexShrink: 0, width: '24px', height: '24px', borderRadius: '50%', background: 'var(--primary-glow)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.85rem' }}>{st.num}</div>
+                              <div>
+                                <h4 style={{ margin: '0 0 0.2rem 0', fontSize: '0.95rem', color: 'var(--text-primary)' }}>{st.name}</h4>
+                                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.4' }}>{st.desc}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
                 {msg.sender === 'user' && <div className="user-avatar">👤</div>}
               </div>
@@ -144,60 +198,6 @@ export default function AIPlanner({ initialPrompt }) {
                 <span className="dot"></span>
                 <span className="dot"></span>
               </div>
-            )}
-
-            {/* Dynamic AI Output Roadmap */}
-            {roadmap && (
-              <motion.div 
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="ai-generated-roadmap"
-                style={{
-                  background: 'var(--bg-card)',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border-color)',
-                  padding: '2rem',
-                  marginTop: '1.5rem',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
-                }}
-              >
-                <div className="roadmap-headline" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
-                  <h3 className="text-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--primary)' }}>
-                    <Compass size={24} /> Your Customized Welfare Roadmap
-                  </h3>
-                  <button className="btn btn-outline btn-sm" onClick={() => alert('Roadmap PDF saved!')}>
-                    <Download size={16} /> Save PDF
-                  </button>
-                </div>
-
-                <div className="mb-4">
-                  <h4 className="text-sm text-muted mb-3" style={{ fontWeight: 600, letterSpacing: '1px' }}>TARGET PROGRAMS DETECTED</h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-                    {roadmap.schemes.map((s, idx) => (
-                      <div key={idx} style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.25rem', position: 'relative' }}>
-                        <span style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px', background: 'var(--primary-glow)', color: 'var(--primary)', fontWeight: 'bold' }}>{s.status}</span>
-                        <h5 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', paddingRight: '4rem', color: 'var(--text-primary)' }}>{s.name}</h5>
-                        <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--success)', fontWeight: '600' }}>{s.benefit}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div style={{ marginTop: '2rem' }}>
-                  <h4 className="text-sm text-muted mb-3" style={{ fontWeight: 600, letterSpacing: '1px' }}>YOUR TASK TIMELINE LOG</h4>
-                  <div className="roadmap-steps-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {roadmap.steps.map((st, idx) => (
-                      <div key={idx} className="roadmap-step-card" style={{ display: 'flex', gap: '1.5rem', background: 'rgba(0,0,0,0.02)', padding: '1.5rem', borderRadius: '12px', borderLeft: '4px solid var(--primary)' }}>
-                        <div style={{ flexShrink: 0, width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem' }}>{st.num}</div>
-                        <div>
-                          <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.1rem', color: 'var(--text-primary)' }}>{st.name}</h4>
-                          <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem' }}>{st.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
             )}
             <div ref={messagesEndRef} />
           </div>
