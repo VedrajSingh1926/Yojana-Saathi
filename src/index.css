@@ -267,7 +267,7 @@ button, input, select, textarea {
   top: 0;
   left: 0;
   right: 0;
-  height: 70px;
+  height: 90px;
   background: rgba(255, 252, 245, 0.85); /* Warm off-white, semi-transparent */
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
