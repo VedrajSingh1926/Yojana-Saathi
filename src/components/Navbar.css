@@ -13,18 +13,18 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 88px;
+  height: 96px;
   width: 100%;
   z-index: 1000;
   display: flex;
   align-items: center;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  background: transparent;
+  background: var(--lux-bg);
   border-bottom: 1px solid transparent;
 }
 
 .luxury-navbar.scrolled {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(250, 250, 248, 0.78);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--lux-border);
@@ -33,22 +33,25 @@
 
 .lux-container {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 100%;
+  position: relative;
 }
 
 /* Logo */
 .lux-brand {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   text-decoration: none;
   cursor: pointer;
+  flex-shrink: 0;
+  z-index: 10;
 }
 
 .lux-logo-img {
@@ -65,8 +68,8 @@
 
 .lux-brand-title {
   font-family: 'Outfit', sans-serif;
-  font-weight: 600;
-  font-size: 20px;
+  font-weight: 700;
+  font-size: 30px;
   color: var(--lux-text);
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -74,33 +77,41 @@
 
 .lux-brand-sub {
   font-family: 'Inter', sans-serif;
-  font-weight: 400;
-  font-size: 12px;
-  color: var(--lux-muted);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--lux-text);
+  opacity: 0.6;
   margin-top: 2px;
+  white-space: nowrap;
 }
 
 /* Navigation Links */
 .lux-nav-links {
   display: flex;
-  gap: 36px;
+  gap: 42px;
   align-items: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .lux-nav-link {
   font-family: 'Inter', sans-serif;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 17px;
   color: var(--lux-muted);
   text-decoration: none;
   position: relative;
   padding: 8px 0;
-  transition: color 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 
 .lux-nav-link:hover {
   color: var(--lux-text);
+  transform: translateY(-2px);
 }
 
 .lux-nav-link::after {
@@ -131,100 +142,145 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  z-index: 10;
 }
 
 /* Dropdowns & Buttons */
 .lux-pill {
-  height: 48px;
-  border-radius: 24px;
-  padding: 0 16px;
+  height: 52px;
+  border-radius: 26px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.5);
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.6);
   border: 1px solid var(--lux-border);
   color: var(--lux-text);
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
 }
 
 .lux-pill:hover {
   background: #fff;
-  border-color: rgba(199, 169, 107, 0.3);
-  box-shadow: 0 0 15px rgba(199, 169, 107, 0.15);
+  border-color: var(--lux-accent);
+  box-shadow: 0 6px 16px rgba(199, 169, 107, 0.12);
+  transform: translateY(-2px);
+}
+
+.lux-pill .chevron-icon {
+  transition: transform 0.3s ease;
+}
+
+.lux-pill:hover .chevron-icon {
+  transform: rotate(180deg);
 }
 
 .lux-icon-btn {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.6);
   border: 1px solid var(--lux-border);
   color: var(--lux-text);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
   position: relative;
 }
 
 .lux-icon-btn:hover {
   background: #fff;
-  border-color: rgba(199, 169, 107, 0.3);
-  box-shadow: 0 0 15px rgba(199, 169, 107, 0.15);
+  border-color: var(--lux-accent);
+  box-shadow: 0 6px 16px rgba(199, 169, 107, 0.12);
+  transform: translateY(-2px);
+}
+
+.lux-icon-btn .bell-icon {
+  transition: transform 0.3s ease;
+}
+
+.lux-icon-btn:hover .bell-icon {
+  transform: rotate(15deg) scale(1.1);
 }
 
 .lux-badge {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 10px;
+  right: 10px;
   width: 8px;
   height: 8px;
   background-color: #ef4444;
   border-radius: 50%;
   box-shadow: 0 0 0 2px #fff;
+  animation: luxPulse 2s infinite;
+}
+
+@keyframes luxPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
 /* Login Button */
 .lux-login-btn {
   font-family: 'Inter', sans-serif;
   font-weight: 500;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--lux-text);
   background: none;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 16px;
   cursor: pointer;
   position: relative;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .lux-login-btn:hover {
   color: var(--lux-accent);
 }
 
+.lux-login-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--lux-accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lux-login-btn:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
 /* Get Started Button */
 .lux-cta-btn {
-  height: 48px;
-  padding: 0 32px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #D4AF37 0%, #AA8034 100%);
+  height: 52px;
+  padding: 0 34px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, #D6B46B 0%, #B8892F 100%);
   color: #fff;
   font-family: 'Outfit', sans-serif;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 16px;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 14px rgba(199, 169, 107, 0.25);
+  box-shadow: 0 4px 14px rgba(214, 180, 107, 0.25);
   overflow: hidden;
   position: relative;
 }
@@ -236,13 +292,13 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
   transition: all 0.6s ease;
 }
 
 .lux-cta-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(199, 169, 107, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(214, 180, 107, 0.4);
 }
 
 .lux-cta-btn:hover::before {
@@ -250,7 +306,7 @@
 }
 
 .lux-cta-btn:hover .arrow-icon {
-  transform: translateX(4px);
+  transform: translateX(6px);
 }
 
 .arrow-icon {
@@ -260,24 +316,24 @@
 /* Dropdown Menus */
 .lux-dropdown {
   position: absolute;
-  top: calc(100% + 12px);
+  top: calc(100% + 16px);
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(24px);
   border: 1px solid var(--lux-border);
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08);
   padding: 8px;
-  min-width: 220px;
+  min-width: 240px;
   z-index: 1001;
   transform-origin: top right;
 }
 
 .lux-dropdown-item {
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 14px 18px;
+  border-radius: 12px;
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--lux-text);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -296,8 +352,8 @@
   border: none;
   background: transparent;
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  padding: 12px;
+  font-size: 15px;
+  padding: 14px;
   outline: none;
   border-bottom: 1px solid var(--lux-border);
   margin-bottom: 8px;
@@ -320,30 +376,31 @@
   left: 0;
   width: 100%;
   height: 100vh;
-  background: var(--lux-bg);
+  background: rgba(250, 250, 248, 0.98);
+  backdrop-filter: blur(20px);
   z-index: 2000;
   display: flex;
   flex-direction: column;
-  padding: 24px;
+  padding: 32px 24px;
 }
 
 .lux-drawer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 48px;
 }
 
 .lux-drawer-links {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
 }
 
 .lux-drawer-link {
   font-family: 'Outfit', sans-serif;
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 32px;
+  font-weight: 700;
   color: var(--lux-text);
   text-decoration: none;
 }
@@ -360,9 +417,19 @@
 }
 
 /* Responsive */
+@media (max-width: 1280px) {
+  .lux-nav-links {
+    position: static;
+    transform: none;
+  }
+}
+
 @media (max-width: 1024px) {
   .luxury-navbar {
     height: 72px;
+  }
+  .lux-container {
+    padding: 0 32px;
   }
   .lux-nav-links, .lux-login-btn {
     display: none;
@@ -377,9 +444,12 @@
     height: 64px;
   }
   .lux-container {
-    padding: 0 20px;
+    padding: 0 24px;
   }
   .lux-pill, .lux-icon-btn, .lux-cta-btn {
+    display: none;
+  }
+  .lux-brand-sub {
     display: none;
   }
 }

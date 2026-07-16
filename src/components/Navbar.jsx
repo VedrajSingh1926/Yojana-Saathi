@@ -48,9 +48,19 @@ export default function Navbar({
   ];
 
   const dropdownVariants = {
-    hidden: { opacity: 0, y: 10, scale: 0.95 },
-    visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 24 } },
-    exit: { opacity: 0, y: 10, scale: 0.95, transition: { duration: 0.2 } }
+    hidden: { opacity: 0, y: 15, scale: 0.95 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 350, damping: 25 } },
+    exit: { opacity: 0, y: 15, scale: 0.95, transition: { duration: 0.2 } }
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } }
+  };
+
+  const linkVariants = {
+    hidden: { opacity: 0, y: -15 },
+    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };
 
   return (
@@ -68,9 +78,9 @@ export default function Navbar({
             href="#" 
             className="lux-brand" 
             onClick={(e) => { e.preventDefault(); onNavigate('home'); }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           >
             <img src="/Logo.png" alt="Yojana Saathi" className="lux-logo-img" />
             <div className="lux-brand-text">
@@ -79,38 +89,44 @@ export default function Navbar({
             </div>
           </motion.a>
 
-          {/* Center Links */}
-          <nav className="lux-nav-links">
-            {navLinks.map((link, i) => (
+          {/* Center Links (Staggered Animation) */}
+          <motion.nav 
+            className="lux-nav-links"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {navLinks.map((link) => (
               <motion.a
                 key={link.id}
+                variants={linkVariants}
                 href={`#${link.id}`}
                 className={`lux-nav-link ${(activeView === link.id || (link.id === 'schemes' && activeView === 'detail')) ? 'active' : ''}`}
                 onClick={(e) => { e.preventDefault(); onNavigate(link.id); }}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + (i * 0.1) }}
               >
                 {link.label}
               </motion.a>
             ))}
-          </nav>
+          </motion.nav>
 
           {/* Right Actions */}
-          <div className="lux-actions">
+          <motion.div 
+            className="lux-actions"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+          >
             
             {/* Language */}
             <div style={{ position: 'relative' }}>
-              <motion.button 
+              <button 
                 className="lux-pill" 
                 onClick={() => { setLangOpen(!langOpen); setStateOpen(false); setNotiOpen(false); }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
               >
-                <Languages size={16} />
+                <Languages size={18} />
                 <span>{langMap[lang]}</span>
-                <ChevronDown size={14} />
-              </motion.button>
+                <ChevronDown size={16} className="chevron-icon" />
+              </button>
               
               <AnimatePresence>
                 {langOpen && (
@@ -137,16 +153,14 @@ export default function Navbar({
 
             {/* State */}
             <div style={{ position: 'relative' }}>
-              <motion.button 
+              <button 
                 className="lux-pill" 
                 onClick={() => { setStateOpen(!stateOpen); setLangOpen(false); setNotiOpen(false); }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
               >
-                <MapPin size={16} />
+                <MapPin size={18} />
                 <span>{stateLocation}</span>
-                <ChevronDown size={14} />
-              </motion.button>
+                <ChevronDown size={16} className="chevron-icon" />
+              </button>
 
               <AnimatePresence>
                 {stateOpen && (
@@ -165,7 +179,7 @@ export default function Navbar({
                       onChange={e => setStateSearch(e.target.value)}
                       autoFocus
                     />
-                    <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                    <div style={{ maxHeight: '240px', overflowY: 'auto' }}>
                       {filteredStates.map(st => (
                         <div 
                           key={st} 
@@ -183,44 +197,42 @@ export default function Navbar({
 
             {/* Notifications */}
             <div style={{ position: 'relative' }}>
-              <motion.button 
+              <button 
                 className="lux-icon-btn" 
                 onClick={() => { setNotiOpen(!notiOpen); setLangOpen(false); setStateOpen(false); }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
               >
-                <Bell size={18} />
+                <Bell size={20} className="bell-icon" />
                 {unreadCount > 0 && <span className="lux-badge" />}
-              </motion.button>
+              </button>
 
               <AnimatePresence>
                 {notiOpen && (
                   <motion.div 
                     className="lux-dropdown"
-                    style={{ width: '300px', right: '-80px' }}
+                    style={{ width: '320px', right: '-40px' }}
                     variants={dropdownVariants}
                     initial="hidden"
                     animate="visible"
                     exit="exit"
                   >
-                    <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--lux-border)', display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontWeight: 600 }}>Alerts</span>
-                      <span style={{ fontSize: '12px', color: 'var(--lux-accent)', cursor: 'pointer' }} onClick={onClearNoti}>Clear</span>
+                    <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--lux-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontWeight: 600, fontSize: '15px' }}>Welfare Alerts</span>
+                      <span style={{ fontSize: '13px', color: 'var(--lux-accent)', cursor: 'pointer', fontWeight: 500 }} onClick={onClearNoti}>Clear All</span>
                     </div>
-                    <div style={{ maxHeight: '300px', overflowY: 'auto', padding: '8px 0' }}>
+                    <div style={{ maxHeight: '350px', overflowY: 'auto', padding: '8px 0' }}>
                       {notifications.length === 0 ? (
-                        <div style={{ padding: '16px', textAlign: 'center', color: 'var(--lux-muted)', fontSize: '14px' }}>No new alerts.</div>
+                        <div style={{ padding: '24px', textAlign: 'center', color: 'var(--lux-muted)', fontSize: '14px' }}>No new alerts.</div>
                       ) : (
                         notifications.map(n => (
                           <div 
                             key={n.id} 
-                            style={{ padding: '12px', display: 'flex', gap: '12px', cursor: 'pointer', background: n.read ? 'transparent' : 'rgba(199,169,107,0.05)' }}
+                            style={{ padding: '16px', display: 'flex', gap: '14px', cursor: 'pointer', background: n.read ? 'transparent' : 'rgba(199,169,107,0.04)', borderBottom: '1px solid rgba(0,0,0,0.03)' }}
                             onClick={() => onMarkNotiRead(n.id)}
                           >
-                            {!n.read && <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ef4444', marginTop: '6px' }} />}
+                            {!n.read && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444', marginTop: '6px', flexShrink: 0 }} />}
                             <div>
-                              <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--lux-text)' }}>{n.title}</div>
-                              <div style={{ fontSize: '12px', color: 'var(--lux-muted)', marginTop: '4px' }}>{n.text}</div>
+                              <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--lux-text)' }}>{n.title}</div>
+                              <div style={{ fontSize: '13px', color: 'var(--lux-muted)', marginTop: '6px', lineHeight: 1.4 }}>{n.text}</div>
                             </div>
                           </div>
                         ))
@@ -241,21 +253,23 @@ export default function Navbar({
                 </SignedOut>
                 <button className="lux-cta-btn" onClick={() => onTriggerAuth(true)}>
                   Get Started
-                  <ArrowRight size={16} className="arrow-icon" />
+                  <ArrowRight size={18} className="arrow-icon" />
                 </button>
               </>
             ) : (
               <SignedIn>
-                <UserButton afterSignOutUrl="/" />
+                <div style={{ paddingLeft: '8px' }}>
+                  <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: { width: 44, height: 44 } } }} />
+                </div>
               </SignedIn>
             )}
 
             {/* Mobile Toggle */}
             <button className="lux-mobile-toggle" onClick={() => setMobileOpen(true)}>
-              <Menu size={24} />
+              <Menu size={28} />
             </button>
 
-          </div>
+          </motion.div>
         </div>
       </motion.header>
 
@@ -264,18 +278,21 @@ export default function Navbar({
         {mobileOpen && (
           <motion.div 
             className="lux-mobile-drawer"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           >
             <div className="lux-drawer-header">
               <div className="lux-brand">
-                <img src="/Logo.png" alt="Logo" style={{ height: '32px' }} />
-                <span className="lux-brand-title">Yojana Saathi</span>
+                <img src="/Logo.png" alt="Logo" className="lux-logo-img" style={{ height: '40px' }} />
+                <div className="lux-brand-text">
+                  <span className="lux-brand-title">Yojana Saathi</span>
+                  <span className="lux-brand-sub">India's AI Welfare OS</span>
+                </div>
               </div>
-              <button className="lux-icon-btn" onClick={() => setMobileOpen(false)}>
-                <X size={20} />
+              <button className="lux-icon-btn" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }} onClick={() => setMobileOpen(false)}>
+                <X size={28} />
               </button>
             </div>
 
@@ -286,8 +303,8 @@ export default function Navbar({
                   href={`#${link.id}`}
                   className={`lux-drawer-link ${activeView === link.id ? 'active' : ''}`}
                   onClick={(e) => { e.preventDefault(); onNavigate(link.id); setMobileOpen(false); }}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + (i * 0.05) }}
                 >
                   {link.label}
@@ -298,7 +315,7 @@ export default function Navbar({
             <div className="lux-drawer-footer">
               {!user ? (
                 <>
-                  <button className="lux-login-btn" style={{ background: 'rgba(15,23,42,0.05)', borderRadius: '24px', padding: '16px' }} onClick={() => { setMobileOpen(false); onTriggerAuth(false); }}>
+                  <button className="lux-login-btn" style={{ background: 'rgba(15,23,42,0.04)', borderRadius: '26px', padding: '18px', width: '100%' }} onClick={() => { setMobileOpen(false); onTriggerAuth(false); }}>
                     Login
                   </button>
                   <button className="lux-cta-btn" style={{ width: '100%', justifyContent: 'center' }} onClick={() => { setMobileOpen(false); onTriggerAuth(true); }}>
@@ -306,7 +323,7 @@ export default function Navbar({
                   </button>
                 </>
               ) : (
-                <button className="lux-login-btn" style={{ background: 'rgba(15,23,42,0.05)', borderRadius: '24px', padding: '16px' }} onClick={() => { setMobileOpen(false); onLogout(); }}>
+                <button className="lux-login-btn" style={{ background: 'rgba(15,23,42,0.04)', borderRadius: '26px', padding: '18px', width: '100%' }} onClick={() => { setMobileOpen(false); onLogout(); }}>
                   Logout
                 </button>
               )}
