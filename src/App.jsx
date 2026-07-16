@@ -50,6 +50,7 @@ export default function App() {
   const handleNavigate = (view, params = {}) => {
     setActiveView(view);
     window.location.hash = view;
+    window.scrollTo(0, 0);
     
     if (view === 'detail') {
       setDetailSchemeId(params.schemeId);
@@ -240,10 +241,13 @@ export default function App() {
         )}
 
         {activeView === 'onboarding' && (
-          <Onboarding onComplete={(data) => {
-            handleLoginSuccess();
-            handleNavigate('home');
-          }} />
+          <Onboarding 
+            onTriggerAuth={() => setIsAuthOpen(true)}
+            onComplete={(data) => {
+              handleLoginSuccess();
+              handleNavigate('home');
+            }} 
+          />
         )}
       </main>
 

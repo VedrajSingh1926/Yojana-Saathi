@@ -1,27 +1,25 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, ChevronRight, User, Home, FileText, Upload, Target, Sparkles, Loader2, Plus, X } from 'lucide-react';
-import { useSignUp } from '@clerk/clerk-react';
+import { Check, ChevronRight, User, Home, FileText, Upload, Target, Sparkles, Loader2, Plus, X, Users } from 'lucide-react';
 
-export default function Onboarding({ onComplete }) {
+export default function Onboarding({ onComplete, onTriggerAuth }) {
   const [step, setStep] = useState(1);
   const [otpSent, setOtpSent] = useState(false);
   const [mobileOtp, setMobileOtp] = useState(['', '', '', '', '', '']);
   const [emailOtp, setEmailOtp] = useState(['', '', '', '', '', '']);
   const [formData, setFormData] = useState({
-    personal: { name: '', phone: '', email: '', age: '', gender: 'Male', state: '', district: '' },
-    household: { isHead: 'Yes', familyType: 'Nuclear', members: [] },
+    personal: { name: '', age: '', gender: 'Male', occupation: '', income: '', phone: '', email: '', state: '', district: '' },
+    household: { isHead: 'Yes', members: [] },
     details: { houseType: 'Own', area: 'Urban', category: 'General', farmer: 'No', bpl: 'No', bank: 'Yes', land: 'None' },
     goals: []
   });
 
-  const { isLoaded, signUp, setActive } = useSignUp();
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
   const [loadingMsg, setLoadingMsg] = useState('');
   const [showAddMember, setShowAddMember] = useState(false);
-  const [newMember, setNewMember] = useState({ name: '', age: '', gender: 'Male', relation: '', occupation: '', education: '', income: '', marital: 'Single', disability: 'No' });
+  const [newMember, setNewMember] = useState({ name: '', age: '', gender: 'Male', relation: '', occupation: '', income: '', education: '', disability: 'No', marital: 'Single' });
 
   const nextStep = () => setStep(s => s + 1);
   const prevStep = () => setStep(s => s - 1);
@@ -29,30 +27,14 @@ export default function Onboarding({ onComplete }) {
   const handleFinish = async () => {
     setStep(7);
     const messages = [
-      "Creating Household Profile...",
+      "Creating Household AI...",
       "Building Family Tree...",
-      "Understanding Your Priorities...",
-      "Finding Eligible Government Schemes...",
-      "Preparing Your Welfare Passport..."
+      "Finding Schemes...",
+      "Preparing Welfare Passport...",
+      "Welcome to Yojana Saathi!"
     ];
     let i = 0;
     setLoadingMsg(messages[i]);
-    
-    // Save to MongoDB in background
-    try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      if (!response.ok) {
-        console.error("Backend error:", await response.text());
-        alert("Warning: Failed to save to MongoDB. Is the backend running?");
-      }
-    } catch (err) {
-      console.error("Failed to save profile", err);
-      alert("Warning: Could not connect to backend server. Data will not be saved.");
-    }
 
     const interval = setInterval(() => {
       i++;
@@ -76,7 +58,7 @@ export default function Onboarding({ onComplete }) {
       }
     }));
     setShowAddMember(false);
-    setNewMember({ name: '', age: '', gender: 'Male', relation: '', occupation: '', education: '', income: '', marital: 'Single', disability: 'No' });
+    setNewMember({ name: '', age: '', gender: 'Male', relation: '', occupation: '', income: '', education: '', disability: 'No', marital: 'Single' });
   };
 
   const toggleGoal = (goal) => {
@@ -94,11 +76,11 @@ export default function Onboarding({ onComplete }) {
   };
 
   return (
-    <div className="view-section animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto', paddingTop: '2rem' }}>
+    <div className="view-section animate-fade-in" style={{ maxWidth: '900px', margin: '0 auto', paddingTop: '2rem' }}>
       {step < 7 && (
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '50%', left: '0', right: '0', height: '2px', background: 'var(--border-color)', zIndex: -1 }}></div>
-          <div style={{ position: 'absolute', top: '50%', left: '0', width: `${((step - 1) / 5) * 100}%`, height: '2px', background: 'var(--primary)', zIndex: -1, transition: 'width 0.3s' }}></div>
+          <div style={{ position: 'absolute', top: '50%', left: '0', width: `${((step - 1) / 6) * 100}%`, height: '2px', background: 'var(--primary)', zIndex: -1, transition: 'width 0.3s' }}></div>
           {[1, 2, 3, 4, 5, 6].map(num => (
             <div key={num} style={{ 
               width: '32px', height: '32px', borderRadius: '50%', 
@@ -115,48 +97,72 @@ export default function Onboarding({ onComplete }) {
       )}
 
       <div className="glass-card" style={{ padding: '2.5rem', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
+        {/* STEP 1: PERSONAL INFORMATION */}
         {step === 1 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
               <User size={24} /> Step 1 — Personal Information
             </h2>
-            <p className="text-muted mb-4">Basic details</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <p className="text-muted mb-0">Basic details for primary applicant</p>
+              <p className="text-sm m-0">
+                Already have an account? <a href="#" className="text-gold" onClick={(e) => { e.preventDefault(); if (onTriggerAuth) onTriggerAuth(false); }}>Sign In</a>
+              </p>
+            </div>
+            
             <div className="grid-2-col" style={{ gap: '1.5rem' }}>
               <div className="form-group">
-                <label>Full Name</label>
-                <input type="text" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} />
-              </div>
-              <div className="form-group">
-                <label>Phone Number</label>
-                <input type="tel" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} />
-              </div>
-              <div className="form-group">
-                <label>Email (Optional)</label>
-                <input type="email" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} />
+                <label>Name</label>
+                <input type="text" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
+                  value={formData.personal.name} onChange={(e) => setFormData({...formData, personal: {...formData.personal, name: e.target.value}})} />
               </div>
               <div className="form-group">
                 <label>Age</label>
-                <input type="number" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} />
+                <input type="number" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
+                  value={formData.personal.age} onChange={(e) => setFormData({...formData, personal: {...formData.personal, age: e.target.value}})} />
               </div>
               <div className="form-group">
                 <label>Gender</label>
-                <select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}>
+                <select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
+                  value={formData.personal.gender} onChange={(e) => setFormData({...formData, personal: {...formData.personal, gender: e.target.value}})}>
                   <option>Male</option><option>Female</option><option>Other</option>
                 </select>
               </div>
               <div className="form-group">
+                <label>Occupation</label>
+                <input type="text" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
+                  value={formData.personal.occupation} onChange={(e) => setFormData({...formData, personal: {...formData.personal, occupation: e.target.value}})} />
+              </div>
+              <div className="form-group">
+                <label>Income (Annual)</label>
+                <input type="number" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
+                  value={formData.personal.income} onChange={(e) => setFormData({...formData, personal: {...formData.personal, income: e.target.value}})} />
+              </div>
+              <div className="form-group">
+                <label>Phone Number</label>
+                <input type="tel" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
+                  value={formData.personal.phone} onChange={(e) => setFormData({...formData, personal: {...formData.personal, phone: e.target.value}})} />
+              </div>
+              <div className="form-group">
+                <label>Email <span className="text-gold">* Required</span></label>
+                <input type="email" className="form-input" required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
+                  value={formData.personal.email} onChange={(e) => setFormData({...formData, personal: {...formData.personal, email: e.target.value}})} />
+              </div>
+              <div className="form-group">
                 <label>State</label>
-                <input type="text" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} />
+                <input type="text" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
+                  value={formData.personal.state} onChange={(e) => setFormData({...formData, personal: {...formData.personal, state: e.target.value}})} />
               </div>
               <div className="form-group">
                 <label>District</label>
-                <input type="text" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} />
+                <input type="text" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
+                  value={formData.personal.district} onChange={(e) => setFormData({...formData, personal: {...formData.personal, district: e.target.value}})} />
               </div>
             </div>
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-              <button type="button" className="btn btn-primary" onClick={async () => {
+              <button type="button" className="btn btn-primary" onClick={() => {
                 if (!formData.personal.phone || !formData.personal.email) {
-                  alert("Please enter both phone number and email for verification.");
+                  alert("Please enter both phone number and email.");
                   return;
                 }
                 nextStep();
@@ -165,6 +171,7 @@ export default function Onboarding({ onComplete }) {
           </motion.div>
         )}
 
+        {/* STEP 2: OTP VERIFICATION */}
         {step === 2 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
@@ -196,30 +203,27 @@ export default function Onboarding({ onComplete }) {
                 </div>
                 {!otpSent ? (
                   <button type="button" className="btn btn-outline btn-sm" disabled={isSendingOtp} onClick={async () => {
-                    if (!isLoaded) return;
                     setIsSendingOtp(true);
                     try {
-                      // Attempt to create a user in Clerk with phone and email
-                      await signUp.create({
-                        phoneNumber: '+91' + formData.personal.phone,
-                        emailAddress: formData.personal.email,
-                        password: Math.random().toString(36).slice(-8) + 'A1!' // Dummy password in case instance requires one
+                      const res = await fetch('/api/auth/send-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ phoneNumber: formData.personal.phone })
                       });
-                      
-                      // Trigger SMS
-                      await signUp.preparePhoneNumberVerification({ strategy: "phone_code" });
-                      // Trigger Email OTP
-                      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-                      
-                      setOtpSent(true);
+                      const data = await res.json();
+                      if (data.success) {
+                        setOtpSent(true);
+                        alert("SMS OTP Sent successfully!");
+                      } else {
+                        alert(data.message || "Failed to send OTP.");
+                      }
                     } catch (err) {
-                      console.error("Clerk Error:", err);
-                      alert(err.errors?.[0]?.longMessage || "Error sending OTP. Make sure Clerk has Phone/Email auth enabled.");
+                      alert("Error connecting to server to send OTP.");
                     } finally {
                       setIsSendingOtp(false);
                     }
                   }}>
-                    {isSendingOtp ? "Sending..." : "Send Real OTP via Clerk"}
+                    {isSendingOtp ? "Sending..." : "Send Verification OTP"}
                   </button>
                 ) : (
                   <span className="text-success text-sm" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Check size={14}/> Sent successfully</span>
@@ -248,7 +252,7 @@ export default function Onboarding({ onComplete }) {
                   ))}
                 </div>
                 {!otpSent ? (
-                  <button type="button" className="btn btn-outline btn-sm" disabled={isSendingOtp} onClick={() => alert("Please click the 'Send Real OTP' button under Mobile OTP first. It will send both simultaneously!")}>
+                  <button type="button" className="btn btn-outline btn-sm" disabled={isSendingOtp} onClick={() => alert("Please click 'Send Verification OTP' under Mobile OTP first. It will send both simultaneously!")}>
                     Send OTP
                   </button>
                 ) : (
@@ -260,38 +264,28 @@ export default function Onboarding({ onComplete }) {
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
               <button type="button" className="btn btn-text" onClick={prevStep}>Back</button>
               <button type="button" className="btn btn-primary" disabled={isVerifying} onClick={async () => {
-                if (mobileOtp.join('').length < 6 || emailOtp.join('').length < 6) {
-                  alert("Please enter the full 6-digit OTP codes sent by Clerk.");
+                const otpString = mobileOtp.join('');
+                if (otpString.length !== 6) {
+                  alert("Please enter the 6-digit Mobile OTP.");
                   return;
                 }
                 
                 setIsVerifying(true);
                 try {
-                  // Verify Phone
-                  const phoneVerification = await signUp.attemptPhoneNumberVerification({
-                    code: mobileOtp.join('')
+                  const res = await fetch('/api/auth/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber: formData.personal.phone, otp: otpString })
                   });
-                  
-                  if (phoneVerification.status !== "complete" && phoneVerification.status !== "missing_requirements") {
-                    alert("Invalid Phone OTP");
-                    setIsVerifying(false);
-                    return;
-                  }
+                  const data = await res.json();
 
-                  // Verify Email
-                  const emailVerification = await signUp.attemptEmailAddressVerification({
-                    code: emailOtp.join('')
-                  });
-
-                  if (emailVerification.status === "complete") {
-                    await setActive({ session: emailVerification.createdSessionId });
+                  if (data.success) {
                     nextStep();
                   } else {
-                    alert("Verification incomplete. Status: " + emailVerification.status);
+                    alert(data.message || "Invalid OTP code.");
                   }
                 } catch (err) {
-                  console.error("Verification Error:", err);
-                  alert(err.errors?.[0]?.longMessage || "Invalid OTP codes provided.");
+                  alert("Error connecting to server to verify OTP.");
                 } finally {
                   setIsVerifying(false);
                 }
@@ -302,65 +296,75 @@ export default function Onboarding({ onComplete }) {
           </motion.div>
         )}
 
+        {/* STEP 3: FAMILY DETAILS */}
         {step === 3 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <Home size={24} /> Step 3 — Household Information
+              <Users size={24} /> Step 3 — Family Details
             </h2>
-            <p className="text-muted mb-4">Tell us about your family</p>
-            <div className="grid-2-col" style={{ gap: '1.5rem', marginBottom: '2rem' }}>
-              <div className="form-group">
-                <label>Are you the Family Head?</label>
-                <select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}>
-                  <option>Yes</option><option>No</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Family Type</label>
-                <select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}>
-                  <option>Nuclear</option><option>Joint</option>
-                </select>
-              </div>
+            <p className="text-muted mb-4">Build your Family Tree for maximum scheme coverage.</p>
+            
+            <div className="form-group" style={{ marginBottom: '2rem' }}>
+              <label>Are you the Family Head?</label>
+              <select className="form-input" style={{ width: '200px', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}
+                value={formData.household.isHead} onChange={(e) => setFormData({...formData, household: {...formData.household, isHead: e.target.value}})}>
+                <option>Yes</option><option>No</option>
+              </select>
             </div>
 
-            {/* Added Members List */}
+            {/* Added Members List - Premium Cards */}
             {formData.household.members.length > 0 && (
               <div style={{ marginBottom: '1.5rem' }}>
-                <h4 style={{ marginBottom: '0.5rem' }}>Family Members ({formData.household.members.length})</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <h4 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Family Members ({formData.household.members.length})</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
                   {formData.household.members.map((m, idx) => (
-                    <div key={idx} style={{ padding: '0.75rem', background: 'var(--bg-darker)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div><strong>{m.name}</strong> <span className="text-muted">({m.relation})</span> - {m.age} yrs, {m.gender}</div>
-                    </div>
+                    <motion.div key={idx} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                      style={{ 
+                        padding: '1.25rem', 
+                        background: 'linear-gradient(145deg, var(--bg-card), var(--bg-darkest))', 
+                        borderRadius: '12px', 
+                        border: '1px solid var(--border-color)',
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                        position: 'relative'
+                      }}>
+                      <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'var(--primary-glow)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 'bold' }}>{m.relation}</div>
+                      <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--gold)' }}>{m.name}</h4>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                        <div><strong>Age:</strong> {m.age}</div>
+                        <div><strong>Gender:</strong> {m.gender}</div>
+                        <div><strong>Occupation:</strong> {m.occupation}</div>
+                        <div><strong>Income:</strong> ₹{m.income}</div>
+                      </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Add Member Form */}
+            {/* Animated Add Member Form */}
             {showAddMember ? (
-              <div style={{ padding: '1.5rem', background: 'rgba(0,0,0,0.02)', border: '1px dashed var(--border-color)', borderRadius: '12px', marginBottom: '1.5rem' }}>
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} style={{ overflow: 'hidden', padding: '1.5rem', background: 'var(--bg-darker)', border: '1px solid var(--border-color)', borderRadius: '12px', marginBottom: '1.5rem', boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.2)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <h4>Add Family Member</h4>
+                  <h4 style={{ color: 'var(--primary)' }}><Users size={16} style={{ display: 'inline', marginRight: '4px' }}/> Add Family Member</h4>
                   <button className="icon-btn" onClick={() => setShowAddMember(false)} style={{ width: '28px', height: '28px' }}><X size={14}/></button>
                 </div>
                 <div className="grid-2-col" style={{ gap: '1rem' }}>
-                  <div className="form-group"><label>Name</label><input type="text" className="form-input" value={newMember.name} onChange={e=>setNewMember({...newMember, name: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
-                  <div className="form-group"><label>Age</label><input type="number" className="form-input" value={newMember.age} onChange={e=>setNewMember({...newMember, age: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
-                  <div className="form-group"><label>Gender</label><select className="form-input" value={newMember.gender} onChange={e=>setNewMember({...newMember, gender: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>Male</option><option>Female</option><option>Other</option></select></div>
-                  <div className="form-group"><label>Relation</label><input type="text" className="form-input" placeholder="e.g. Son, Wife" value={newMember.relation} onChange={e=>setNewMember({...newMember, relation: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
-                  <div className="form-group"><label>Occupation</label><input type="text" className="form-input" value={newMember.occupation} onChange={e=>setNewMember({...newMember, occupation: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
-                  <div className="form-group"><label>Education</label><input type="text" className="form-input" value={newMember.education} onChange={e=>setNewMember({...newMember, education: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
-                  <div className="form-group"><label>Annual Income</label><input type="number" className="form-input" value={newMember.income} onChange={e=>setNewMember({...newMember, income: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} /></div>
-                  <div className="form-group"><label>Marital Status</label><select className="form-input" value={newMember.marital} onChange={e=>setNewMember({...newMember, marital: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>Single</option><option>Married</option><option>Widowed</option></select></div>
-                  <div className="form-group"><label>Disability (Yes/No)</label><select className="form-input" value={newMember.disability} onChange={e=>setNewMember({...newMember, disability: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>No</option><option>Yes</option></select></div>
+                  <div className="form-group"><label>Name</label><input type="text" className="form-input" value={newMember.name} onChange={e=>setNewMember({...newMember, name: e.target.value})} /></div>
+                  <div className="form-group"><label>Age</label><input type="number" className="form-input" value={newMember.age} onChange={e=>setNewMember({...newMember, age: e.target.value})} /></div>
+                  <div className="form-group"><label>Gender</label><select className="form-input" value={newMember.gender} onChange={e=>setNewMember({...newMember, gender: e.target.value})}><option>Male</option><option>Female</option><option>Other</option></select></div>
+                  <div className="form-group"><label>Relation</label><input type="text" className="form-input" placeholder="e.g. Son, Wife, Father" value={newMember.relation} onChange={e=>setNewMember({...newMember, relation: e.target.value})} /></div>
+                  <div className="form-group"><label>Occupation</label><input type="text" className="form-input" value={newMember.occupation} onChange={e=>setNewMember({...newMember, occupation: e.target.value})} /></div>
+                  <div className="form-group"><label>Annual Income</label><input type="number" className="form-input" value={newMember.income} onChange={e=>setNewMember({...newMember, income: e.target.value})} /></div>
+                  <div className="form-group"><label>Education</label><input type="text" className="form-input" value={newMember.education} onChange={e=>setNewMember({...newMember, education: e.target.value})} /></div>
+                  <div className="form-group"><label>Marital Status</label><select className="form-input" value={newMember.marital} onChange={e=>setNewMember({...newMember, marital: e.target.value})}><option>Single</option><option>Married</option><option>Widowed</option><option>Divorced</option></select></div>
+                  <div className="form-group"><label>Disability (Yes/No)</label><select className="form-input" value={newMember.disability} onChange={e=>setNewMember({...newMember, disability: e.target.value})}><option>No</option><option>Yes</option></select></div>
                 </div>
-                <button className="btn btn-primary btn-sm mt-3" onClick={handleAddMember}>Save Member</button>
-              </div>
+                <button className="btn btn-primary btn-sm mt-4" onClick={handleAddMember} style={{ padding: '0.75rem 1.5rem' }}>Save Member Profile</button>
+              </motion.div>
             ) : (
-              <button className="btn btn-outline btn-sm mb-3" onClick={() => setShowAddMember(true)}>
-                <Plus size={14} /> Add Family Members (Unlimited)
-              </button>
+              <motion.button whileHover={{ scale: 1.02 }} className="btn btn-outline mb-3" onClick={() => setShowAddMember(true)} style={{ width: '100%', padding: '1rem', borderStyle: 'dashed' }}>
+                <Plus size={18} style={{ marginRight: '8px' }} /> Add Family Member (Unlimited)
+              </motion.button>
             )}
 
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
@@ -370,20 +374,22 @@ export default function Onboarding({ onComplete }) {
           </motion.div>
         )}
 
+        {/* STEP 4: HOUSE DETAILS */}
         {step === 4 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <FileText size={24} /> Step 4 — Household Details
+              <Home size={24} /> Step 4 — House Details
             </h2>
-            <p className="text-muted mb-4">Information to identify eligible schemes</p>
+            <p className="text-muted mb-4">Information to identify specific eligible schemes (like housing, farming)</p>
+            
             <div className="grid-2-col" style={{ gap: '1.5rem' }}>
-              <div className="form-group"><label>House Type</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>Own</option><option>Rented</option></select></div>
-              <div className="form-group"><label>Area</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>Rural</option><option>Urban</option></select></div>
-              <div className="form-group"><label>Category</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>General</option><option>OBC</option><option>SC</option><option>ST</option><option>EWS</option></select></div>
-              <div className="form-group"><label>Farmer?</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>No</option><option>Yes</option></select></div>
-              <div className="form-group"><label>BPL Card?</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>No</option><option>Yes</option></select></div>
-              <div className="form-group"><label>Bank Account Available?</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>Yes</option><option>No</option></select></div>
-              <div className="form-group"><label>Land Ownership</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }}><option>None</option><option>Agricultural</option><option>Residential</option></select></div>
+              <div className="form-group"><label>House Ownership</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} value={formData.details.houseType} onChange={e=>setFormData({...formData, details: {...formData.details, houseType: e.target.value}})}><option>Own</option><option>Rent</option></select></div>
+              <div className="form-group"><label>Area Type</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} value={formData.details.area} onChange={e=>setFormData({...formData, details: {...formData.details, area: e.target.value}})}><option>Rural</option><option>Urban</option></select></div>
+              <div className="form-group"><label>Land Ownership</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} value={formData.details.land} onChange={e=>setFormData({...formData, details: {...formData.details, land: e.target.value}})}><option>None</option><option>Agricultural</option><option>Residential</option></select></div>
+              <div className="form-group"><label>Category</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} value={formData.details.category} onChange={e=>setFormData({...formData, details: {...formData.details, category: e.target.value}})}><option>General</option><option>OBC</option><option>SC</option><option>ST</option><option>EWS</option></select></div>
+              <div className="form-group"><label>Bank Account Available?</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} value={formData.details.bank} onChange={e=>setFormData({...formData, details: {...formData.details, bank: e.target.value}})}><option>Yes</option><option>No</option></select></div>
+              <div className="form-group"><label>Farmer?</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} value={formData.details.farmer} onChange={e=>setFormData({...formData, details: {...formData.details, farmer: e.target.value}})}><option>No</option><option>Yes</option></select></div>
+              <div className="form-group"><label>BPL Card Holder?</label><select className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} value={formData.details.bpl} onChange={e=>setFormData({...formData, details: {...formData.details, bpl: e.target.value}})}><option>No</option><option>Yes</option></select></div>
             </div>
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
               <button type="button" className="btn btn-text" onClick={prevStep}>Back</button>
@@ -392,24 +398,25 @@ export default function Onboarding({ onComplete }) {
           </motion.div>
         )}
 
+        {/* STEP 5: DOCUMENTS */}
         {step === 5 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <Upload size={24} /> Step 5 — Documents (Optional)
+              <Upload size={24} /> Step 5 — Documents
             </h2>
-            <p className="text-muted mb-4">For Hackathon Demo - Upload if available (optional):</p>
+            <p className="text-muted mb-4">Optional Upload for faster verifications</p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
-              {['Aadhaar Card', 'Income Certificate', 'Ration Card', 'Disability Certificate', 'Caste Certificate', 'Other Supporting Documents'].map(doc => (
-                <div key={doc} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'var(--bg-darker)', border: '1px dashed var(--border-color)', borderRadius: '8px' }}>
-                  <span>{doc}</span>
-                  <button className="btn btn-outline btn-sm">Upload</button>
+              {['Income Certificate', 'Aadhaar Card', 'Ration Card', 'Disability Certificate', 'Other Supporting Documents'].map(doc => (
+                <div key={doc} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem', background: 'var(--bg-darker)', border: '1px dashed var(--border-color)', borderRadius: '12px', transition: 'all 0.2s' }} className="hover:border-primary cursor-pointer">
+                  <span style={{ fontWeight: 500 }}>{doc}</span>
+                  <button className="btn btn-outline btn-sm">Select File</button>
                 </div>
               ))}
             </div>
 
-            <div style={{ padding: '1rem', background: 'rgba(217, 119, 54, 0.1)', borderLeft: '4px solid var(--primary)', borderRadius: '0 8px 8px 0', fontSize: '0.85rem' }}>
-              <strong>Note:</strong> Documents are optional for this demo. Government verification will happen through official APIs in the production version.
+            <div style={{ padding: '1rem', background: 'rgba(217, 119, 54, 0.1)', borderLeft: '4px solid var(--primary)', borderRadius: '0 8px 8px 0', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+              <strong>For demo purposes documents are optional. Government verification will happen in production.</strong>
             </div>
 
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
@@ -419,59 +426,85 @@ export default function Onboarding({ onComplete }) {
           </motion.div>
         )}
 
+        {/* STEP 6: GOALS */}
         {step === 6 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
-              <Target size={24} /> Step 6 — Goals & Priorities
+              <Target size={24} /> Step 6 — Goals
             </h2>
-            <p className="text-muted mb-4">What would you like AI to help you with?</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-              {['🏠 House', '🎓 Education', '💼 Employment', '💰 Business', '🌾 Agriculture', '❤️ Health', '👩 Women Welfare', '👴 Pension', '👶 Child Welfare', '♿ Disability Support'].map(goal => (
-                <div 
+            <p className="text-muted mb-4">What would you like the AI to help you achieve?</p>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+              {['🏠 House', '🎓 Education', '💼 Employment', '💰 Business', '👩 Women', '❤️ Health', '🌾 Agriculture', '👴 Pension'].map(goal => (
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
                   key={goal} 
                   onClick={() => toggleGoal(goal)}
                   style={{ 
-                    padding: '1rem', border: '1px solid', borderColor: formData.goals.includes(goal) ? 'var(--primary)' : 'var(--border-color)', 
-                    borderRadius: '8px', textAlign: 'center', cursor: 'pointer', 
+                    padding: '1.5rem', 
+                    border: '2px solid', 
+                    borderColor: formData.goals.includes(goal) ? 'var(--primary)' : 'var(--border-color)', 
+                    borderRadius: '12px', 
+                    textAlign: 'center', 
+                    cursor: 'pointer', 
                     background: formData.goals.includes(goal) ? 'var(--primary-glow)' : 'var(--bg-darkest)',
-                    transition: 'all 0.2s', fontWeight: formData.goals.includes(goal) ? '600' : '400'
+                    boxShadow: formData.goals.includes(goal) ? '0 4px 15px rgba(212,175,55,0.15)' : 'none',
+                    transition: 'all 0.2s', 
+                    fontWeight: formData.goals.includes(goal) ? '700' : '500',
+                    fontSize: '1.1rem'
                   }}
                 >
                   {goal}
-                </div>
+                </motion.div>
               ))}
             </div>
             
-            <p className="text-sm text-muted">The AI uses these priorities to personalize recommendations.</p>
-
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
               <button type="button" className="btn btn-text" onClick={prevStep}>Back</button>
-              <button type="button" className="btn btn-primary" onClick={handleFinish}>Complete Setup <Sparkles size={18} style={{ marginLeft: '6px' }}/></button>
+              <button type="button" className="btn btn-primary" onClick={handleFinish} style={{ padding: '0.75rem 2rem' }}>Complete Registration <Sparkles size={18} style={{ marginLeft: '8px' }}/></button>
             </div>
           </motion.div>
         )}
 
+        {/* STEP 7: LOADING ANIMATION */}
         {step === 7 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', padding: '4rem 2rem' }}>
             {loadingMsg.includes("Welcome") ? (
-              <div style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>
-                <Check size={56} style={{ margin: '0 auto' }} />
-              </div>
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 10 }}>
+                <div style={{ marginBottom: '1.5rem', color: 'var(--primary)', display: 'flex', justifyContent: 'center' }}>
+                  <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--primary-glow)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--primary)' }}>
+                    <Check size={40} />
+                  </div>
+                </div>
+              </motion.div>
             ) : (
-              <Loader2 size={48} className="text-gold" style={{ animation: 'spin 2s linear infinite', margin: '0 auto 1.5rem', color: 'var(--primary)' }} />
+              <Loader2 size={56} className="text-gold" style={{ animation: 'spin 2s linear infinite', margin: '0 auto 2rem', color: 'var(--primary)' }} />
             )}
             <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
             
-            <div style={{ textAlign: 'left', maxWidth: '300px', margin: '0 auto 2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: loadingMsg.includes("Building") || loadingMsg.includes("Welcome") || loadingMsg.includes("Priorities") || loadingMsg.includes("Schemes") || loadingMsg.includes("Passport") ? 'var(--primary)' : 'var(--text-muted)' }}><Check size={16}/> Creating Household Profile...</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: loadingMsg.includes("Priorities") || loadingMsg.includes("Welcome") || loadingMsg.includes("Schemes") || loadingMsg.includes("Passport") ? 'var(--primary)' : 'var(--text-muted)' }}><Check size={16}/> Building Family Tree...</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: loadingMsg.includes("Schemes") || loadingMsg.includes("Welcome") || loadingMsg.includes("Passport") ? 'var(--primary)' : 'var(--text-muted)' }}><Check size={16}/> Understanding Your Priorities...</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: loadingMsg.includes("Passport") || loadingMsg.includes("Welcome") ? 'var(--primary)' : 'var(--text-muted)' }}><Check size={16}/> Finding Eligible Government Schemes...</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: loadingMsg.includes("Welcome") ? 'var(--primary)' : 'var(--text-muted)' }}><Check size={16}/> Preparing Your Welfare Passport...</div>
+            <div style={{ textAlign: 'left', maxWidth: '350px', margin: '0 auto 2.5rem', padding: '1.5rem', background: 'var(--bg-darker)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', fontSize: '1.05rem', color: loadingMsg.includes("Building") || loadingMsg.includes("Finding") || loadingMsg.includes("Preparing") || loadingMsg.includes("Welcome") ? 'var(--primary)' : 'var(--text-muted)' }}>
+                {loadingMsg.includes("Creating") ? <Loader2 size={18} style={{ animation: 'spin 2s linear infinite' }} /> : <Check size={18}/>} 
+                Creating Household AI...
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', fontSize: '1.05rem', color: loadingMsg.includes("Finding") || loadingMsg.includes("Preparing") || loadingMsg.includes("Welcome") ? 'var(--primary)' : 'var(--text-muted)' }}>
+                {loadingMsg.includes("Building") ? <Loader2 size={18} style={{ animation: 'spin 2s linear infinite' }} /> : <Check size={18}/>} 
+                Building Family Tree...
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', fontSize: '1.05rem', color: loadingMsg.includes("Preparing") || loadingMsg.includes("Welcome") ? 'var(--primary)' : 'var(--text-muted)' }}>
+                {loadingMsg.includes("Finding") ? <Loader2 size={18} style={{ animation: 'spin 2s linear infinite' }} /> : <Check size={18}/>} 
+                Finding Schemes...
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.05rem', color: loadingMsg.includes("Welcome") ? 'var(--primary)' : 'var(--text-muted)' }}>
+                {loadingMsg.includes("Preparing") ? <Loader2 size={18} style={{ animation: 'spin 2s linear infinite' }} /> : <Check size={18}/>} 
+                Preparing Welfare Passport...
+              </div>
             </div>
 
             {loadingMsg.includes("Welcome") && (
-              <h3 style={{ fontSize: '1.75rem', color: 'var(--text-primary)' }}>Welcome to Yojana Saathi 🚀</h3>
+              <motion.h3 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} style={{ fontSize: '2rem', color: 'var(--text-primary)', margin: 0 }}>
+                Welcome to Yojana Saathi 🚀
+              </motion.h3>
             )}
           </motion.div>
         )}

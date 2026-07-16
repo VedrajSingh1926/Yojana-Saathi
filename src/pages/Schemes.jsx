@@ -46,7 +46,7 @@ export default function Schemes({
     const matchesSearch = scheme.name.toLowerCase().includes(search.toLowerCase()) ||
                           scheme.description.toLowerCase().includes(search.toLowerCase()) ||
                           scheme.category.toLowerCase().includes(search.toLowerCase());
-    const matchesType = types.includes(scheme.type);
+    const matchesType = types.length === 0 ? true : types.includes(scheme.type);
     const matchesCategory = category === 'all' || scheme.category === category;
     return matchesSearch && matchesType && matchesCategory;
   });

@@ -9,7 +9,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!otpSent) {
@@ -17,19 +17,47 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         alert("Please enter a valid 10-digit mobile number.");
         return;
       }
-      setOtpSent(true);
-      alert("Demo SMS OTP Sent! Enter '123456' to verify.");
-    } else {
-      if (otp !== '123456') {
-        alert("Invalid OTP code. Please enter '123456' for verification.");
-        return;
+      
+      try {
+        const res = await fetch('/api/auth/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phoneNumber: phone })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          setOtpSent(true);
+          alert("SMS OTP Sent successfully!");
+        } else {
+          alert(data.message || "Failed to send OTP.");
+        }
+      } catch (err) {
+        alert("Error connecting to server to send OTP.");
       }
-      onLoginSuccess();
-      onClose();
-      // Reset
-      setPhone('');
-      setOtp('');
-      setOtpSent(false);
+
+    } else {
+      try {
+        const res = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phoneNumber: phone, otp })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          onLoginSuccess();
+          onClose();
+          // Reset
+          setPhone('');
+          setOtp('');
+          setOtpSent(false);
+        } else {
+          alert(data.message || "Invalid OTP code.");
+        }
+      } catch (err) {
+        alert("Error connecting to server to verify OTP.");
+      }
     }
   };
 
@@ -74,7 +102,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                 />
-                <span className="form-hint text-gold">A demo OTP code was sent to your phone. Use code "123456" to log in.</span>
+                <span className="form-hint text-gold">An OTP code was sent to your phone. Enter it to log in.</span>
               </div>
             )}
 

@@ -22,7 +22,8 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-qr-code": "^2.2.0",
-    "react-router-dom": "^7.18.1"
+    "react-router-dom": "^7.18.1",
+    "twilio": "^6.0.2"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
