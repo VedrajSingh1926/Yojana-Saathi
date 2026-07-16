@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ChevronRight, User, Home, FileText, Upload, Target, Sparkles, Loader2, Plus, X } from 'lucide-react';
+import { useSignUp } from '@clerk/clerk-react';
 
 export default function Onboarding({ onComplete }) {
   const [step, setStep] = useState(1);
   const [otpSent, setOtpSent] = useState(false);
-  const [mobileOtp, setMobileOtp] = useState(['', '', '', '']);
-  const [emailOtp, setEmailOtp] = useState(['', '', '', '']);
+  const [mobileOtp, setMobileOtp] = useState(['', '', '', '', '', '']);
+  const [emailOtp, setEmailOtp] = useState(['', '', '', '', '', '']);
   const [formData, setFormData] = useState({
     personal: { name: '', phone: '', email: '', age: '', gender: 'Male', state: '', district: '' },
     household: { isHead: 'Yes', familyType: 'Nuclear', members: [] },
     details: { houseType: 'Own', area: 'Urban', category: 'General', farmer: 'No', bpl: 'No', bank: 'Yes', land: 'None' },
     goals: []
   });
+
+  const { isLoaded, signUp, setActive } = useSignUp();
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const [loadingMsg, setLoadingMsg] = useState('');
   const [showAddMember, setShowAddMember] = useState(false);
@@ -149,7 +154,7 @@ export default function Onboarding({ onComplete }) {
               </div>
             </div>
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-              <button type="button" className="btn btn-primary" onClick={() => {
+              <button type="button" className="btn btn-primary" onClick={async () => {
                 if (!formData.personal.phone || !formData.personal.email) {
                   alert("Please enter both phone number and email for verification.");
                   return;
@@ -172,7 +177,7 @@ export default function Onboarding({ onComplete }) {
                 <h4 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Mobile OTP</h4>
                 <p className="text-sm text-muted mb-3">Sent to {formData.personal.phone}</p>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                  {[0, 1, 2, 3].map(i => (
+                  {[0, 1, 2, 3, 4, 5].map(i => (
                     <input 
                       key={i} 
                       type="text" 
@@ -190,7 +195,32 @@ export default function Onboarding({ onComplete }) {
                   ))}
                 </div>
                 {!otpSent ? (
-                  <button className="btn btn-outline btn-sm" onClick={() => setOtpSent(true)}>Send OTP</button>
+                  <button type="button" className="btn btn-outline btn-sm" disabled={isSendingOtp} onClick={async () => {
+                    if (!isLoaded) return;
+                    setIsSendingOtp(true);
+                    try {
+                      // Attempt to create a user in Clerk with phone and email
+                      await signUp.create({
+                        phoneNumber: '+91' + formData.personal.phone,
+                        emailAddress: formData.personal.email,
+                        password: Math.random().toString(36).slice(-8) + 'A1!' // Dummy password in case instance requires one
+                      });
+                      
+                      // Trigger SMS
+                      await signUp.preparePhoneNumberVerification({ strategy: "phone_code" });
+                      // Trigger Email OTP
+                      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+                      
+                      setOtpSent(true);
+                    } catch (err) {
+                      console.error("Clerk Error:", err);
+                      alert(err.errors?.[0]?.longMessage || "Error sending OTP. Make sure Clerk has Phone/Email auth enabled.");
+                    } finally {
+                      setIsSendingOtp(false);
+                    }
+                  }}>
+                    {isSendingOtp ? "Sending..." : "Send Real OTP via Clerk"}
+                  </button>
                 ) : (
                   <span className="text-success text-sm" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Check size={14}/> Sent successfully</span>
                 )}
@@ -200,7 +230,7 @@ export default function Onboarding({ onComplete }) {
                 <h4 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Email OTP</h4>
                 <p className="text-sm text-muted mb-3">Sent to {formData.personal.email}</p>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                  {[0, 1, 2, 3].map(i => (
+                  {[0, 1, 2, 3, 4, 5].map(i => (
                     <input 
                       key={i} 
                       type="text" 
@@ -218,7 +248,9 @@ export default function Onboarding({ onComplete }) {
                   ))}
                 </div>
                 {!otpSent ? (
-                  <button className="btn btn-outline btn-sm" onClick={() => setOtpSent(true)}>Send OTP</button>
+                  <button type="button" className="btn btn-outline btn-sm" disabled={isSendingOtp} onClick={() => alert("Please click the 'Send Real OTP' button under Mobile OTP first. It will send both simultaneously!")}>
+                    Send OTP
+                  </button>
                 ) : (
                   <span className="text-success text-sm" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Check size={14}/> Sent successfully</span>
                 )}
@@ -227,13 +259,45 @@ export default function Onboarding({ onComplete }) {
 
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
               <button type="button" className="btn btn-text" onClick={prevStep}>Back</button>
-              <button type="button" className="btn btn-primary" onClick={() => {
-                if (mobileOtp.join('').length < 4 || emailOtp.join('').length < 4) {
-                  alert("Please enter the 4-digit OTPs (for demo, any 4 digits work)");
+              <button type="button" className="btn btn-primary" disabled={isVerifying} onClick={async () => {
+                if (mobileOtp.join('').length < 6 || emailOtp.join('').length < 6) {
+                  alert("Please enter the full 6-digit OTP codes sent by Clerk.");
                   return;
                 }
-                nextStep();
-              }}>Verify & Next <ChevronRight size={18} /></button>
+                
+                setIsVerifying(true);
+                try {
+                  // Verify Phone
+                  const phoneVerification = await signUp.attemptPhoneNumberVerification({
+                    code: mobileOtp.join('')
+                  });
+                  
+                  if (phoneVerification.status !== "complete" && phoneVerification.status !== "missing_requirements") {
+                    alert("Invalid Phone OTP");
+                    setIsVerifying(false);
+                    return;
+                  }
+
+                  // Verify Email
+                  const emailVerification = await signUp.attemptEmailAddressVerification({
+                    code: emailOtp.join('')
+                  });
+
+                  if (emailVerification.status === "complete") {
+                    await setActive({ session: emailVerification.createdSessionId });
+                    nextStep();
+                  } else {
+                    alert("Verification incomplete. Status: " + emailVerification.status);
+                  }
+                } catch (err) {
+                  console.error("Verification Error:", err);
+                  alert(err.errors?.[0]?.longMessage || "Invalid OTP codes provided.");
+                } finally {
+                  setIsVerifying(false);
+                }
+              }}>
+                {isVerifying ? "Verifying..." : "Verify & Next"} <ChevronRight size={18} />
+              </button>
             </div>
           </motion.div>
         )}
