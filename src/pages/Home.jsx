@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles, ChevronRight, Landmark, Brain, IdCard } from 'luc
 import { motion, AnimatePresence } from 'framer-motion';
 
 const HERO_IMAGES = [
-  'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2000',
+  'https://images.unsplash.com/photo-1530022718889-8d7529323eb7?auto=format&fit=crop&q=80&w=2000',
   'https://images.unsplash.com/photo-1596395819057-e37f55a8516d?auto=format&fit=crop&q=80&w=2000',
   'https://images.unsplash.com/photo-1627885060195-021bdeea6438?auto=format&fit=crop&q=80&w=2000'
 ];

@@ -67,7 +67,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     try {
-      const fullPhone = '+91' + phone;
+      const fullPhone = phone.startsWith('+') ? phone : '+91' + phone;
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -96,7 +96,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     <div className="modal-overlay active" onClick={onClose}>
       <div className="modal-dialog modal-split" onClick={(e) => e.stopPropagation()}>
         {/* Left Side: Image */}
-        <div className="modal-split-image" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=1000)' }}>
+        <div className="modal-split-image" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1590403328249-14a9a08eec13?auto=format&fit=crop&q=80&w=1000)' }}>
           <div className="modal-split-image-overlay">
             <h3 className="text-white">Your Family's Digital Welfare Passport</h3>
             <p className="text-white-alpha mt-2">Unlock personalized schemes, track applications, and store your important documents securely in one place.</p>
@@ -151,7 +151,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                       Send OTP <Send size={14} />
                     </button>
                     <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                      <a href="#" onClick={(e) => e.preventDefault()} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Mobile No.?</a>
+                      <a href="#" onClick={(e) => { e.preventDefault(); alert("To recover your Mobile No., please visit your nearest Gram Panchayat or CSC center with your Aadhaar Card."); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Mobile No.?</a>
                     </div>
                   </form>
                 ) : (
@@ -170,7 +170,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                       Continue <Send size={14} />
                     </button>
                     <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                      <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('phone'); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Saathi ID? Login with Phone</a>
+                      <a href="#" onClick={(e) => { e.preventDefault(); alert("To recover your Saathi ID, please login using your Mobile Number or visit your nearest Gram Panchayat office."); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Saathi ID?</a>
+                      <br/>
+                      <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('phone'); }} style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'inline-block', marginTop: '8px' }}>Login with Phone Instead</a>
                     </div>
                   </form>
                 )}

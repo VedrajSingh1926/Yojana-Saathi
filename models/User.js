@@ -36,7 +36,8 @@ const userSchema = new mongoose.Schema({
   documents: [{
     name: String,
     verified: { type: Boolean, default: false }
-  }]
+  }],
+  createdAtIST: { type: String, default: () => new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) }
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);
