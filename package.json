@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "test": "jest",
     "test:api:record": "keploy record -c \"npm run server\"",
-    "test:api:test": "keploy test -c \"npm run server\""
+    "test:api:test": "keploy test -c \"npm run server\"",
+    "test-local-api": "node /Users/apple/.gemini/antigravity-ide/brain/f7a1461c-002f-4404-88b8-51e7505e0fa2/scratch/test-endpoints.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -39,6 +40,7 @@
     "@vitejs/plugin-react": "^6.0.3",
     "concurrently": "^10.0.3",
     "jest": "^29.0.0",
+    "mongodb-memory-server": "^11.2.0",
     "nodemon": "^3.1.14",
     "oxlint": "^1.71.0",
     "supertest": "^6.3.3",

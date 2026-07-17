@@ -1,18 +1,21 @@
 import React from 'react';
 import { ArrowRight, Sparkles, ChevronRight, Landmark, Brain, IdCard } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { translations } from '../data/translations';
 
-export default function Home({ onNavigate, onTriggerAuth }) {
+export default function Home({ lang, onNavigate, onTriggerAuth }) {
+
+  const t = translations[lang] || translations.en;
 
   const milestones = [
-    { id: 'child', icon: '👶', title: 'Child Born', desc: 'Maternity relief, baby supplies, nutritional support.', cat: 'Women', color: 'bg-soft-blue' },
-    { id: 'education', icon: '🎓', title: 'Education', desc: 'Scholarships, study loans, books, laptop grants.', cat: 'Student', color: 'bg-soft-purple' },
-    { id: 'housing', icon: '🏠', title: 'House Building', desc: 'Urban/rural housing subsidies, repair funds.', cat: 'Housing', color: 'bg-soft-gold' },
-    { id: 'marriage', icon: '💍', title: 'Marriage', desc: 'Social support for daughters\' marriages, community funds.', cat: 'Women', color: 'bg-soft-red' },
-    { id: 'women', icon: '👩', title: 'Women', desc: 'Livelihood support, cooking gas subsidies, self-help groups.', cat: 'Women', color: 'bg-soft-rose' },
-    { id: 'senior', icon: '👴', title: 'Senior Citizen', desc: 'Old age pensions, health insurance, free transport cards.', cat: 'Senior Citizen', color: 'bg-soft-green' },
-    { id: 'farmer', icon: '🚜', title: 'Farmer Support', desc: 'Direct cash transfers, crop insurance, solar pump subsidies.', cat: 'Farmer', color: 'bg-soft-amber' },
-    { id: 'business', icon: '💼', title: 'Start a Business', desc: 'Collateral-free loans, seed funds, vendor startup kits.', cat: 'Business', color: 'bg-soft-cyan' },
+    { id: 'child', icon: '👶', title: t.milestoneChild || 'Child Born', desc: t.milestoneChildDesc || 'Maternity relief, baby supplies, nutritional support.', cat: 'Women', color: 'bg-soft-blue' },
+    { id: 'education', icon: '🎓', title: t.milestoneEducation || 'Education', desc: t.milestoneEducationDesc || 'Scholarships, study loans, books, laptop grants.', cat: 'Student', color: 'bg-soft-purple' },
+    { id: 'housing', icon: '🏠', title: t.milestoneHousing || 'House Building', desc: t.milestoneHousingDesc || 'Urban/rural housing subsidies, repair funds.', cat: 'Housing', color: 'bg-soft-gold' },
+    { id: 'marriage', icon: '💍', title: t.milestoneMarriage || 'Marriage', desc: t.milestoneMarriageDesc || 'Social support for daughters\' marriages, community funds.', cat: 'Women', color: 'bg-soft-red' },
+    { id: 'women', icon: '👩', title: t.milestoneWomen || 'Women', desc: t.milestoneWomenDesc || 'Livelihood support, cooking gas subsidies, self-help groups.', cat: 'Women', color: 'bg-soft-rose' },
+    { id: 'senior', icon: '👴', title: t.milestoneSenior || 'Senior Citizen', desc: t.milestoneSeniorDesc || 'Old age pensions, health insurance, free transport cards.', cat: 'Senior Citizen', color: 'bg-soft-green' },
+    { id: 'farmer', icon: '🚜', title: t.milestoneFarmer || 'Farmer Support', desc: t.milestoneFarmerDesc || 'Direct cash transfers, crop insurance, solar pump subsidies.', cat: 'Farmer', color: 'bg-soft-amber' },
+    { id: 'business', icon: '💼', title: t.milestoneBusiness || 'Start a Business', desc: t.milestoneBusinessDesc || 'Collateral-free loans, seed funds, vendor startup kits.', cat: 'Business', color: 'bg-soft-cyan' },
   ];
 
   const handleMilestoneClick = (category) => {
@@ -52,8 +55,8 @@ export default function Home({ onNavigate, onTriggerAuth }) {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="hero-title text-white"
           >
-            Every Family Deserves <br />
-            <span className="text-gradient">Every Benefit.</span>
+            {t.heroTitlePrefix || "Every Family Deserves "}<br />
+            <span className="text-gradient">{t.heroTitleGradient || "Every Benefit."}</span>
           </motion.h1>
 
           <motion.p 
@@ -62,7 +65,7 @@ export default function Home({ onNavigate, onTriggerAuth }) {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="hero-subtitle text-white-alpha"
           >
-            Yojana Saathi uses AI to match your household with government schemes, simplifying criteria, avoiding scams, and managing applications end-to-end.
+            {t.heroSubtitle || "Yojana Saathi uses AI to match your household with government schemes, simplifying criteria, avoiding scams, and managing applications end-to-end."}
           </motion.p>
 
           <motion.div 
@@ -72,18 +75,18 @@ export default function Home({ onNavigate, onTriggerAuth }) {
             className="hero-ctas"
           >
             <button className="btn btn-primary btn-lg" onClick={() => onTriggerAuth(true)}>
-              Get Started <ArrowRight size={18} />
+              {t.getStarted || "Get Started"} <ArrowRight size={18} />
             </button>
             <button className="btn btn-outline btn-outline-light btn-lg" onClick={() => onNavigate('planner')}>
-              <Sparkles size={18} className="text-gold" /> Try AI Planner
+              <Sparkles size={18} className="text-gold" /> {t.tryPlanner || "Try AI Planner"}
             </button>
             <button className="btn btn-text btn-text-light btn-lg" onClick={() => onNavigate('schemes')}>
-              Explore Schemes <ChevronRight size={18} />
+              {t.exploreSchemes || "Explore Schemes"} <ChevronRight size={18} />
             </button>
           </motion.div>
 
           <p className="hero-footer-text text-white-alpha">
-            🇮🇳 Made for India. Built for Every Family.
+            {t.madeForIndia || "🇮🇳 Made for India. Built for Every Family."}
           </p>
         </div>
       </section>
@@ -91,9 +94,9 @@ export default function Home({ onNavigate, onTriggerAuth }) {
       {/* Life Events Milestones Section */}
       <section className="section-container">
         <div className="section-header text-center">
-          <span className="section-tagline">DISCOVER BY LIFE MILESTONES</span>
-          <h2 className="section-title">Find Schemes by Life Events</h2>
-          <p className="section-desc">Choose a milestone below to instantly see helpful government programs.</p>
+          <span className="section-tagline">{t.discoverMilestones || "DISCOVER BY LIFE MILESTONES"}</span>
+          <h2 className="section-title">{t.findSchemesMilestone || "Find Schemes by Life Events"}</h2>
+          <p className="section-desc">{t.chooseMilestone || "Choose a milestone below to instantly see helpful government programs."}</p>
         </div>
         
         <div className="life-events-grid">

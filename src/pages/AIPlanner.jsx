@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Sparkles, Download, Compass, Mic, FileText, CheckCircle2, AlertTriangle, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { translations } from '../data/translations';
 
 export default function AIPlanner({ initialPrompt, user, lang }) {
   const [chat, setChat] = useState([
@@ -14,6 +15,18 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
   const API_URL = import.meta.env.VITE_API_URL || '';
+
+  const t = translations[lang] || translations.en;
+
+  useEffect(() => {
+    // Translate the initial welcome message when language changes
+    setChat(prev => {
+      if (prev.length === 1 && prev[0].sender === 'system' && prev[0].id === 1) {
+        return [{ id: 1, sender: 'system', text: lang === 'hi' ? "नमस्ते! मैं योजना साथी का एआई कल्याण योजनाकार हूं। आपके परिवार को किस चीज़ की आवश्यकता है, इसका वर्णन करें या नीचे दिए गए कार्डों में से एक चुनें, और मैं आपके लिए एक रोडमैप तैयार करूँगा।" : "Hello! I am Yojana Saathi's AI Welfare Planner. Describe what your household needs or plans, or select one of the cards below, and I will generate a step-by-step Welfare Roadmap for you." }];
+      }
+      return prev;
+    });
+  }, [lang]);
 
   useEffect(() => {
     if (initialPrompt) {
@@ -31,10 +44,10 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   }, [chat, typing]);
 
   const starters = [
-    { text: 'I want to build my first house', icon: '🏠', desc: 'AI will analyze PMAY and state housing subsidies.' },
-    { text: 'My daughter needs a scholarship to study engineering', icon: '🎓', desc: 'AI finds national higher education student waivers.' },
-    { text: 'I want to start a dairy business in my village', icon: '🚜', desc: 'AI maps mudra loans, dairy enterprise schemes.' },
-    { text: 'My father is turning 60 this month and has no pension', icon: '👴', desc: 'AI links pension funds and health insurance plans.' }
+    { text: t.starter1 || 'I want to build my first house', icon: '🏠', desc: t.starter1Desc || 'AI will analyze PMAY and state housing subsidies.' },
+    { text: t.starter2 || 'My daughter needs a scholarship to study engineering', icon: '🎓', desc: t.starter2Desc || 'AI finds national higher education student waivers.' },
+    { text: t.starter3 || 'I want to start a dairy business in my village', icon: '🚜', desc: t.starter3Desc || 'AI maps mudra loans, dairy enterprise schemes.' },
+    { text: t.starter4 || 'My father is turning 60 this month and has no pension', icon: '👴', desc: t.starter4Desc || 'AI links pension funds and health insurance plans.' }
   ];
 
   const handleVoiceInput = async () => {
@@ -58,7 +71,7 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
         formData.append('audio', audioBlob, 'audio.webm');
         formData.append('language', lang);
 
-        setInput('Transcribing via Gnani...');
+        setInput(t.transcribing || 'Transcribing via Gnani...');
         try {
           const response = await fetch(`${API_URL}/api/ai/stt`, { method: 'POST', body: formData });
           const data = await response.json();
@@ -79,7 +92,7 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
 
       mediaRecorder.current.start();
       setIsListening(true);
-      setInput('Listening via Gnani.ai... (Click mic to stop)');
+      setInput(t.listening || 'Listening via Gnani.ai... (Click mic to stop)');
     } catch (err) {
       console.error('Microphone access error:', err);
       alert('Could not access microphone.');
@@ -155,11 +168,11 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   };
 
   return (
-    <div className="view-section animate-fade-in">
+    <div className="view-section planner-view-section animate-fade-in">
       <div className="planner-hero">
-        <span className="pill-badge"><Sparkles size={14} style={{ display: 'inline', marginRight: '4px' }} /> Personal AI Welfare Advisor</span>
-        <h1>Plan Your Government Journey</h1>
-        <p className="text-muted">Describe what your household needs or plans, and our AI will map out a roadmap of schemes you should target, how to prepare documents, and when to apply.</p>
+        <span className="pill-badge"><Sparkles size={14} style={{ display: 'inline', marginRight: '4px' }} /> {t.plannerBadge || 'Personal AI Welfare Advisor'}</span>
+        <h1>{t.plannerTitle || 'Plan Your Government Journey'}</h1>
+        <p className="text-muted">{t.plannerSubtitle || 'Describe what your household needs or plans, and our AI will map out a roadmap of schemes you should target, how to prepare documents, and when to apply.'}</p>
       </div>
 
       <div className="planner-workspace">
@@ -302,11 +315,11 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Ask AI: e.g. 'I want to open a small shop...'"
+              placeholder={t.askPlaceholder || "Ask AI: e.g. 'I want to open a small shop...'"}
               style={{ flex: 1 }}
             />
             <button className="btn btn-primary" onClick={() => handleSendPrompt(input)} style={{ flexShrink: 0 }}>
-              <span>Send</span> <Send size={16} />
+              <span>{t.send || 'Send'}</span> <Send size={16} />
             </button>
           </div>
           

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Globe, Link, Video, Camera } from 'lucide-react';
 
-export default function Footer({ onNavigate, onTriggerAuth }) {
+export default function Footer({ user, onNavigate, onTriggerAuth }) {
   return (
     <footer className="glass-footer">
       <div className="footer-container">
@@ -54,15 +54,17 @@ export default function Footer({ onNavigate, onTriggerAuth }) {
         </div>
 
         {/* CTA Column */}
-        <div className="footer-brand-action">
-          <div className="footer-cta-card">
-            <h3>Ready to Get Started?</h3>
-            <p className="text-sm text-muted mb-3">Create your verified household profile and unlock all matching welfare benefits.</p>
-            <button className="btn btn-primary w-full" onClick={() => onTriggerAuth(true)}>
-              Get Started Now
-            </button>
+        {!user && (
+          <div className="footer-brand-action">
+            <div className="footer-cta-card">
+              <h3>Ready to Get Started?</h3>
+              <p className="text-sm text-muted mb-3">Create your verified household profile and unlock all matching welfare benefits.</p>
+              <button className="btn btn-primary w-full" onClick={() => onTriggerAuth(true)}>
+                Get Started Now
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
 
