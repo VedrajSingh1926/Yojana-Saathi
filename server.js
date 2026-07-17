@@ -4,6 +4,7 @@ import cors from 'cors';
 import 'dotenv/config';
 
 import authRoutes from './routes/auth.js';
+import aiRoutes from './routes/ai.js';
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -23,6 +24,7 @@ app.get('/api/test', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/ai', aiRoutes);
 
 if (process.env.NODE_ENV !== 'production') {
   app.listen(port, () => {

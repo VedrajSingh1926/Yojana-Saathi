@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { X, Send, Fingerprint, Phone } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
-  const [loginMethod, setLoginMethod] = useState('mobile'); // 'mobile' or 'saathi'
+  const [loginMethod, setLoginMethod] = useState('mobile'); // 'mobile' or 'saathi' or 'recovery'
   const [phone, setPhone] = useState('');
   const [saathiId, setSaathiId] = useState('');
+  const [password, setPassword] = useState('');
   const [maskedPhone, setMaskedPhone] = useState('');
-  
-  const [step, setStep] = useState(1); // 1: Input ID/Mobile, 2: Confirm Masked (for Saathi), 3: Enter OTP
-  const [otp, setOtp] = useState('');
+  const [recoveryInput, setRecoveryInput] = useState('');
+  const [recoveredData, setRecoveredData] = useState(null);
 
   if (!isOpen) return null;
 
@@ -36,59 +36,56 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     }
   };
 
-  const handleSendOtp = async (e) => {
-    if (e) e.preventDefault();
-    if (phone.length < 5) {
-      alert("Please enter a valid mobile number.");
-      return;
-    }
-    
+  const handleRecovery = async (e) => {
+    e.preventDefault();
+    if (!recoveryInput.trim()) return alert("Enter Phone Number or Email");
+
     try {
-      const fullPhone = '+91' + phone;
-      const res = await fetch('/api/auth/send-otp', {
+      const res = await fetch('/api/auth/recover', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: fullPhone })
+        body: JSON.stringify({ identifier: recoveryInput })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRecoveredData({ saathiId: data.saathiId, maskedMobile: data.maskedMobile });
+      } else {
+        alert(data.message || "Account not found.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error looking up account.");
+    }
+  };
+
+  const handleLogin = async (e, type) => {
+    e.preventDefault();
+    const identifier = type === 'mobile' ? phone : saathiId;
+    if (!identifier || !password) {
+      return alert("Please enter all required fields.");
+    }
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, password })
       });
       const data = await res.json();
       
       if (data.success) {
-        setStep(3);
-        alert("SMS OTP Sent successfully!");
-      } else {
-        alert(data.message || "Failed to send OTP.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error connecting to server to send OTP.");
-    }
-  };
-
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    try {
-      const fullPhone = phone.startsWith('+') ? phone : '+91' + phone;
-      const res = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: fullPhone, otp })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        onLoginSuccess(data.user, data.user?.saathiId);
+        onLoginSuccess(data.user, data.saathiId);
         onClose();
         // Reset
         setPhone('');
         setSaathiId('');
-        setOtp('');
-        setStep(1);
+        setPassword('');
       } else {
-        alert(data.message || "Invalid OTP code.");
+        alert(data.message || "Invalid credentials.");
       }
     } catch (err) {
       console.error(err);
-      alert("Error connecting to server to verify OTP.");
+      alert("Error connecting to server.");
     }
   };
 
@@ -112,28 +109,27 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           
           <div className="modal-body">
             
-            {step === 1 && (
               <>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', background: 'var(--lux-bg)', padding: '4px', borderRadius: '12px' }}>
                   <button 
                     style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: loginMethod === 'mobile' ? 'white' : 'transparent', boxShadow: loginMethod === 'mobile' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', fontWeight: loginMethod === 'mobile' ? 600 : 500, color: loginMethod === 'mobile' ? 'var(--lux-text)' : 'var(--lux-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', cursor: 'pointer' }}
-                    onClick={() => { setLoginMethod('mobile'); setPhone(''); }}
+                    onClick={() => { setLoginMethod('mobile'); setPhone(''); setPassword(''); }}
                   >
                     <Phone size={16} /> Mobile
                   </button>
                   <button 
                     style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: loginMethod === 'saathi' ? 'white' : 'transparent', boxShadow: loginMethod === 'saathi' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', fontWeight: loginMethod === 'saathi' ? 600 : 500, color: loginMethod === 'saathi' ? 'var(--lux-text)' : 'var(--lux-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', cursor: 'pointer' }}
-                    onClick={() => { setLoginMethod('saathi'); setSaathiId(''); }}
+                    onClick={() => { setLoginMethod('saathi'); setSaathiId(''); setPassword(''); }}
                   >
                     <Fingerprint size={16} /> Saathi ID
                   </button>
                 </div>
 
                 {loginMethod === 'mobile' ? (
-                  <form onSubmit={handleSendOtp}>
+                  <form onSubmit={(e) => handleLogin(e, 'mobile')}>
                     <div className="form-group">
                       <label>Mobile Number</label>
-                      <div className="phone-input-wrapper" style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-darkest)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.25rem' }}>
+                      <div className="phone-input-wrapper" style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-darkest)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.25rem', marginBottom: '1rem' }}>
                         <span style={{ padding: '0.5rem 0.75rem', color: 'var(--text-muted)', fontWeight: '500', borderRight: '1px solid var(--border-color)' }}>+91</span>
                         <input 
                           type="tel" 
@@ -147,16 +143,26 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                         />
                       </div>
                     </div>
+                    <div className="form-group">
+                      <label>Password</label>
+                      <input 
+                        type="password" 
+                        required 
+                        placeholder="Enter your password" 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
                     <button type="submit" className="btn btn-primary w-full mt-3">
-                      Send OTP <Send size={14} />
+                      Login <Send size={14} />
                     </button>
                     <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                      <a href="#" onClick={(e) => { e.preventDefault(); alert("To recover your Mobile No., please visit your nearest Gram Panchayat or CSC center with your Aadhaar Card."); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Mobile No.?</a>
+                      <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('recovery'); setRecoveredData(null); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Mobile No.?</a>
                     </div>
                   </form>
-                ) : (
-                  <form onSubmit={handleLookupSaathi}>
-                    <div className="form-group">
+                ) : loginMethod === 'saathi' ? (
+                  <form onSubmit={(e) => handleLogin(e, 'saathi')}>
+                    <div className="form-group" style={{ marginBottom: '1rem' }}>
                       <label>Saathi ID</label>
                       <input 
                         type="text" 
@@ -166,64 +172,59 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                         onChange={(e) => setSaathiId(e.target.value.toUpperCase())}
                       />
                     </div>
+                    <div className="form-group">
+                      <label>Password</label>
+                      <input 
+                        type="password" 
+                        required 
+                        placeholder="Enter your password" 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
                     <button type="submit" className="btn btn-primary w-full mt-3">
-                      Continue <Send size={14} />
+                      Login <Send size={14} />
                     </button>
                     <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                      <a href="#" onClick={(e) => { e.preventDefault(); alert("To recover your Saathi ID, please login using your Mobile Number or visit your nearest Gram Panchayat office."); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Saathi ID?</a>
-                      <br/>
-                      <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('phone'); }} style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'inline-block', marginTop: '8px' }}>Login with Phone Instead</a>
+                      <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('recovery'); setRecoveredData(null); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Saathi ID?</a>
                     </div>
+                  </form>
+                ) : (
+                  <form onSubmit={handleRecovery}>
+                    {recoveredData ? (
+                      <div style={{ background: 'var(--bg-darkest)', padding: '1.5rem', borderRadius: '12px', border: '1px dashed var(--gold)', textAlign: 'center' }}>
+                        <h4 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>Account Recovered</h4>
+                        <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Your Saathi ID:</p>
+                        <strong style={{ fontSize: '1.2rem', color: 'var(--text-primary)', display: 'block', marginBottom: '1rem' }}>{recoveredData.saathiId}</strong>
+                        <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Linked Mobile:</p>
+                        <strong style={{ fontSize: '1.2rem', color: 'var(--text-primary)', display: 'block' }}>{recoveredData.maskedMobile}</strong>
+                        <button type="button" className="btn btn-primary w-full mt-4" onClick={() => { setLoginMethod('mobile'); }}>
+                          Back to Login
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="form-group">
+                          <label>Enter Registered Email or Mobile</label>
+                          <input 
+                            type="text" 
+                            required 
+                            placeholder="Email or Phone Number" 
+                            value={recoveryInput}
+                            onChange={(e) => setRecoveryInput(e.target.value)}
+                          />
+                        </div>
+                        <button type="submit" className="btn btn-primary w-full mt-3">
+                          Recover Details
+                        </button>
+                        <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                          <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('mobile'); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Back to Login</a>
+                        </div>
+                      </>
+                    )}
                   </form>
                 )}
               </>
-            )}
-
-            {step === 2 && (
-              <form onSubmit={handleSendOtp}>
-                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                  <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(199,169,107,0.1)', color: 'var(--lux-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                    <Fingerprint size={30} />
-                  </div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--lux-text)' }}>Account Found</h3>
-                  <p style={{ color: 'var(--lux-muted)', fontSize: '14px', marginTop: '8px' }}>
-                    Linked Mobile Number:<br/>
-                    <strong style={{ fontSize: '20px', color: 'var(--lux-text)', letterSpacing: '2px', display: 'block', marginTop: '8px' }}>{maskedPhone}</strong>
-                  </p>
-                </div>
-                <button type="submit" className="btn btn-primary w-full">
-                  Send OTP to this number
-                </button>
-                <button type="button" className="btn btn-outline w-full mt-3" onClick={() => setStep(1)}>
-                  Back
-                </button>
-              </form>
-            )}
-
-            {step === 3 && (
-              <form onSubmit={handleVerifyOtp}>
-                <div className="form-group">
-                  <label>Enter 6-digit OTP</label>
-                  <input 
-                    type="text" 
-                    required 
-                    maxLength={6}
-                    pattern="[0-9]{6}"
-                    placeholder="123456" 
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    autoFocus
-                  />
-                  <span className="form-hint text-gold">An OTP code was sent to {loginMethod === 'saathi' ? maskedPhone : phone}.</span>
-                </div>
-                <button type="submit" className="btn btn-primary w-full mt-3">
-                  Verify OTP <Send size={14} />
-                </button>
-                <button type="button" className="btn btn-outline w-full mt-3" onClick={() => { setStep(1); setOtp(''); }}>
-                  Cancel
-                </button>
-              </form>
-            )}
 
             <div className="auth-alternative-footer mt-4">
               <p className="text-sm text-center">

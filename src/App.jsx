@@ -14,6 +14,7 @@ import Family from './pages/Family';
 import ScamShield from './pages/ScamShield';
 import Onboarding from './pages/Onboarding';
 import GovFormAssistant from './pages/GovFormAssistant';
+import Partners from './pages/Partners';
 
 export default function App() {
   const [activeView, setActiveView] = useState('home');
@@ -40,7 +41,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant'].includes(hash)) {
+      if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant', 'partners'].includes(hash)) {
         setActiveView(hash);
       }
     };
@@ -307,6 +308,8 @@ export default function App() {
 
         {activeView === 'onboarding' && (
           <Onboarding 
+            stateLocation={stateLocation}
+            onChangeState={setStateLocation}
             onTriggerAuth={() => setIsAuthOpen(true)}
             onComplete={(data, saathiId) => {
               handleLoginSuccess(data, saathiId);
@@ -320,6 +323,10 @@ export default function App() {
             user={user}
             onBack={() => handleNavigate('schemes')}
           />
+        )}
+
+        {activeView === 'partners' && (
+          <Partners />
         )}
       </main>
 

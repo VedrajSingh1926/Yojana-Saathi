@@ -1,6 +1,7 @@
 import express from 'express';
 import User from '../models/User.js';
 import twilio from 'twilio';
+import bcrypt from 'bcryptjs';
 
 const router = express.Router();
 
@@ -111,6 +112,13 @@ router.post('/register', async (req, res) => {
   try {
     const { personal, household, details, goals } = req.body;
     
+    if (!personal.password) {
+      return res.status(400).json({ success: false, message: 'Password is required' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(personal.password, salt);
+
     const generateSaathiId = () => 'YS-' + new Date().getFullYear() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
     let saathiId = generateSaathiId();
     while (await User.findOne({ saathiId })) {
@@ -125,6 +133,7 @@ router.post('/register', async (req, res) => {
     const newUser = new User({
       saathiId,
       fullName: personal.name,
+      password: hashedPassword,
       mobileNumber: formattedNumber,
       email: personal.email,
       state: personal.state,
@@ -167,6 +176,99 @@ router.post('/saathi-lookup', async (req, res) => {
   } catch (error) {
     console.error('Saathi Lookup Error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// Check if phone number already exists
+router.post('/check-number', async (req, res) => {
+  const { phoneNumber } = req.body;
+  if (!phoneNumber) return res.status(400).json({ success: false, message: 'Phone number is required' });
+
+  let formattedNumber = phoneNumber;
+  if (!formattedNumber.startsWith('+')) {
+    formattedNumber = '+91' + formattedNumber;
+  }
+
+  try {
+    const user = await User.findOne({ mobileNumber: formattedNumber });
+    if (user) {
+      return res.status(200).json({ success: true, exists: true, message: 'Phone number already registered' });
+    }
+    return res.status(200).json({ success: true, exists: false });
+  } catch (error) {
+    console.error('Check Number Error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// Recover Saathi ID / Mobile
+router.post('/recover', async (req, res) => {
+  const { identifier } = req.body;
+  if (!identifier) return res.status(400).json({ success: false, message: 'Phone number or Email is required' });
+
+  let query = {};
+  if (identifier.includes('@')) {
+    query.email = identifier;
+  } else {
+    let formattedNumber = identifier;
+    if (!formattedNumber.startsWith('+')) {
+      formattedNumber = '+91' + formattedNumber;
+    }
+    query.mobileNumber = formattedNumber;
+  }
+
+  try {
+    const user = await User.findOne(query);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'No account found with this information' });
+    }
+    
+    // Return Saathi ID and masked mobile number
+    const phone = user.mobileNumber;
+    const masked = 'x'.repeat(phone.length - 2) + phone.slice(-2);
+
+    return res.status(200).json({ success: true, saathiId: user.saathiId, maskedMobile: masked, message: 'Account found successfully' });
+  } catch (error) {
+    console.error('Recover Error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// Route to Login with Password
+router.post('/login', async (req, res) => {
+  const { identifier, password } = req.body;
+  if (!identifier || !password) {
+    return res.status(400).json({ success: false, message: 'Identifier and password are required' });
+  }
+
+  let query = {};
+  if (identifier.includes('@')) {
+    query.email = identifier;
+  } else if (identifier.toUpperCase().startsWith('YS-')) {
+    query.saathiId = identifier.toUpperCase();
+  } else {
+    let formattedNumber = identifier;
+    if (!formattedNumber.startsWith('+')) {
+      formattedNumber = '+91' + formattedNumber;
+    }
+    query.mobileNumber = formattedNumber;
+  }
+
+  try {
+    const user = await User.findOne(query);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    res.status(200).json({ success: true, message: 'Logged in successfully', user, saathiId: user.saathiId });
+  } catch (error) {
+    console.error('Login Error:', error);
+    res.status(500).json({ success: false, message: 'Server error during login' });
   }
 });
 

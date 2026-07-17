@@ -1,19 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ChevronRight, User, Home, Upload, Target, Sparkles, Loader2, Plus, X, Users, Fingerprint } from 'lucide-react';
 
-export default function Onboarding({ onComplete, onTriggerAuth }) {
+export default function Onboarding({ stateLocation, onChangeState, onComplete, onTriggerAuth }) {
   const [step, setStep] = useState(1);
   const [otpSent, setOtpSent] = useState(false);
   const [mobileOtp, setMobileOtp] = useState(['', '', '', '', '', '']);
   const [generatedSaathiId, setGeneratedSaathiId] = useState(null);
 
   const [formData, setFormData] = useState({
-    personal: { name: '', age: '', gender: 'Male', occupation: '', income: '', phone: '', email: '', state: '', district: '' },
-    household: { isHead: 'Yes', members: [] },
+    personal: { name: '', age: '', gender: 'Male', occupation: '', income: '', phone: '', email: '', password: '', state: stateLocation || '', district: '' },
+    household: { isHead: 'Yes', headName: '', members: [] },
     details: { houseType: 'Own', area: 'Urban', category: 'General', farmer: 'No', bpl: 'No', bank: 'Yes', land: 'None' },
     goals: []
   });
+
+  useEffect(() => {
+    if (formData.personal.state && onChangeState && formData.personal.state !== stateLocation) {
+      onChangeState(formData.personal.state);
+    }
+  }, [formData.personal.state]);
 
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -193,6 +199,11 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
                   value={formData.personal.email} onChange={(e) => setFormData({...formData, personal: {...formData.personal, email: e.target.value}})} />
               </div>
               <div className="form-group">
+                <label>Password</label>
+                <input type="password" required className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
+                  value={formData.personal.password} onChange={(e) => setFormData({...formData, personal: {...formData.personal, password: e.target.value}})} />
+              </div>
+              <div className="form-group">
                 <label>State</label>
                 <input type="text" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
                   value={formData.personal.state} onChange={(e) => setFormData({...formData, personal: {...formData.personal, state: e.target.value}})} />
@@ -210,12 +221,26 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
                   return;
                 }
                 
-                nextStep();
+                setIsSendingOtp(true);
+                try {
+                  const fullPhone = '+91' + formData.personal.phone;
+                  
+                  // Check if number exists
+                  const checkRes = await fetch('/api/auth/check-number', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber: fullPhone })
+                  });
+                  const checkData = await checkRes.json();
+                  
+                  if (checkData.exists) {
+                    alert("This mobile number is already registered. Please login instead.");
+                    if (onTriggerAuth) onTriggerAuth(false);
+                    setIsSendingOtp(false);
+                    return;
+                  }
 
-                if (!otpSent) {
-                  setIsSendingOtp(true);
-                  try {
-                    const fullPhone = '+91' + formData.personal.phone;
+                  if (!otpSent) {
                     const res = await fetch('/api/auth/send-otp', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
@@ -224,15 +249,18 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
                     const data = await res.json();
                     if (data.success) {
                       setOtpSent(true);
+                      nextStep();
                     } else {
                       alert(data.message || "Failed to send OTP.");
                     }
-                  } catch (err) {
-                    console.error(err);
-                    alert("Error connecting to server to send OTP.");
-                  } finally {
-                    setIsSendingOtp(false);
+                  } else {
+                    nextStep();
                   }
+                } catch (err) {
+                  console.error(err);
+                  alert("Error connecting to server.");
+                } finally {
+                  setIsSendingOtp(false);
                 }
               }}>Next <ChevronRight size={18} /></button>
             </div>
@@ -356,6 +384,17 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
               </select>
             </div>
 
+            {formData.household.isHead === 'No' && (
+              <div className="form-group" style={{ marginBottom: '2rem' }}>
+                <label>Family Head Name</label>
+                <input type="text" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)', maxWidth: '400px' }} 
+                  placeholder="Enter name of the Family Head"
+                  value={formData.household.headName || ''} 
+                  onChange={(e) => setFormData({...formData, household: {...formData.household, headName: e.target.value}})} 
+                />
+              </div>
+            )}
+
             {/* Added Members List - Premium Cards */}
             {formData.household.members.length > 0 && (
               <div style={{ marginBottom: '1.5rem' }}>
@@ -437,7 +476,14 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
             </div>
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
               <button type="button" className="btn btn-text" onClick={prevStep}>Back</button>
-              <button type="button" className="btn btn-primary" onClick={nextStep}>Next <ChevronRight size={18} /></button>
+              <button type="button" className="btn btn-primary" onClick={() => {
+                const { houseType, area, land, category, bank, farmer, bpl } = formData.details;
+                if (!houseType || !area || !land || !category || !bank || !farmer || !bpl) {
+                  alert("Please fill in all house details before proceeding.");
+                  return;
+                }
+                nextStep();
+              }}>Next <ChevronRight size={18} /></button>
             </div>
           </motion.div>
         )}
@@ -479,7 +525,7 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
             <p className="text-muted mb-4">What would you like the AI to help you achieve?</p>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-              {['🏠 House', '🎓 Education', '💼 Employment', '💰 Business', '👩 Women', '❤️ Health', '🌾 Agriculture', '👴 Pension'].map(goal => (
+              {['🏠 House', '🎓 Education', '💼 Employment', '💰 Business', '👩 Women Improvement', '❤️ Health', '🌾 Agriculture', '👴 Pension'].map(goal => (
                 <motion.div 
                   whileHover={{ scale: 1.05 }}
                   key={goal} 

@@ -2,21 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight, Sparkles, ChevronRight, Landmark, Brain, IdCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const HERO_IMAGES = [
-  'https://images.unsplash.com/photo-1530022718889-8d7529323eb7?auto=format&fit=crop&q=80&w=2000',
-  'https://images.unsplash.com/photo-1596395819057-e37f55a8516d?auto=format&fit=crop&q=80&w=2000',
-  'https://images.unsplash.com/photo-1627885060195-021bdeea6438?auto=format&fit=crop&q=80&w=2000'
-];
-
 export default function Home({ onNavigate, onTriggerAuth }) {
-  const [bgIndex, setBgIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setBgIndex((prev) => (prev + 1) % HERO_IMAGES.length);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, []);
 
   const milestones = [
     { id: 'child', icon: '👶', title: 'Child Born', desc: 'Maternity relief, baby supplies, nutritional support.', cat: 'Women', color: 'bg-soft-blue' },
@@ -37,17 +23,16 @@ export default function Home({ onNavigate, onTriggerAuth }) {
     <div className="view-section animate-fade-in" style={{ padding: 0, maxWidth: '100%' }}>
       {/* Hero Section */}
       <section className="hero-section hero-carousel">
-        <AnimatePresence mode="popLayout">
-          <motion.div
-            key={bgIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5 }}
-            className="hero-carousel-bg"
-            style={{ backgroundImage: `url(${HERO_IMAGES[bgIndex]})` }}
-          />
-        </AnimatePresence>
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          className="hero-carousel-bg"
+          style={{ objectFit: 'cover' }}
+        >
+          <source src="/Background Video.mp4" type="video/mp4" />
+        </video>
         
         <div className="hero-carousel-overlay"></div>
 

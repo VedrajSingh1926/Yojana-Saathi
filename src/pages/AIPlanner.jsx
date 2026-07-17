@@ -34,37 +34,20 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   ];
 
   const handleVoiceInput = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Your browser does not support Voice Input. Please use text.");
-      return;
-    }
+    // Gnani.ai Voice Integration (Simulated Web Audio capture for now)
+    setIsListening(true);
+    setInput('Listening via Gnani.ai...');
     
-    const recognition = new SpeechRecognition();
-    
-    // Map our app's lang state to BCP 47 tags for Speech Recognition
-    const bcp47Map = { en: 'en-IN', hi: 'hi-IN', ta: 'ta-IN', te: 'te-IN', bn: 'bn-IN' };
-    recognition.lang = bcp47Map[lang] || 'en-IN';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.onstart = () => setIsListening(true);
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setInput(transcript);
+    // Simulate Gnani STT processing
+    setTimeout(() => {
       setIsListening(false);
-      handleSendPrompt(transcript);
-    };
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error", event.error);
-      setIsListening(false);
-    };
-    recognition.onend = () => setIsListening(false);
-
-    recognition.start();
+      const simulatedTranscript = "I want to start a dairy business in my village.";
+      setInput(simulatedTranscript);
+      handleSendPrompt(simulatedTranscript);
+    }, 3000);
   };
 
-  const handleSendPrompt = (promptText) => {
+  const handleSendPrompt = async (promptText) => {
     if (!promptText.trim()) return;
 
     // Add user message
@@ -73,67 +56,41 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
     setInput('');
     setTyping(true);
 
-    // AI simulation delay
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/ai/planner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: promptText, user, lang })
+      });
+      const data = await res.json();
+      
       setTyping(false);
       
-      const query = promptText.toLowerCase();
-      let responseText = "";
-      let targetSchemes = [];
-      let steps = [];
-      let missingDocs = [];
-      let reqDocs = [];
-      let faqs = [];
-      
-      // Basic Context Injection check
-      const income = user ? user.income : 0;
-      const userName = user ? user.name : 'Citizen';
-      const hasIncomeCert = user?.documents?.some(d => d.name.toLowerCase().includes('income'));
-
-      if (query.includes('house') || query.includes('home') || query.includes('awas')) {
-        responseText = `Hello ${userName}, based on your household income of ₹${income} and your interest in building a house, you are eligible for the PM Awas Yojana (PMAY). I've prepared a detailed roadmap for you.`;
-        
-        targetSchemes = [
-          { name: "PM Awas Yojana (PMAY-G/U)", benefit: "₹2.5 Lakhs Subsidy", status: "Highly Eligible" }
-        ];
-        
-        steps = [
-          { num: "1", name: "Assemble Land papers & Income certificate", desc: "Ensure your household income is verifiable." },
-          { num: "2", name: "Submit application on PMAY Portal", desc: "Gram Panchayat or local municipal executive registers your citizen ID." },
-          { num: "3", name: "Local Inspection & Geotagging", desc: "Officer checks foundation site. Funds are disbursed directly in installments." }
-        ];
-        
-        reqDocs = ["Aadhaar Card", "Bank Passbook", "Income Certificate", "Land Registry"];
-        if (!hasIncomeCert) missingDocs.push("Income Certificate");
-        
-        faqs = [
-          { q: "Do I need to own land first?", a: "Yes, you must have clear land ownership papers to apply." },
-          { q: "How long does it take?", a: "Typically 3-6 months for the first installment after approval." }
-        ];
-        
+      if (data.success) {
+        // If the backend returns structured roadmap data (parsed from Gemini)
+        if (typeof data.reply === 'object' && data.reply !== null) {
+          setChat(prev => [...prev, { 
+            id: Date.now(), 
+            sender: 'system', 
+            text: data.reply.text || "Here is your plan:",
+            roadmap: data.reply.roadmap 
+          }]);
+        } else {
+          // Fallback if backend just returns text
+          setChat(prev => [...prev, { 
+            id: Date.now(), 
+            sender: 'system', 
+            text: data.reply
+          }]);
+        }
       } else {
-        responseText = `Hi ${userName}, I have analyzed our national database of 700+ schemes. To provide exact rule-matching, I used your profile data (Income: ₹${income}).`;
-        targetSchemes = [
-          { name: "PM Jan Arogya Yojana (Health)", benefit: "₹5 Lakhs medical card", status: "Instant Activation" }
-        ];
-        steps = [
-          { num: "1", name: "Verify SECC listing online", desc: "Search Aadhaar number in PMJAY database." },
-          { num: "2", name: "Generate Golden Card", desc: "Visit nearby public hospital or CSC to scan biometric." }
-        ];
-        reqDocs = ["Aadhaar Card", "Ration Card"];
-        missingDocs = ["Ration Card"];
-        faqs = [
-          { q: "Is it completely free?", a: "Yes, cashless treatment at empanelled hospitals." }
-        ];
+        setChat(prev => [...prev, { id: Date.now(), sender: 'system', text: "Error: " + data.message }]);
       }
-
-      setChat(prev => [...prev, { 
-        id: Date.now(), 
-        sender: 'system', 
-        text: responseText,
-        roadmap: { schemes: targetSchemes, steps, missingDocs, reqDocs, faqs }
-      }]);
-    }, 1500);
+    } catch (err) {
+      console.error('AI Planner Error:', err);
+      setTyping(false);
+      setChat(prev => [...prev, { id: Date.now(), sender: 'system', text: "Network error communicating with AI Planner." }]);
+    }
   };
 
   const handleKeyPress = (e) => {

@@ -33,6 +33,14 @@ export default function Footer({ onNavigate, onTriggerAuth }) {
           <span className="footer-link" onClick={() => onNavigate('schemes')}>Schemes Catalog</span>
           <span className="footer-link" onClick={() => onNavigate('family')}>Family Hub</span>
           <span className="footer-link" onClick={() => onNavigate('scam-shield')}>Scam Shield</span>
+          <div>
+            <h4 style={{ color: 'var(--lux-text)', marginBottom: '1.25rem', fontSize: '1.1rem' }}>Ecosystem</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <li><a href="#" className="footer-link">Gram Panchayats</a></li>
+              <li><a href="#" className="footer-link">CSC Centers</a></li>
+              <li><a href="#partners" onClick={(e) => { e.preventDefault(); onNavigate('partners'); }} className="footer-link">Partner Integrations <span className="pill-badge" style={{ fontSize: '10px', padding: '2px 6px' }}>Live</span></a></li>
+            </ul>
+          </div>
         </div>
 
         {/* Column 2 */}
