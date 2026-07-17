@@ -303,7 +303,7 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
                       <ShieldCheck size={18} /> WELFARE PASSPORT
                     </div>
                     <div style={{ background: '#fff', padding: '0.5rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-                      <QRCode value={`YS-9824-${user.name}`} size={80} fgColor="#0a1945" />
+                      <QRCode value={`${user.saathiId}-${user.name}`} size={80} fgColor="#0a1945" />
                     </div>
                   </div>
 
@@ -363,7 +363,7 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
                         </div>
                         <div>
                           <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', letterSpacing: '1px' }}>YOJANA ID</div>
-                          <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#c2410c' }}>YS-9824</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#c2410c' }}>{user.saathiId}</div>
                         </div>
                       </div>
 
@@ -374,7 +374,10 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
                         </div>
                         <div>
                           <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', letterSpacing: '1px' }}>SAATHI CARD</div>
-                          <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#0a1945' }}>Created on<br/>16 July 2026</div>
+                          <div style={{ display: 'flex', gap: '20px' }}>
+                            <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#0a1945' }}>Created on<br/>{user.events?.[0]?.date || new Date().toLocaleDateString('en-GB')}</div>
+                            <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#0a1945' }}>Validity<br/>Lifetime</div>
+                          </div>
                         </div>
                       </div>
                     </div>
