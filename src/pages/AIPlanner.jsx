@@ -13,7 +13,7 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   const messagesEndRef = useRef(null);
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
-  const API_URL = import.meta.env.VITE_API_URL || '';
+  const API_URL = import.meta.env.VITE_API_URL || 'https://yojana-saathi-qkgl.onrender.com';
 
   useEffect(() => {
     if (initialPrompt) {

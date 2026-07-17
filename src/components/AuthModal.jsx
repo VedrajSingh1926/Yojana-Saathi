@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Send, Fingerprint, Phone } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
-  const API_URL = import.meta.env.VITE_API_URL || '';
+  const API_URL = import.meta.env.VITE_API_URL || 'https://yojana-saathi-qkgl.onrender.com';
   const [loginMethod, setLoginMethod] = useState('mobile'); // 'mobile' or 'saathi' or 'recovery'
   const [phone, setPhone] = useState('');
   const [saathiId, setSaathiId] = useState('');
