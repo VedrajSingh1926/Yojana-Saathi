@@ -13,7 +13,7 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   const messagesEndRef = useRef(null);
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
-  const API_URL = import.meta.env.VITE_API_URL || 'https://yojana-saathi-qkgl.onrender.com';
+  const API_URL = import.meta.env.VITE_API_URL || '';
 
   useEffect(() => {
     if (initialPrompt) {
@@ -89,25 +89,39 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   const handleSendPrompt = async (promptText) => {
     if (!promptText.trim()) return;
 
+    console.log('[Frontend Debug] Button clicked / Send initiated with prompt:', promptText);
+
     // Add user message
     const userMsgId = Date.now();
-    setChat(prev => [...prev, { id: userMsgId, sender: 'user', text: promptText }]);
+    setChat(prev => {
+      console.log('[Frontend Debug] Updating State (User Message)');
+      return [...prev, { id: userMsgId, sender: 'user', text: promptText }];
+    });
     setInput('');
     setTyping(true);
+
+    const requestBody = { prompt: promptText, user, lang };
+    console.log('[Frontend Debug] Sending request to:', `${API_URL}/api/ai/planner`);
+    console.log('[Frontend Debug] Request Body:', requestBody);
 
     try {
       const res = await fetch(`${API_URL}/api/ai/planner`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptText, user, lang })
+        body: JSON.stringify(requestBody)
       });
+      
+      console.log('[Frontend Debug] Response Status:', res.status, res.statusText);
+      
       const data = await res.json();
+      console.log('[Frontend Debug] Parsed JSON (Response Body):', data);
       
       setTyping(false);
       
       if (data.success) {
         // If the backend returns structured roadmap data (parsed from Gemini)
         if (typeof data.reply === 'object' && data.reply !== null) {
+          console.log('[Frontend Debug] Updating State (AI Message - Structured Roadmap)');
           setChat(prev => [...prev, { 
             id: Date.now(), 
             sender: 'system', 
@@ -115,6 +129,7 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
             roadmap: data.reply.roadmap 
           }]);
         } else {
+          console.log('[Frontend Debug] Updating State (AI Message - Plain Text)');
           // Fallback if backend just returns text
           setChat(prev => [...prev, { 
             id: Date.now(), 
@@ -123,10 +138,11 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
           }]);
         }
       } else {
-        setChat(prev => [...prev, { id: Date.now(), sender: 'system', text: "Error: " + data.message }]);
+        console.error('[Frontend Debug] API returned success: false', data);
+        setChat(prev => [...prev, { id: Date.now(), sender: 'system', text: "Error: " + (data.message || data.error) }]);
       }
     } catch (err) {
-      console.error('AI Planner Error:', err);
+      console.error('[Frontend Debug] AI Planner Error (Fetch failed):', err);
       setTyping(false);
       setChat(prev => [...prev, { id: Date.now(), sender: 'system', text: "Network error communicating with AI Planner." }]);
     }

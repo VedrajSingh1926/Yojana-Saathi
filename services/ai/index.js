@@ -1,24 +1,25 @@
 import Document from '../../models/Document.js';
+import { logger } from '../../utils/logger.js';
+import { fetchWithTimeoutAndRetry } from '../../utils/http.js';
 
 // 1. Google Gemini Service
 export class GeminiService {
   static async generateRecommendation(context, prompt) {
-    // Uses Google Gemini via REST API or SDK
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      console.warn('[Gemini] No API key found, returning mock response.');
-      return "Based on your family's profile, you are eligible for PM Awas Yojana and PM Kisan Samman Nidhi.";
-    }
+    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
     try {
-      const isBearer = !apiKey.startsWith('AIza');
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent${isBearer ? '' : `?key=${apiKey}`}`;
+      // Check if it's a bearer token (Google OAuth tokens usually start with ya29)
+      const isBearer = apiKey.startsWith('ya29.');
+      // Upgrade to gemini-flash-lite-latest as it is the latest supported working model
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent${isBearer ? '' : `?key=${apiKey}`}`;
       const headers = { 'Content-Type': 'application/json' };
       if (isBearer) {
         headers['Authorization'] = `Bearer ${apiKey}`;
       }
 
-      const response = await fetch(url, {
+      logger.info('Gemini Generating Recommendation', { promptLength: prompt.length });
+      const response = await fetchWithTimeoutAndRetry(url, {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -32,46 +33,55 @@ export class GeminiService {
           },
           contents: [{ parts: [{ text: `Context: ${JSON.stringify(context)}\nUser Request: ${prompt}` }] }]
         })
-      });
+      }, 2, 500, 15000);
+
+      // Task 1: Log the COMPLETE raw Gemini response before parsing
       const data = await response.json();
-      // Parse the successful response
-      const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      logger.info('Raw Gemini Response Details', { 
+        httpStatus: response.status, 
+        headers: Object.fromEntries(response.headers.entries()),
+        body: data 
+      });
+
+      // Task 3 & 4: Verify error object and handle gracefully
+      if (!response.ok || data.error) {
+        logger.error('Gemini API Error Response', { status: response.status, error: data.error });
+        throw new Error(data.error?.message || `Gemini API returned status ${response.status}`);
+      }
+
+      // Task 7: Safely handle missing parts
+      if (!data.candidates || data.candidates.length === 0) {
+        logger.warn('Gemini API returned no candidates', { data });
+        throw new Error('Gemini API returned no candidates');
+      }
+
+      const candidate = data.candidates[0];
+
+      // Task 5: If the response contains blocked content or finishReason, log it
+      if (candidate.finishReason && candidate.finishReason !== 'STOP') {
+        logger.warn('Gemini API returned non-STOP finishReason', { finishReason: candidate.finishReason, safetyRatings: candidate.safetyRatings });
+        if (candidate.finishReason === 'SAFETY') {
+           throw new Error('Gemini API blocked the response due to safety concerns.');
+        }
+      }
+
+      const textResponse = candidate.content?.parts?.[0]?.text;
       
       if (textResponse) {
         try {
           return JSON.parse(textResponse);
         } catch (e) {
-          console.error('[Gemini] Failed to parse JSON', e, textResponse);
+          logger.error('Gemini Failed to parse JSON', { parseError: e.message, text: textResponse });
           return { text: textResponse, roadmap: null };
         }
       }
-      
-      // Fallback if API completely fails (e.g., invalid token)
-      return { 
-        text: "Based on your family's profile and standard welfare protocols, here is a recommended plan.", 
-        roadmap: { 
-          schemes: [{ name: "PM Awas Yojana (PMAY-G/U)", benefit: "₹2.5 Lakhs Subsidy", status: "Highly Eligible" }], 
-          steps: [
-            { num: "1", name: "Assemble Land papers & Income certificate", desc: "Ensure your household income is verifiable." },
-            { num: "2", name: "Submit application on PMAY Portal", desc: "Gram Panchayat or local municipal executive registers your citizen ID." }
-          ], 
-          reqDocs: ["Aadhaar Card", "Bank Passbook", "Income Certificate", "Land Registry"], 
-          missingDocs: ["Income Certificate"], 
-          faqs: [{ q: "Do I need to own land first?", a: "Yes, you must have clear land ownership papers to apply." }] 
-        } 
-      };
+
+      // Task 8: Print raw response whenever parsing fails
+      logger.error('Gemini API returned empty text response within candidates', { data });
+      throw new Error('Gemini API returned empty text response');
     } catch (error) {
-      console.error('[Gemini] Error:', error);
-      return {
-        text: "Here is a standard recommended plan based on our offline knowledge base.", 
-        roadmap: { 
-          schemes: [{ name: "Standard Welfare Scheme", benefit: "Details pending verification", status: "Pending" }], 
-          steps: [{ num: "1", name: "Check Connection", desc: "Please check your API keys and internet connection." }], 
-          reqDocs: [], 
-          missingDocs: [], 
-          faqs: [] 
-        } 
-      };
+      logger.error('Gemini Service Error', { error: error.message, stack: error.stack });
+      throw error;
     }
   }
 }
@@ -80,32 +90,35 @@ export class GeminiService {
 export class Mem0Service {
   static async storeContext(userId, contextData) {
     const apiKey = process.env.MEM0_API_KEY;
-    if (!apiKey) return true;
+    if (!apiKey) throw new Error('MEM0_API_KEY is not set');
+
     try {
       let memoryContent = typeof contextData === 'string' ? contextData : JSON.stringify(contextData);
-      const res = await fetch('https://api.mem0.ai/v1/memories', {
+      await fetchWithTimeoutAndRetry('https://api.mem0.ai/v1/memories', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           user_id: userId, 
           messages: [{ role: 'user', content: memoryContent }] 
         })
-      });
-      if (!res.ok) console.error('[Mem0] Store HTTP Error:', res.status);
+      }, 2, 500, 10000);
+      logger.info('Mem0 Stored Context', { userId });
       return true;
     } catch (error) {
-      console.error('[Mem0] Store Error:', error);
-      return false;
+      logger.error('Mem0 Store Error', error);
+      throw error;
     }
   }
 
   static async retrieveContext(userId) {
     const apiKey = process.env.MEM0_API_KEY;
-    if (!apiKey) return null;
+    if (!apiKey) throw new Error('MEM0_API_KEY is not set');
+
     try {
-      const res = await fetch(`https://api.mem0.ai/v1/memories?user_id=${userId}`, {
+      const res = await fetchWithTimeoutAndRetry(`https://api.mem0.ai/v1/memories?user_id=${userId}`, {
         headers: { 'Authorization': `Bearer ${apiKey}` }
-      });
+      }, 2, 500, 10000);
+      
       const data = await res.json();
       if (data && Array.isArray(data)) {
         return data.map(m => m.memory).join('\n');
@@ -114,7 +127,8 @@ export class Mem0Service {
       }
       return null;
     } catch (error) {
-      console.error('[Mem0] Retrieve Error:', error);
+      logger.error('Mem0 Retrieve Error', error);
+      // Not throwing here, memory is not mission-critical for planning
       return null;
     }
   }
@@ -123,16 +137,12 @@ export class Mem0Service {
 // 3. Outlier LLM Evaluation
 export class OutlierService {
   static async evaluateResponse(_prompt, _responseText) {
-    const apiKey = process.env.OUTLIER_API_KEY;
-    if (!apiKey) return { score: 95, status: 'mocked' };
-    
-    // Asynchronous logging to Outlier for Quality Tracking
+    // Left as mock/telemetry stub, could integrate real tracking
     try {
-      // Mock Outlier API Endpoint
-      console.log(`[Outlier] Logging response evaluation...`);
+      logger.debug('Outlier Logging response evaluation...');
       return { score: 98, status: 'logged' };
     } catch (error) {
-      console.error('[Outlier] Eval Error:', error);
+      logger.error('Outlier Eval Error', error);
       return { score: 0, status: 'error' };
     }
   }
@@ -141,18 +151,12 @@ export class OutlierService {
 // 4. Alchemyst AI Orchestrator
 export class AlchemystService {
   static async orchestrate(userId, currentHousehold, userPrompt) {
-    console.log('[Alchemyst] Starting orchestration pipeline for:', userId);
+    logger.info('Alchemyst Starting orchestration', { userId });
     
-    // Step 1: User Query
     const query = userPrompt;
-
-    // Step 2: Household Context
     const household = currentHousehold;
+    const longTermContext = await Mem0Service.retrieveContext(userId).catch(() => null);
     
-    // Step 3: Mem0 Context
-    const longTermContext = await Mem0Service.retrieveContext(userId);
-    
-    // Step 4: Uploaded Documents
     let docsContext = 'No uploaded documents.';
     if (userId !== 'anonymous') {
       try {
@@ -162,24 +166,21 @@ export class AlchemystService {
           docsContext = `Uploaded Documents:\n${docList}`;
         }
       } catch (err) {
-        console.error('[Alchemyst] Error fetching documents:', err);
+        logger.error('Alchemyst Error fetching documents', err);
       }
     }
     
-    // Step 5: Prompt Engineering
     const richContext = {
       household,
       history: longTermContext || 'No previous history.',
       documents: docsContext
     };
     
-    // Step 6: Google Gemini (and Response Formatter inside it)
+    // Core Gemini generation
     const response = await GeminiService.generateRecommendation(richContext, query);
     
-    // Evaluate Response (Outlier)
     OutlierService.evaluateResponse(query, response);
     
-    // Update Memory (Mem0) with full tracked context
     const fullContextToRemember = `
       Saathi ID: ${userId}
       Household Context: ${JSON.stringify(household)}
@@ -187,9 +188,12 @@ export class AlchemystService {
       User Prompt: ${query}
       Recommended Scheme: ${response?.roadmap?.schemes?.[0]?.name || 'None'}
     `;
-    Mem0Service.storeContext(userId, fullContextToRemember);
     
-    // Step 8: Planner UI (Return response)
+    // Store asynchronously to not block response
+    Mem0Service.storeContext(userId, fullContextToRemember).catch(err => {
+      logger.error('Alchemyst async memory store failed', err);
+    });
+    
     return response;
   }
 }

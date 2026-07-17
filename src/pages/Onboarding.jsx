@@ -26,7 +26,7 @@ export default function Onboarding({ stateLocation, onChangeState, onComplete, o
   const [isVerifying, setIsVerifying] = useState(false);
 
   const [loading, setLoading] = useState(false);
-  const API_URL = import.meta.env.VITE_API_URL || 'https://yojana-saathi-qkgl.onrender.com';
+  const API_URL = import.meta.env.VITE_API_URL || '';
   const [loadingMsg, setLoadingMsg] = useState('');
   const [showAddMember, setShowAddMember] = useState(false);
   const [newMember, setNewMember] = useState({ name: '', age: '', gender: 'Male', relation: '', occupation: '', income: '', education: '', disability: 'No', marital: 'Single' });
