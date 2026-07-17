@@ -25,6 +25,8 @@ export default function Onboarding({ stateLocation, onChangeState, onComplete, o
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL || '';
   const [loadingMsg, setLoadingMsg] = useState('');
   const [showAddMember, setShowAddMember] = useState(false);
   const [newMember, setNewMember] = useState({ name: '', age: '', gender: 'Male', relation: '', occupation: '', income: '', education: '', disability: 'No', marital: 'Single' });
@@ -63,7 +65,7 @@ export default function Onboarding({ stateLocation, onChangeState, onComplete, o
         }
       };
       
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitData)
@@ -227,7 +229,7 @@ export default function Onboarding({ stateLocation, onChangeState, onComplete, o
                   const fullPhone = '+91' + formData.personal.phone;
                   
                   // Check if number exists
-                  const checkRes = await fetch('/api/auth/check-number', {
+                  const checkRes = await fetch(`${API_URL}/api/auth/check-number`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ phoneNumber: fullPhone })
@@ -242,7 +244,7 @@ export default function Onboarding({ stateLocation, onChangeState, onComplete, o
                   }
 
                   if (!otpSent) {
-                    const res = await fetch('/api/auth/send-otp', {
+                    const res = await fetch(`${API_URL}/api/auth/send-otp`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ phoneNumber: fullPhone })
@@ -309,7 +311,7 @@ export default function Onboarding({ stateLocation, onChangeState, onComplete, o
                       setIsSendingOtp(true);
                       try {
                         const fullPhone = '+91' + formData.personal.phone;
-                        const res = await fetch('/api/auth/send-otp', {
+                        const res = await fetch(`${API_URL}/api/auth/send-otp`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ phoneNumber: fullPhone })
@@ -344,7 +346,7 @@ export default function Onboarding({ stateLocation, onChangeState, onComplete, o
                 setIsVerifying(true);
                 try {
                   const fullPhone = '+91' + formData.personal.phone;
-                  const res = await fetch('/api/auth/verify-otp', {
+                  const res = await fetch(`${API_URL}/api/auth/verify-otp`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ phoneNumber: fullPhone, otp: otpString })

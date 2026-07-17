@@ -13,6 +13,7 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   const messagesEndRef = useRef(null);
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
+  const API_URL = import.meta.env.VITE_API_URL || '';
 
   useEffect(() => {
     if (initialPrompt) {
@@ -59,7 +60,7 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
 
         setInput('Transcribing via Gnani...');
         try {
-          const response = await fetch('/api/ai/stt', { method: 'POST', body: formData });
+          const response = await fetch(`${API_URL}/api/ai/stt`, { method: 'POST', body: formData });
           const data = await response.json();
           if (data.success) {
             setInput(data.transcript);
@@ -95,7 +96,7 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
     setTyping(true);
 
     try {
-      const res = await fetch('/api/ai/planner', {
+      const res = await fetch(`${API_URL}/api/ai/planner`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: promptText, user, lang })

@@ -47,10 +47,8 @@ process.on('unhandledRejection', (reason, promise) => {
   // Optional: Add logging to monitoring service here
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(port, () => {
-    console.log(`Server is running on port: ${port}`);
-  });
-}
+app.listen(port, () => {
+  console.log(`Server is running on port: ${port}`);
+});
 
 export default app;

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Send, Fingerprint, Phone } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
+  const API_URL = import.meta.env.VITE_API_URL || '';
   const [loginMethod, setLoginMethod] = useState('mobile'); // 'mobile' or 'saathi' or 'recovery'
   const [phone, setPhone] = useState('');
   const [saathiId, setSaathiId] = useState('');
@@ -16,7 +17,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     if (!recoveryInput.trim()) return alert("Enter Phone Number or Email");
 
     try {
-      const res = await fetch('/api/auth/recover', {
+      const res = await fetch(`${API_URL}/api/auth/recover`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier: recoveryInput })
@@ -41,7 +42,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     }
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier, password })

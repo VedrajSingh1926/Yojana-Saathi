@@ -32,7 +32,7 @@ export class GeminiService {
         })
       });
       const data = await response.json();
-      console.log('[Gemini] RAW API RESPONSE:', JSON.stringify(data, null, 2));
+      // Parse the successful response
       const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
       
       if (textResponse) {
