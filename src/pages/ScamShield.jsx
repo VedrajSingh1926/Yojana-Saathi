@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
+import { translations } from '../data/translations';
 
-export default function ScamShield() {
+export default function ScamShield({ lang }) {
   const [text, setText] = useState('');
   const [report, setReport] = useState(null);
+
+  const t = translations[lang] || translations.en;
 
   const sampleScam = "Urgently claim your PM Awas Yojana subsidy of Rs. 2,500 by paying a processing deposit via UPI to pm-awas-verify@upi immediately. Verify your card here: http://pm-awas-subsidy.in/claim";
 
@@ -43,6 +46,7 @@ export default function ScamShield() {
     let verdict = 'SAFE';
     let verdictClass = 'color-success';
     let fillClass = 'bg-success';
+
     if (safetyIndex < 40) {
       verdict = 'DANGER: PHISHING FRAUD DETECTED';
       verdictClass = 'color-danger';
@@ -66,8 +70,8 @@ export default function ScamShield() {
     <div className="view-section animate-fade-in">
       <div className="scam-hero">
         <span className="pill-badge badge-warning"><ShieldAlert size={14} style={{ display: 'inline', marginRight: '4px' }} /> Real-time Welfare Defense</span>
-        <h1>Yojana Scam Shield</h1>
-        <p className="text-muted">Received a suspicious WhatsApp message, SMS, or link promising government funds? Paste it here. Our AI scans it to verify if it's official or a phishing trap.</p>
+        <h1>{t.scamTitle || "Yojana Scam Shield"}</h1>
+        <p className="text-muted">{t.scamSubtitle || "Received a suspicious WhatsApp message, SMS, or link promising government funds? Paste it here. Our AI scans it to verify if it's official or a phishing trap."}</p>
       </div>
 
       <div className="scam-analyzer-grid">

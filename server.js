@@ -13,9 +13,42 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI)
-.then(() => console.log('MongoDB connection established successfully'))
-.catch(err => console.error('MongoDB connection error:', err));
+let mongoServer;
+const connectDB = async () => {
+  let dbUri = process.env.MONGODB_URI;
+  if (!dbUri || dbUri === 'memory') {
+    console.log('No MONGODB_URI provided. Starting MongoMemoryServer fallback...');
+    try {
+      const { MongoMemoryServer } = await import('mongodb-memory-server');
+      mongoServer = await MongoMemoryServer.create();
+      dbUri = mongoServer.getUri();
+      console.log('MongoMemoryServer started at:', dbUri);
+    } catch (err) {
+      console.error('Failed to start MongoMemoryServer:', err);
+      process.exit(1);
+    }
+  }
+
+  try {
+    await mongoose.connect(dbUri, { serverSelectionTimeoutMS: 3000 });
+    console.log('MongoDB connection established successfully');
+  } catch (err) {
+    console.error('MongoDB connection error:', err.message);
+    if (!mongoServer && process.env.NODE_ENV !== 'production') {
+      console.log('Falling back to MongoMemoryServer...');
+      try {
+        const { MongoMemoryServer } = await import('mongodb-memory-server');
+        mongoServer = await MongoMemoryServer.create();
+        const fallbackUri = mongoServer.getUri();
+        await mongoose.connect(fallbackUri);
+        console.log('Connected to fallback MongoMemoryServer successfully');
+      } catch (fallbackErr) {
+        console.error('Failed to connect to fallback MongoMemoryServer:', fallbackErr);
+      }
+    }
+  }
+};
+connectDB();
 
 // Basic Test Route
 app.get('/api/test', (req, res) => {

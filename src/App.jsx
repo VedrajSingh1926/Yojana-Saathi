@@ -259,6 +259,7 @@ export default function App() {
       <main className="main-content">
         {activeView === 'home' && (
           <Home 
+            lang={lang}
             onNavigate={handleNavigate}
             onTriggerAuth={(isRegister) => {
               if (isRegister) handleNavigate('onboarding');
@@ -269,6 +270,7 @@ export default function App() {
         
         {activeView === 'schemes' && (
           <Schemes 
+            lang={lang}
             onNavigate={handleNavigate}
             compareList={compareList}
             onToggleCompare={handleToggleCompare}
@@ -296,6 +298,7 @@ export default function App() {
 
         {activeView === 'family' && (
           <Family 
+            lang={lang}
             user={user}
             onAddMember={handleAddMember}
             onUploadDoc={handleUploadDoc}
@@ -304,7 +307,7 @@ export default function App() {
         )}
 
         {activeView === 'scam-shield' && (
-          <ScamShield />
+          <ScamShield lang={lang} />
         )}
 
         {activeView === 'onboarding' && (
@@ -336,13 +339,16 @@ export default function App() {
       </main>
 
       {/* Bottom Sticky Footer */}
-      <Footer 
-        onNavigate={handleNavigate}
-        onTriggerAuth={(isRegister) => {
-          if (isRegister) handleNavigate('onboarding');
-          else setIsAuthOpen(true);
-        }}
-      />
+      {activeView !== 'planner' && (
+        <Footer 
+          user={user}
+          onNavigate={handleNavigate}
+          onTriggerAuth={(isRegister) => {
+            if (isRegister) handleNavigate('onboarding');
+            else setIsAuthOpen(true);
+          }}
+        />
+      )}
 
       {/* Modals & Overlays */}
       <AuthModal 

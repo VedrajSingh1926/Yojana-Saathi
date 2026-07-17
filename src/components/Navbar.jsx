@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Languages, MapPin, Bell, Menu, X, ChevronDown, ArrowRight, User, LogOut } from 'lucide-react';
+import { translations } from '../data/translations';
 import './Navbar.css';
 
 export default function Navbar({ 
@@ -31,6 +32,8 @@ export default function Navbar({
   const filteredStates = states.filter(s => s.toLowerCase().includes(stateSearch.toLowerCase()));
   const unreadCount = notifications.filter(n => !n.read).length;
 
+  const t = translations[lang] || translations.en;
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -40,11 +43,11 @@ export default function Navbar({
   }, []);
 
   const navLinks = [
-    { id: 'home', label: 'Home' },
-    { id: 'planner', label: 'Planner' },
-    { id: 'schemes', label: 'Schemes' },
-    { id: 'family', label: 'Family' },
-    { id: 'scam-shield', label: 'Scam Shield' }
+    { id: 'home', label: t.home || 'Home' },
+    { id: 'planner', label: t.planner || 'Planner' },
+    { id: 'schemes', label: t.schemes || 'Schemes' },
+    { id: 'family', label: t.family || 'Family' },
+    { id: 'scam-shield', label: t.scamShield || 'Scam Shield' }
   ];
 
   const dropdownVariants = {
@@ -246,9 +249,9 @@ export default function Navbar({
             {/* Auth Buttons */}
             {!user ? (
               <>
-                <button className="lux-login-btn" onClick={() => onTriggerAuth(false)}>Login</button>
+                <button className="lux-login-btn" onClick={() => onTriggerAuth(false)}>{t.login || 'Login'}</button>
                 <button className="lux-cta-btn" onClick={() => onTriggerAuth(true)}>
-                  Get Started
+                  {t.getStarted || 'Get Started'}
                   <ArrowRight size={18} className="arrow-icon" />
                 </button>
               </>
@@ -284,7 +287,7 @@ export default function Navbar({
                         style={{ color: 'var(--danger)', marginTop: '4px', borderTop: '1px solid var(--lux-border)', paddingTop: '14px', borderRadius: '0 0 12px 12px' }}
                         onClick={() => { onLogout(); setProfileOpen(false); }}
                       >
-                        <LogOut size={16} /> Logout
+                        <LogOut size={16} /> {t.logout || 'Logout'}
                       </div>
                     </motion.div>
                   )}
@@ -344,15 +347,15 @@ export default function Navbar({
               {!user ? (
                 <>
                   <button className="lux-login-btn" style={{ background: 'rgba(15,23,42,0.04)', borderRadius: '26px', padding: '18px', width: '100%' }} onClick={() => { setMobileOpen(false); onTriggerAuth(false); }}>
-                    Login
+                    {t.login || 'Login'}
                   </button>
                   <button className="lux-cta-btn" style={{ width: '100%', justifyContent: 'center' }} onClick={() => { setMobileOpen(false); onTriggerAuth(true); }}>
-                    Get Started
+                    {t.getStarted || 'Get Started'}
                   </button>
                 </>
               ) : (
                 <button className="lux-login-btn" style={{ background: 'rgba(15,23,42,0.04)', borderRadius: '26px', padding: '18px', width: '100%' }} onClick={() => { setMobileOpen(false); onLogout(); }}>
-                  Logout
+                  {t.logout || 'Logout'}
                 </button>
               )}
             </div>

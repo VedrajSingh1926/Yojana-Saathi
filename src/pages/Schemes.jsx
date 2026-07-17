@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Search, Sliders, Scale, Trash2, ArrowRight } from 'lucide-react';
 import { SCHEMES_DB } from '../data/schemes';
 import { motion, AnimatePresence } from 'framer-motion';
+import { translations } from '../data/translations';
 
 export default function Schemes({ 
+  lang,
   onNavigate, 
   compareList, 
   onToggleCompare, 
@@ -15,6 +17,8 @@ export default function Schemes({
   const [category, setCategory] = useState(initialCategory);
   const [trendingTab, setTrendingTab] = useState('all-trending');
 
+  const t = translations[lang] || translations.en;
+
   // Keep state in sync with parent updates (e.g. milestone redirects)
   useEffect(() => {
     if (initialCategory) {
@@ -25,6 +29,15 @@ export default function Schemes({
   const categories = [
     'all', 'Women', 'Student', 'Farmer', 'Business', 'Housing', 'Health', 'Employment', 'Education', 'Senior Citizen', 'Disabled', 'Minority'
   ];
+
+  const categoryLabels = {
+    all: t.allCategories || 'All Schemes',
+    Women: t.filterWomen || 'Women',
+    Student: t.filterStudent || 'Student',
+    Farmer: t.filterFarmer || 'Farmer',
+    Business: t.filterBusiness || 'Business',
+    'Senior Citizen': t.filterSenior || 'Senior Citizen'
+  };
 
   const handleTypeChange = (typeVal) => {
     if (types.includes(typeVal)) {
@@ -65,8 +78,8 @@ export default function Schemes({
   return (
     <div className="view-section animate-fade-in">
       <div className="schemes-hero">
-        <h1 className="hero-title text-center">Explore Government Schemes</h1>
-        <p className="text-center text-muted">AI organized. Easy to understand. Always updated.</p>
+        <h1 className="hero-title text-center">{t.catalogTitle || "Explore Government Schemes"}</h1>
+        <p className="text-center text-muted">{t.catalogSubtitle || "AI organized. Easy to understand. Always updated."}</p>
 
         {/* Search */}
         <div className="search-box-wrapper">
@@ -75,11 +88,11 @@ export default function Schemes({
             type="text" 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search any scheme... (e.g. PM Awas, PM Kisan, Startup India, Scholarship)"
+            placeholder={t.searchPlaceholder || "Search any scheme... (e.g. PM Awas, PM Kisan, Startup India, Scholarship)"}
           />
           {search && (
             <button className="btn btn-primary search-clear-btn" onClick={() => setSearch('')}>
-              Clear
+              {t.clear || "Clear"}
             </button>
           )}
         </div>
@@ -139,7 +152,7 @@ export default function Schemes({
                   className={`filter-pill ${category === cat ? 'active' : ''}`}
                   onClick={() => setCategory(cat)}
                 >
-                  {cat === 'all' ? 'All Schemes' : cat}
+                  {categoryLabels[cat] || cat}
                 </button>
               ))}
             </div>

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Users, User, Check, Network, IdCard, FolderOpen, Calendar, ShieldCheck, Plus } from 'lucide-react';
 import QRCode from 'react-qr-code';
+import { translations } from '../data/translations';
 
-export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }) {
+export default function Family({ lang, user, onAddMember, onUploadDoc, onTriggerAuth }) {
   const [subtab, setSubtab] = useState('overview');
   
   // Member Form State
@@ -12,6 +13,8 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
   const [memberAge, setMemberAge] = useState('');
   const [memberOccupation, setMemberOccupation] = useState('Student');
   const [memberIncome, setMemberIncome] = useState('');
+
+  const t = translations[lang] || translations.en;
 
   if (!user) {
     return (
@@ -58,21 +61,21 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
   return (
     <div className="view-section animate-fade-in">
       <div className="family-hero">
-        <h1 className="hero-title text-center">Family Welfare Dashboard</h1>
-        <p className="text-center text-muted">Manage your household members, documents, and welfare profile in one place to automate eligibility checks.</p>
+        <h1 className="hero-title text-center">{t.familyHeroTitle || "Family Welfare Dashboard"}</h1>
+        <p className="text-center text-muted">{t.familyHeroSubtitle || "Manage your household members, documents, and welfare profile in one place to automate eligibility checks."}</p>
       </div>
 
       <div className="family-tabs-container">
         {/* Navigation tabs */}
         <div className="family-tabs-header">
           <button className={`family-tab-btn ${subtab === 'overview' ? 'active' : ''}`} onClick={() => setSubtab('overview')}>
-            <Users size={16} /> Household Overview
+            <Users size={16} /> {t.tabOverview || "Household Overview"}
           </button>
           <button className={`family-tab-btn ${subtab === 'tree' ? 'active' : ''}`} onClick={() => setSubtab('tree')}>
-            <Network size={16} /> Family Tree
+            <Network size={16} /> {t.tabTree || "Family Tree"}
           </button>
           <button className={`family-tab-btn ${subtab === 'passport' ? 'active' : ''}`} onClick={() => setSubtab('passport')}>
-            <IdCard size={16} /> Welfare Passport
+            <IdCard size={16} /> {t.tabPassport || "Welfare Passport"}
           </button>
           <button className={`family-tab-btn ${subtab === 'documents' ? 'active' : ''}`} onClick={() => setSubtab('documents')}>
             <FolderOpen size={16} /> Documents Locker
@@ -203,14 +206,16 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
           {subtab === 'tree' && (
             <div className="tree-container glass-card animate-fade-in">
               <div className="tree-explanation text-center mb-4">
-                <h3>Interactive Household Tree</h3>
-                <p className="text-muted text-sm">Visualizes dependent relationships. AI maps parent-child categories to link generational benefits.</p>
+                <h3>{t.treeTitle || "Interactive Household Tree"}</h3>
+                <p className="text-muted text-sm">{t.treeSubtitle || "Visualizes dependent relationships. AI maps parent-child categories to link generational benefits."}</p>
               </div>
               <div className="tree-canvas-wrapper">
                 <div className="family-node-root">
                   {/* Root Node (Head) */}
                   <div className="tree-node head-node">
-                    <div className="node-avatar">RS</div>
+                    <div className="node-avatar">
+                      {(user.name || 'YS').split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                    </div>
                     <div className="node-details">
                       <strong>{user.name} (Head)</strong>
                       <span>Age: {user.age} | {user.occupation}</span>
