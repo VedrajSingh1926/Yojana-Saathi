@@ -80,14 +80,23 @@ export default function App() {
 
   const handleLoginSuccess = (registeredData = null, saathiId = null) => {
     if (registeredData && saathiId) {
+      // Check if it's the raw formData from Onboarding or the DB User object
+      const isFromDB = !!registeredData.fullName;
+      
+      const userName = isFromDB ? registeredData.fullName : (registeredData.personal?.name || 'User');
+      const userAge = isFromDB ? 0 : (parseInt(registeredData.personal?.age) || 0);
+      const userOccupation = isFromDB ? 'N/A' : (registeredData.personal?.occupation || 'N/A');
+      const userIncome = isFromDB ? (registeredData.household?.annualIncome || 0) : (parseInt(registeredData.personal?.income) || 0);
+      const userPhone = isFromDB ? registeredData.mobileNumber : (registeredData.personal?.phone || '9999999999');
+
       // Create dynamic user profile from registration data
       const familyMembers = [
         { 
-          name: registeredData.personal.name || 'User', 
+          name: userName, 
           relation: "Head", 
-          age: parseInt(registeredData.personal.age) || 0, 
-          occupation: registeredData.personal.occupation || 'N/A', 
-          income: parseInt(registeredData.personal.income) || 0, 
+          age: userAge, 
+          occupation: userOccupation, 
+          income: userIncome, 
           status: "Verified" 
         }
       ];
@@ -106,13 +115,13 @@ export default function App() {
       }
 
       setUser({
-        name: registeredData.personal.name || 'User',
+        name: userName,
         relation: "Head",
-        age: parseInt(registeredData.personal.age) || 0,
-        occupation: registeredData.personal.occupation || 'N/A',
-        income: parseInt(registeredData.personal.income) || 0,
+        age: userAge,
+        occupation: userOccupation,
+        income: userIncome,
         saathiId: saathiId,
-        mobileNumber: registeredData.personal.phone || '9999999999',
+        mobileNumber: userPhone,
         family: familyMembers,
         documents: [
           { name: "Aadhaar Card", verified: true }
@@ -123,7 +132,7 @@ export default function App() {
       });
 
       setNotifications(prev => [
-        { id: Date.now(), title: "Welfare Passport Activated", text: `Welcome ${registeredData.personal.name}! Your Saathi ID is ${saathiId}.`, time: "Just now", read: false },
+        { id: Date.now(), title: "Welfare Passport Activated", text: `Welcome ${userName}! Your Saathi ID is ${saathiId}.`, time: "Just now", read: false },
         ...prev
       ]);
     } else {
