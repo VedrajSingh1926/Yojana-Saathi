@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Sparkles, Download, Compass, Mic, FileText, CheckCircle2, AlertTriangle, HelpCircle, Plus, MessageSquare, Bookmark, History, Users, Paperclip } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { translations } from '../data/translations';
 
 export default function AIPlanner({ initialPrompt, user, lang }) {
@@ -151,29 +151,29 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   };
 
   return (
-    <div className="view-section planner-view-section animate-fade-in" style={{ padding: '2rem 1rem' }}>
-      <div className="planner-hero" style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <span className="pill-badge" style={{ marginBottom: '1rem', display: 'inline-flex', alignItems: 'center' }}><Sparkles size={14} style={{ marginRight: '6px' }} /> {t.plannerBadge || 'Personal AI Welfare Advisor'}</span>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>{t.plannerTitle || 'Plan Your Government Journey'}</h1>
-        <p className="text-muted" style={{ maxWidth: '800px', margin: '0 auto', fontSize: '1rem' }}>{t.plannerSubtitle || 'Describe what your household needs or plans, and our AI will map out a roadmap of schemes you should target, how to prepare documents, and when to apply.'}</p>
+    <div className="view-section planner-view-section animate-fade-in" style={{ padding: '1.5rem 1rem 0 1rem' }}>
+      <div className="planner-hero" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+        <span className="pill-badge" style={{ marginBottom: '0.75rem', display: 'inline-flex', alignItems: 'center', fontWeight: '600' }}><Sparkles size={14} style={{ marginRight: '6px' }} /> {t.plannerBadge || 'Personal AI Welfare Advisor'}</span>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', fontWeight: '700' }}>{t.plannerTitle || 'Plan Your Government Journey'}</h1>
+        <p className="text-muted" style={{ maxWidth: '800px', margin: '0 auto', fontSize: '1.05rem', lineHeight: '1.5' }}>{t.plannerSubtitle || 'Describe what your household needs or plans, and our AI will map out a roadmap of schemes you should target, how to prepare documents, and when to apply.'}</p>
       </div>
 
       <div className="gpt-layout-container">
         {/* Left Sidebar */}
-        <div className="gpt-sidebar glass-card">
-          <button className="btn btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.85rem' }} onClick={() => setChat([chat[0]])}>
+        <div className="gpt-sidebar glass-card" style={{ padding: '1.25rem' }}>
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="btn btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.85rem', borderRadius: '12px' }} onClick={() => setChat([chat[0]])}>
             <Plus size={18} /> New Planning Session
-          </button>
+          </motion.button>
           
-          <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem' }}>History</span>
+          <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>History</span>
             <button className="gpt-sidebar-btn active"><MessageSquare size={16} /> Current Session</button>
             <button className="gpt-sidebar-btn"><MessageSquare size={16} /> Education Grant Query</button>
             <button className="gpt-sidebar-btn"><MessageSquare size={16} /> Housing Subsidy (PMAY)</button>
           </div>
 
-          <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem' }}>Assets</span>
+          <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>Assets</span>
             <button className="gpt-sidebar-btn"><Bookmark size={16} /> Saved Roadmaps</button>
             <button className="gpt-sidebar-btn"><History size={16} /> Welfare History</button>
             <button className="gpt-sidebar-btn"><Users size={16} /> Family Profiles</button>
@@ -183,139 +183,148 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
         {/* Main Chat Area */}
         <div className="gpt-main-chat glass-card" style={{ padding: 0 }}>
           <div className="chat-messages" style={{ flex: 1, padding: '2rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {chat.map(msg => (
-              <div key={msg.id} className={`message ${msg.sender === 'user' ? 'user-message' : 'system-message'}`} style={{ marginBottom: 0, maxWidth: '100%' }}>
-                {msg.sender === 'system' && <div className="bot-avatar"><Sparkles size={16} /></div>}
-                
-                <div className="message-bubble" style={{ maxWidth: msg.sender === 'system' ? '100%' : '85%' }}>
-                  <p style={{ margin: 0, whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>{msg.text}</p>
+            <AnimatePresence>
+              {chat.map((msg, index) => (
+                <motion.div 
+                  key={msg.id} 
+                  initial={index > 0 ? { opacity: 0, y: 15 } : false}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className={`message ${msg.sender === 'user' ? 'user-message' : 'system-message'}`} 
+                  style={{ marginBottom: 0, maxWidth: '100%' }}
+                >
+                  {msg.sender === 'system' && <div className="bot-avatar"><Sparkles size={16} /></div>}
                   
-                  {/* Starter Suggestions */}
-                  {msg.id === 1 && chat.length === 1 && (
-                    <div className="planner-starters-inline" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', marginTop: '1.5rem' }}>
-                      {starters.map((st, idx) => (
-                        <div key={idx} className="starter-card-inline" onClick={() => handleSendPrompt(st.text)}>
-                          <div className="starter-icon" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{st.icon}</div>
-                          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: 'var(--text-primary)' }}>"{st.text.slice(0, 45)}..."</h4>
-                          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{st.desc}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Inline Roadmap Content */}
-                  {msg.roadmap && msg.roadmap.schemes && msg.roadmap.schemes.length > 0 && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="ai-generated-roadmap"
-                      style={{
-                        paddingTop: '1.5rem',
-                        marginTop: '1.5rem',
-                        borderTop: '1px dashed var(--border-color)',
-                        display: 'flex', flexDirection: 'column', gap: '1.5rem'
-                      }}
-                    >
-                      <div className="roadmap-headline" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--primary)', fontSize: '1.15rem' }}>
-                          <Compass size={20} /> Recommended Action Plan
-                        </h3>
-                        <button className="btn btn-outline btn-sm" onClick={() => alert('Roadmap PDF saved!')} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
-                          <Download size={14} /> Save PDF
-                        </button>
-                      </div>
-
-                      {/* TARGET SCHEMES */}
-                      <div>
-                        <h4 className="text-sm mb-3" style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>TARGET PROGRAMS</h4>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-                          {msg.roadmap.schemes.map((s, idx) => (
-                            <div key={idx} style={{ padding: '1.25rem', background: 'var(--bg-darkest)', border: '1px solid var(--gold)', borderRadius: '12px', position: 'relative' }}>
-                              <span style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '0.75rem', background: 'var(--primary-glow)', padding: '2px 8px', borderRadius: '12px', color: 'var(--primary)', fontWeight: 'bold' }}>{s.status}</span>
-                              <h5 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: 'var(--text-primary)', paddingRight: '80px' }}>{s.name}</h5>
-                              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gold)', fontWeight: '500' }}>Benefit: {s.benefit}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="grid-2-col" style={{ gap: '1.5rem' }}>
-                        {/* REQUIRED DOCS */}
-                        <div style={{ background: 'var(--bg-darkest)', padding: '1.25rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                           <h4 className="text-sm mb-3" style={{ fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}><FileText size={16}/> REQUIRED DOCUMENTS</h4>
-                           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                             {msg.roadmap.reqDocs?.map(d => (
-                               <li key={d} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', color: 'var(--text-primary)' }}><CheckCircle2 size={18} className="text-success" /> {d}</li>
-                             ))}
-                           </ul>
-                        </div>
-
-                        {/* MISSING DOCS */}
-                        {msg.roadmap.missingDocs?.length > 0 && (
-                          <div style={{ background: 'rgba(239, 68, 68, 0.05)', padding: '1.25rem', borderRadius: '12px', border: '1px dashed #ef4444' }}>
-                            <h4 className="text-sm mb-3" style={{ fontWeight: 600, color: '#ef4444', display: 'flex', alignItems: 'center', gap: '6px' }}><AlertTriangle size={16}/> MISSING FROM LOCKER</h4>
-                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                              {msg.roadmap.missingDocs.map(d => (
-                                <li key={d} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', color: '#ef4444' }}><AlertTriangle size={18} /> {d}</li>
-                              ))}
-                            </ul>
-                            <button className="btn btn-outline btn-sm mt-3" style={{ borderColor: '#ef4444', color: '#ef4444', width: '100%' }}>Upload Now</button>
+                  <div className="message-bubble" style={{ maxWidth: msg.sender === 'system' ? '100%' : '85%' }}>
+                    <p style={{ margin: 0, whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>{msg.text}</p>
+                    
+                    {/* Starter Suggestions */}
+                    {msg.id === 1 && chat.length === 1 && (
+                      <div className="planner-starters-inline" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginTop: '1.5rem' }}>
+                        {starters.map((st, idx) => (
+                          <div key={idx} className="starter-card-inline" onClick={() => handleSendPrompt(st.text)} style={{ padding: '1.25rem' }}>
+                            <div className="starter-icon" style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>{st.icon}</div>
+                            <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.05rem', color: 'var(--text-primary)', fontWeight: '600' }}>"{st.text.slice(0, 45)}..."</h4>
+                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>{st.desc}</p>
                           </div>
-                        )}
+                        ))}
                       </div>
-
-                      {/* TIMELINE */}
-                      <div>
-                        <h4 className="text-sm mb-3" style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>APPLICATION TIMELINE</h4>
-                        <div className="roadmap-steps-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderLeft: '2px solid var(--primary-glow)', marginLeft: '12px', paddingLeft: '24px' }}>
-                          {msg.roadmap.steps.map((st, idx) => (
-                            <div key={idx} style={{ position: 'relative', padding: '0.5rem 0' }}>
-                              <div style={{ position: 'absolute', left: '-40px', top: '10px', width: '28px', height: '28px', borderRadius: '50%', background: 'var(--bg-card)', border: '2px solid var(--primary)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.85rem', zIndex: 1 }}>{st.num}</div>
-                              <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.05rem', color: 'var(--text-primary)' }}>{st.name}</h4>
-                              <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.5' }}>{st.desc}</p>
-                            </div>
-                          ))}
+                    )}
+                    
+                    {/* Inline Roadmap Content */}
+                    {msg.roadmap && msg.roadmap.schemes && msg.roadmap.schemes.length > 0 && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="ai-generated-roadmap"
+                        style={{
+                          paddingTop: '1.5rem',
+                          marginTop: '1.5rem',
+                          borderTop: '1px dashed var(--border-color)',
+                          display: 'flex', flexDirection: 'column', gap: '1.5rem'
+                        }}
+                      >
+                        <div className="roadmap-headline" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--primary)', fontSize: '1.2rem', fontWeight: '700' }}>
+                            <Compass size={22} /> Recommended Action Plan
+                          </h3>
+                          <button className="btn btn-outline btn-sm" onClick={() => alert('Roadmap PDF saved!')} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+                            <Download size={14} /> Save PDF
+                          </button>
                         </div>
-                      </div>
 
-                      {/* FAQs */}
-                      {msg.roadmap.faqs?.length > 0 && (
+                        {/* TARGET SCHEMES */}
                         <div>
-                          <h4 className="text-sm mb-3" style={{ fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}><HelpCircle size={16}/> FREQUENTLY ASKED</h4>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            {msg.roadmap.faqs.map((f, i) => (
-                              <div key={i} style={{ background: 'var(--bg-darkest)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                                <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: '4px' }}>Q: {f.q}</strong>
-                                <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>A: {f.a}</span>
+                          <h4 className="text-sm mb-3" style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>TARGET PROGRAMS</h4>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+                            {msg.roadmap.schemes.map((s, idx) => (
+                              <div key={idx} style={{ padding: '1.5rem', background: 'var(--bg-darkest)', border: '1px solid var(--gold)', borderRadius: '24px', position: 'relative', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}>
+                                <span style={{ position: 'absolute', top: '16px', right: '16px', fontSize: '0.75rem', background: 'var(--primary-glow)', padding: '4px 10px', borderRadius: '12px', color: 'var(--primary)', fontWeight: 'bold' }}>{s.status}</span>
+                                <h5 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', color: 'var(--text-primary)', paddingRight: '80px', fontWeight: '700' }}>{s.name}</h5>
+                                <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--gold)', fontWeight: '500' }}>Benefit: {s.benefit}</p>
                               </div>
                             ))}
                           </div>
                         </div>
-                      )}
-                    </motion.div>
-                  )}
-                </div>
-                {msg.sender === 'user' && <div className="user-avatar">👤</div>}
-              </div>
-            ))}
+
+                        <div className="grid-2-col" style={{ gap: '1.5rem' }}>
+                          {/* REQUIRED DOCS */}
+                          <div style={{ background: 'var(--bg-darkest)', padding: '1.5rem', borderRadius: '24px', border: '1px solid var(--border-color)', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}>
+                             <h4 className="text-sm mb-3" style={{ fontWeight: 700, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}><FileText size={16}/> REQUIRED DOCUMENTS</h4>
+                             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                               {msg.roadmap.reqDocs?.map(d => (
+                                 <li key={d} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.95rem', color: 'var(--text-primary)' }}><CheckCircle2 size={18} className="text-success" /> {d}</li>
+                               ))}
+                             </ul>
+                          </div>
+
+                          {/* MISSING DOCS */}
+                          {msg.roadmap.missingDocs?.length > 0 && (
+                            <div style={{ background: 'rgba(239, 68, 68, 0.05)', padding: '1.5rem', borderRadius: '24px', border: '1px dashed #ef4444', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}>
+                              <h4 className="text-sm mb-3" style={{ fontWeight: 700, color: '#ef4444', display: 'flex', alignItems: 'center', gap: '6px' }}><AlertTriangle size={16}/> MISSING FROM LOCKER</h4>
+                              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                {msg.roadmap.missingDocs.map(d => (
+                                  <li key={d} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.95rem', color: '#ef4444' }}><AlertTriangle size={18} /> {d}</li>
+                                ))}
+                              </ul>
+                              <button className="btn btn-outline btn-sm mt-4" style={{ borderColor: '#ef4444', color: '#ef4444', width: '100%', borderRadius: '12px' }}>Upload Now</button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* TIMELINE */}
+                        <div>
+                          <h4 className="text-sm mb-3" style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>APPLICATION TIMELINE</h4>
+                          <div className="roadmap-steps-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderLeft: '2px solid var(--primary-glow)', marginLeft: '12px', paddingLeft: '24px' }}>
+                            {msg.roadmap.steps.map((st, idx) => (
+                              <div key={idx} style={{ position: 'relative', padding: '0.5rem 0' }}>
+                                <div style={{ position: 'absolute', left: '-40px', top: '10px', width: '28px', height: '28px', borderRadius: '50%', background: 'var(--bg-card)', border: '2px solid var(--primary)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.85rem', zIndex: 1 }}>{st.num}</div>
+                                <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.05rem', color: 'var(--text-primary)', fontWeight: '600' }}>{st.name}</h4>
+                                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.5' }}>{st.desc}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* FAQs */}
+                        {msg.roadmap.faqs?.length > 0 && (
+                          <div>
+                            <h4 className="text-sm mb-3" style={{ fontWeight: 700, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}><HelpCircle size={16}/> FREQUENTLY ASKED</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                              {msg.roadmap.faqs.map((f, i) => (
+                                <div key={i} style={{ background: 'var(--bg-darkest)', padding: '1rem', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
+                                  <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: '4px' }}>Q: {f.q}</strong>
+                                  <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>A: {f.a}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+                  </div>
+                  {msg.sender === 'user' && <div className="user-avatar">👤</div>}
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
             {typing && (
-              <div className="typing-indicator" style={{ margin: 0 }}>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="typing-indicator" style={{ margin: 0 }}>
                 <span className="dot"></span>
                 <span className="dot"></span>
                 <span className="dot"></span>
-              </div>
+              </motion.div>
             )}
             <div ref={messagesEndRef} style={{ height: '1px' }} />
           </div>
 
-          <div className="chat-input-bar" style={{ padding: '1.5rem', borderTop: '1px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 }}>
+          <div className="chat-input-bar" style={{ padding: '1.25rem 2rem', borderTop: '1px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', gap: '12px', alignItems: 'center', flexShrink: 0 }}>
             <button 
               className={`btn btn-outline`} 
               onClick={() => alert("Attachment functionality coming soon")}
-              style={{ width: '48px', height: '48px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}
+              style={{ width: '56px', height: '56px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}
             >
-              <Paperclip size={18} />
+              <Paperclip size={20} />
             </button>
             <input 
               type="text" 
@@ -323,24 +332,24 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder={t.askPlaceholder || "Ask AI: e.g. 'I want to open a small shop...'"}
-              style={{ flex: 1, padding: '1rem 1.5rem', borderRadius: '24px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)', fontSize: '1rem', outline: 'none', color: 'var(--text-primary)' }}
+              style={{ flex: 1, padding: '0 1.5rem', borderRadius: '30px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)', fontSize: '1.05rem', outline: 'none', color: 'var(--text-primary)' }}
             />
             <button 
               className={`btn ${isListening ? 'btn-primary' : 'btn-outline'}`} 
               onClick={handleVoiceInput}
-              style={{ width: '48px', height: '48px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, animation: isListening ? 'pulse 1.5s infinite' : 'none' }}
+              style={{ width: '56px', height: '56px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, animation: isListening ? 'pulse 1.5s infinite' : 'none' }}
             >
-              <Mic size={20} />
+              <Mic size={22} />
             </button>
-            <button className="btn btn-primary" onClick={() => handleSendPrompt(input)} style={{ width: '48px', height: '48px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>
-              <Send size={18} style={{ marginLeft: '2px' }} />
+            <button className="btn btn-primary" onClick={() => handleSendPrompt(input)} style={{ width: '56px', height: '56px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>
+              <Send size={20} style={{ marginLeft: '2px' }} />
             </button>
           </div>
           
           <style>{`
             @keyframes pulse {
               0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
-              70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+              70% { box-shadow: 0 0 0 12px rgba(212, 175, 55, 0); }
               100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
             }
           `}</style>

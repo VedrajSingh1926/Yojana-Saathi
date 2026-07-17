@@ -2996,3 +2996,22 @@ button, input, select, textarea {
 .gpt-sidebar-btn.active { background: var(--bg-card); border-color: var(--primary); color: var(--primary); }
 .gpt-main-chat { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 @media (max-width: 1024px) { .gpt-sidebar { display: none; } }
+
+
+/* Premium AI Planner UI Tweaks */
+.planner-view-section { padding-top: 0 !important; background: radial-gradient(circle at center, rgba(212,175,55,0.03) 0%, transparent 60%); }
+.planner-hero { margin-bottom: 1rem !important; }
+.gpt-layout-container { height: calc(100vh - var(--nav-height) - 80px) !important; max-width: 1500px !important; position: relative; }
+.gpt-layout-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at center, rgba(255,255,255,0.4) 0%, transparent 70%); filter: blur(40px); z-index: -1; pointer-events: none; }
+.gpt-sidebar { flex: 0 0 20% !important; min-width: 220px !important; gap: 1.25rem !important; }
+.gpt-sidebar-btn { padding: 1rem !important; border-radius: 12px !important; transition: all 0.3s ease !important; }
+.gpt-sidebar-btn:hover { transform: scale(1.02); background: rgba(255, 255, 255, 0.7) !important; }
+.gpt-sidebar-btn.active { background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(212,175,55,0.02) 100%) !important; box-shadow: 0 4px 15px rgba(212,175,55,0.1) !important; border-color: rgba(212,175,55,0.3) !important; }
+.starter-card-inline { border-radius: 20px !important; transition: all 0.3s ease !important; cursor: pointer; }
+.starter-card-inline:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.06) !important; border-color: rgba(212,175,55,0.4) !important; }
+.chat-messages { -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%); }
+.chat-input-bar input { height: 60px; border-radius: 30px !important; transition: all 0.3s ease; }
+.chat-input-bar input:focus { box-shadow: 0 0 0 3px rgba(212,175,55,0.2) !important; border-color: var(--primary) !important; }
+.chat-input-bar .btn { border-radius: 50% !important; transition: all 0.3s ease !important; }
+.chat-input-bar .btn:hover { transform: scale(1.08); box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; }
+.chat-input-bar .btn:active { transform: scale(0.95); }
