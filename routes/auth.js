@@ -1,6 +1,5 @@
 import express from 'express';
 import User from '../models/User.js';
-import twilio from 'twilio';
 import bcrypt from 'bcryptjs';
 
 const router = express.Router();
