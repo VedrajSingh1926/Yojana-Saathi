@@ -3015,3 +3015,5 @@ button, input, select, textarea {
 .chat-input-bar .btn { border-radius: 50% !important; transition: all 0.3s ease !important; }
 .chat-input-bar .btn:hover { transform: scale(1.08); box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; }
 .chat-input-bar .btn:active { transform: scale(0.95); }
+
+.markdown-body { font-family: inherit; } .markdown-body p { margin-bottom: 1em; } .markdown-body ul, .markdown-body ol { margin-left: 1.5em; margin-bottom: 1em; } .markdown-body li { margin-bottom: 0.5em; } .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1em; } .markdown-body th, .markdown-body td { border: 1px solid var(--border-color); padding: 8px; text-align: left; } .markdown-body th { background: rgba(255,255,255,0.05); } .markdown-body a { color: var(--primary); text-decoration: underline; }

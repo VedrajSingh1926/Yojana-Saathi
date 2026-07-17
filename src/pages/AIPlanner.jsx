@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Send, Sparkles, Download, Compass, Mic, FileText, CheckCircle2, AlertTriangle, HelpCircle, Plus, MessageSquare, Bookmark, History, Users, Paperclip } from 'lucide-react';
+import { Send, Sparkles, Mic, Plus, MessageSquare, Bookmark, History, Users, Paperclip } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { translations } from '../data/translations';
 
 export default function AIPlanner({ initialPrompt, user, lang }) {
@@ -121,20 +122,15 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
       setTyping(false);
       
       if (data.success) {
-        if (typeof data.reply === 'object' && data.reply !== null) {
-          setChat(prev => [...prev, { 
-            id: Date.now(), 
-            sender: 'system', 
-            text: data.reply.text || "Here is your plan:",
-            roadmap: data.reply.roadmap 
-          }]);
-        } else {
-          setChat(prev => [...prev, { 
-            id: Date.now(), 
-            sender: 'system', 
-            text: data.reply
-          }]);
-        }
+        let replyText = typeof data.reply === 'object' && data.reply !== null
+          ? data.reply.text || JSON.stringify(data.reply, null, 2)
+          : data.reply;
+          
+        setChat(prev => [...prev, { 
+          id: Date.now(), 
+          sender: 'system', 
+          text: replyText
+        }]);
       } else {
         setChat(prev => [...prev, { id: Date.now(), sender: 'system', text: "Error: " + (data.message || data.error) }]);
       }
@@ -195,8 +191,14 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
                 >
                   {msg.sender === 'system' && <div className="bot-avatar"><Sparkles size={16} /></div>}
                   
-                  <div className="message-bubble" style={{ maxWidth: msg.sender === 'system' ? '100%' : '85%' }}>
-                    <p style={{ margin: 0, whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>{msg.text}</p>
+                  <div className="message-bubble" style={{ maxWidth: msg.sender === 'system' ? '100%' : '85%', overflow: 'hidden' }}>
+                    {msg.sender === 'system' ? (
+                      <div className="markdown-body" style={{ margin: 0, whiteSpace: 'normal', lineHeight: '1.6', fontSize: '1rem', color: 'var(--text-primary)' }}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p style={{ margin: 0, whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>{msg.text}</p>
+                    )}
                     
                     {/* Starter Suggestions */}
                     {msg.id === 1 && chat.length === 1 && (
@@ -209,98 +211,6 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
                           </div>
                         ))}
                       </div>
-                    )}
-                    
-                    {/* Inline Roadmap Content */}
-                    {msg.roadmap && msg.roadmap.schemes && msg.roadmap.schemes.length > 0 && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="ai-generated-roadmap"
-                        style={{
-                          paddingTop: '1.5rem',
-                          marginTop: '1.5rem',
-                          borderTop: '1px dashed var(--border-color)',
-                          display: 'flex', flexDirection: 'column', gap: '1.5rem'
-                        }}
-                      >
-                        <div className="roadmap-headline" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--primary)', fontSize: '1.2rem', fontWeight: '700' }}>
-                            <Compass size={22} /> Recommended Action Plan
-                          </h3>
-                          <button className="btn btn-outline btn-sm" onClick={() => alert('Roadmap PDF saved!')} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
-                            <Download size={14} /> Save PDF
-                          </button>
-                        </div>
-
-                        {/* TARGET SCHEMES */}
-                        <div>
-                          <h4 className="text-sm mb-3" style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>TARGET PROGRAMS</h4>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-                            {msg.roadmap.schemes.map((s, idx) => (
-                              <div key={idx} style={{ padding: '1.5rem', background: 'var(--bg-darkest)', border: '1px solid var(--gold)', borderRadius: '24px', position: 'relative', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}>
-                                <span style={{ position: 'absolute', top: '16px', right: '16px', fontSize: '0.75rem', background: 'var(--primary-glow)', padding: '4px 10px', borderRadius: '12px', color: 'var(--primary)', fontWeight: 'bold' }}>{s.status}</span>
-                                <h5 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', color: 'var(--text-primary)', paddingRight: '80px', fontWeight: '700' }}>{s.name}</h5>
-                                <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--gold)', fontWeight: '500' }}>Benefit: {s.benefit}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="grid-2-col" style={{ gap: '1.5rem' }}>
-                          {/* REQUIRED DOCS */}
-                          <div style={{ background: 'var(--bg-darkest)', padding: '1.5rem', borderRadius: '24px', border: '1px solid var(--border-color)', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}>
-                             <h4 className="text-sm mb-3" style={{ fontWeight: 700, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}><FileText size={16}/> REQUIRED DOCUMENTS</h4>
-                             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                               {msg.roadmap.reqDocs?.map(d => (
-                                 <li key={d} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.95rem', color: 'var(--text-primary)' }}><CheckCircle2 size={18} className="text-success" /> {d}</li>
-                               ))}
-                             </ul>
-                          </div>
-
-                          {/* MISSING DOCS */}
-                          {msg.roadmap.missingDocs?.length > 0 && (
-                            <div style={{ background: 'rgba(239, 68, 68, 0.05)', padding: '1.5rem', borderRadius: '24px', border: '1px dashed #ef4444', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}>
-                              <h4 className="text-sm mb-3" style={{ fontWeight: 700, color: '#ef4444', display: 'flex', alignItems: 'center', gap: '6px' }}><AlertTriangle size={16}/> MISSING FROM LOCKER</h4>
-                              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                {msg.roadmap.missingDocs.map(d => (
-                                  <li key={d} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.95rem', color: '#ef4444' }}><AlertTriangle size={18} /> {d}</li>
-                                ))}
-                              </ul>
-                              <button className="btn btn-outline btn-sm mt-4" style={{ borderColor: '#ef4444', color: '#ef4444', width: '100%', borderRadius: '12px' }}>Upload Now</button>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* TIMELINE */}
-                        <div>
-                          <h4 className="text-sm mb-3" style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>APPLICATION TIMELINE</h4>
-                          <div className="roadmap-steps-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderLeft: '2px solid var(--primary-glow)', marginLeft: '12px', paddingLeft: '24px' }}>
-                            {msg.roadmap.steps.map((st, idx) => (
-                              <div key={idx} style={{ position: 'relative', padding: '0.5rem 0' }}>
-                                <div style={{ position: 'absolute', left: '-40px', top: '10px', width: '28px', height: '28px', borderRadius: '50%', background: 'var(--bg-card)', border: '2px solid var(--primary)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.85rem', zIndex: 1 }}>{st.num}</div>
-                                <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.05rem', color: 'var(--text-primary)', fontWeight: '600' }}>{st.name}</h4>
-                                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.5' }}>{st.desc}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* FAQs */}
-                        {msg.roadmap.faqs?.length > 0 && (
-                          <div>
-                            <h4 className="text-sm mb-3" style={{ fontWeight: 700, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}><HelpCircle size={16}/> FREQUENTLY ASKED</h4>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                              {msg.roadmap.faqs.map((f, i) => (
-                                <div key={i} style={{ background: 'var(--bg-darkest)', padding: '1rem', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
-                                  <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: '4px' }}>Q: {f.q}</strong>
-                                  <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>A: {f.a}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </motion.div>
                     )}
                   </div>
                   {msg.sender === 'user' && <div className="user-avatar">👤</div>}
