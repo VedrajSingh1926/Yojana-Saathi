@@ -12,10 +12,10 @@ export class GeminiService {
 
     try {
       const isBearer = !apiKey.startsWith('AIza');
-      const url = \`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent\${isBearer ? '' : \`?key=\${apiKey}\`}\`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent${isBearer ? '' : `?key=${apiKey}`}`;
       const headers = { 'Content-Type': 'application/json' };
       if (isBearer) {
-        headers['Authorization'] = \`Bearer \${apiKey}\`;
+        headers['Authorization'] = `Bearer ${apiKey}`;
       }
 
       const response = await fetch(url, {
