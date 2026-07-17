@@ -80,14 +80,18 @@ export class GeminiService {
 export class Mem0Service {
   static async storeContext(userId, contextData) {
     const apiKey = process.env.MEM0_API_KEY;
-    if (!apiKey) return true; // Mock success
+    if (!apiKey) return true;
     try {
-      // Mock Mem0 API Call
-      await fetch('https://api.mem0.ai/v1/memories', {
+      let memoryContent = typeof contextData === 'string' ? contextData : JSON.stringify(contextData);
+      const res = await fetch('https://api.mem0.ai/v1/memories', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, data: contextData })
+        body: JSON.stringify({ 
+          user_id: userId, 
+          messages: [{ role: 'user', content: memoryContent }] 
+        })
       });
+      if (!res.ok) console.error('[Mem0] Store HTTP Error:', res.status);
       return true;
     } catch (error) {
       console.error('[Mem0] Store Error:', error);
@@ -97,12 +101,18 @@ export class Mem0Service {
 
   static async retrieveContext(userId) {
     const apiKey = process.env.MEM0_API_KEY;
-    if (!apiKey) return null; // Mock empty context
+    if (!apiKey) return null;
     try {
       const res = await fetch(`https://api.mem0.ai/v1/memories?user_id=${userId}`, {
         headers: { 'Authorization': `Bearer ${apiKey}` }
       });
-      return await res.json();
+      const data = await res.json();
+      if (data && Array.isArray(data)) {
+        return data.map(m => m.memory).join('\n');
+      } else if (data && data.data) {
+        return data.data.map(m => m.memory).join('\n');
+      }
+      return null;
     } catch (error) {
       console.error('[Mem0] Retrieve Error:', error);
       return null;
@@ -169,8 +179,15 @@ export class AlchemystService {
     // Evaluate Response (Outlier)
     OutlierService.evaluateResponse(query, response);
     
-    // Update Memory (Mem0)
-    Mem0Service.storeContext(userId, { prompt: query, response: response });
+    // Update Memory (Mem0) with full tracked context
+    const fullContextToRemember = `
+      Saathi ID: ${userId}
+      Household Context: ${JSON.stringify(household)}
+      Uploaded Documents: ${docsContext}
+      User Prompt: ${query}
+      Recommended Scheme: ${response?.roadmap?.schemes?.[0]?.name || 'None'}
+    `;
+    Mem0Service.storeContext(userId, fullContextToRemember);
     
     // Step 8: Planner UI (Return response)
     return response;
