@@ -1,3 +1,5 @@
+import Document from '../../models/Document.js';
+
 // 1. Google Gemini Service
 export class GeminiService {
   static async generateRecommendation(context, prompt) {
@@ -129,28 +131,48 @@ export class OutlierService {
 // 4. Alchemyst AI Orchestrator
 export class AlchemystService {
   static async orchestrate(userId, currentHousehold, userPrompt) {
-    console.log('[Alchemyst] Starting orchestration pipeline...');
+    console.log('[Alchemyst] Starting orchestration pipeline for:', userId);
     
-    // Step 1: Retrieve Long-Term Memory (Mem0)
+    // Step 1: User Query
+    const query = userPrompt;
+
+    // Step 2: Household Context
+    const household = currentHousehold;
+    
+    // Step 3: Mem0 Context
     const longTermContext = await Mem0Service.retrieveContext(userId);
     
-    // Step 2: Prompt Engineering with Context
+    // Step 4: Uploaded Documents
+    let docsContext = 'No uploaded documents.';
+    if (userId !== 'anonymous') {
+      try {
+        const userDocs = await Document.find({ userId });
+        if (userDocs && userDocs.length > 0) {
+          const docList = userDocs.map(doc => `- ${doc.type} (${doc.status})`).join('\n');
+          docsContext = `Uploaded Documents:\n${docList}`;
+        }
+      } catch (err) {
+        console.error('[Alchemyst] Error fetching documents:', err);
+      }
+    }
+    
+    // Step 5: Prompt Engineering
     const richContext = {
-      household: currentHousehold,
-      history: longTermContext || 'No previous history.'
+      household,
+      history: longTermContext || 'No previous history.',
+      documents: docsContext
     };
     
-    // Step 3: LLM Generation (Gemini)
-    const response = await GeminiService.generateRecommendation(richContext, userPrompt);
+    // Step 6: Google Gemini (and Response Formatter inside it)
+    const response = await GeminiService.generateRecommendation(richContext, query);
     
-    // Step 4: Evaluate Response (Outlier)
-    // Non-blocking evaluation
-    OutlierService.evaluateResponse(userPrompt, response);
+    // Evaluate Response (Outlier)
+    OutlierService.evaluateResponse(query, response);
     
-    // Step 5: Update Memory (Mem0)
-    // Non-blocking memory update
-    Mem0Service.storeContext(userId, { prompt: userPrompt, response: response });
+    // Update Memory (Mem0)
+    Mem0Service.storeContext(userId, { prompt: query, response: response });
     
+    // Step 8: Planner UI (Return response)
     return response;
   }
 }
