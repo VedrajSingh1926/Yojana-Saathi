@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, ChevronRight, User, Home, Upload, Target, Sparkles, Loader2, Plus, X, Users } from 'lucide-react';
+import { Check, ChevronRight, User, Home, Upload, Target, Sparkles, Loader2, Plus, X, Users, Fingerprint } from 'lucide-react';
 
 export default function Onboarding({ onComplete, onTriggerAuth }) {
   const [step, setStep] = useState(1);
   const [otpSent, setOtpSent] = useState(false);
   const [mobileOtp, setMobileOtp] = useState(['', '', '', '', '', '']);
+  const [generatedSaathiId, setGeneratedSaathiId] = useState(null);
 
   const [formData, setFormData] = useState({
     personal: { name: '', age: '', gender: 'Male', occupation: '', income: '', phone: '', email: '', state: '', district: '' },
@@ -46,17 +47,31 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
     }, 1200);
 
     try {
+      // Create a copy of formData with the full phone number for submission
+      const submitData = {
+        ...formData,
+        personal: {
+          ...formData.personal,
+          phone: '+91' + formData.personal.phone
+        }
+      };
+      
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submitData)
       });
       const data = await res.json();
       
       // Wait for the animation to finish roughly
       setTimeout(() => {
         if (data.success) {
-          onComplete(formData, data.saathiId);
+          setGeneratedSaathiId(data.saathiId);
+          setStep(8);
+          // Auto close after 60 seconds
+          setTimeout(() => {
+            onComplete(formData, data.saathiId);
+          }, 60000);
         } else {
           alert("Registration failed: " + data.message);
         }
@@ -166,8 +181,11 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
               </div>
               <div className="form-group">
                 <label>Phone Number</label>
-                <input type="tel" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
-                  value={formData.personal.phone} onChange={(e) => setFormData({...formData, personal: {...formData.personal, phone: e.target.value}})} />
+                <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-darkest)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.25rem' }}>
+                  <span style={{ padding: '0.5rem 0.75rem', color: 'var(--text-muted)', fontWeight: '500', borderRight: '1px solid var(--border-color)' }}>+91</span>
+                  <input type="tel" className="form-input" style={{ flex: 1, padding: '0.75rem', background: 'transparent', border: 'none', outline: 'none', width: '100%' }} 
+                    value={formData.personal.phone} onChange={(e) => setFormData({...formData, personal: {...formData.personal, phone: e.target.value.replace(/\D/g, '')}})} placeholder="98765 43210" maxLength={10} />
+                </div>
               </div>
               <div className="form-group">
                 <label>Email</label>
@@ -197,10 +215,11 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
                 if (!otpSent) {
                   setIsSendingOtp(true);
                   try {
+                    const fullPhone = '+91' + formData.personal.phone;
                     const res = await fetch('/api/auth/send-otp', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ phoneNumber: formData.personal.phone })
+                      body: JSON.stringify({ phoneNumber: fullPhone })
                     });
                     const data = await res.json();
                     if (data.success) {
@@ -231,7 +250,7 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
             <div style={{ gap: '2rem', marginBottom: '2rem', maxWidth: '500px' }}>
               <div style={{ background: 'var(--bg-darkest)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                 <h4 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Mobile OTP</h4>
-                <p className="text-sm text-muted mb-3">Sent to {formData.personal.phone}</p>
+                <p className="text-sm text-muted mb-3">Sent to +91{formData.personal.phone}</p>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                   {[0, 1, 2, 3, 4, 5].map(i => (
                     <input 
@@ -260,10 +279,11 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
                     <button type="button" className="btn btn-text btn-sm text-gold" disabled={isSendingOtp} onClick={async () => {
                       setIsSendingOtp(true);
                       try {
+                        const fullPhone = '+91' + formData.personal.phone;
                         const res = await fetch('/api/auth/send-otp', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ phoneNumber: formData.personal.phone })
+                          body: JSON.stringify({ phoneNumber: fullPhone })
                         });
                         const data = await res.json();
                         if (data.success) {
@@ -294,10 +314,11 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
                 
                 setIsVerifying(true);
                 try {
+                  const fullPhone = '+91' + formData.personal.phone;
                   const res = await fetch('/api/auth/verify-otp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phoneNumber: formData.personal.phone, otp: otpString })
+                    body: JSON.stringify({ phoneNumber: fullPhone, otp: otpString })
                   });
                   const data = await res.json();
 
@@ -529,6 +550,61 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
                 Welcome to Yojana Saathi 🚀
               </motion.h3>
             )}
+          </motion.div>
+        )}
+
+        {/* STEP 8: SAATHI ID GENERATION POPUP (60s) */}
+        {step === 8 && (
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+            <div style={{ display: 'inline-flex', padding: '16px', borderRadius: '50%', background: 'rgba(212, 175, 55, 0.1)', color: 'var(--gold)', marginBottom: '1.5rem' }}>
+              <Fingerprint size={48} />
+            </div>
+            
+            <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Welcome to Yojana Saathi!</h2>
+            <p className="text-muted mb-4" style={{ fontSize: '1.1rem' }}>Your Family's Digital Welfare Passport is ready.</p>
+            
+            <div style={{ background: 'var(--bg-darkest)', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-color)', margin: '0 auto 2rem', maxWidth: '400px', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+              <p style={{ textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Your Saathi ID</p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', background: 'var(--bg-card)', padding: '1rem', borderRadius: '12px', border: '1px dashed var(--gold)' }}>
+                <strong style={{ fontSize: '1.8rem', color: 'var(--gold)', letterSpacing: '3px' }}>{generatedSaathiId}</strong>
+              </div>
+              
+              <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
+                <button 
+                  className="btn btn-outline" 
+                  style={{ flex: 1 }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(generatedSaathiId);
+                    alert("Saathi ID Copied to clipboard!");
+                  }}
+                >
+                  Copy ID
+                </button>
+                <button 
+                  className="btn btn-primary" 
+                  style={{ flex: 1 }}
+                  onClick={() => alert("Downloading ID Card (Demo)...")}
+                >
+                  Download Card
+                </button>
+              </div>
+
+              <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'white', borderRadius: '8px', display: 'inline-block' }}>
+                {/* Mock QR Code */}
+                <div style={{ width: '120px', height: '120px', background: 'url(https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg) center/contain no-repeat' }}></div>
+              </div>
+            </div>
+
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+              <strong>Note:</strong> Your Saathi ID will be used for all future logins and government benefit tracking. Please keep it safe.
+            </p>
+
+            <button 
+              className="btn btn-text" 
+              onClick={() => onComplete(formData, generatedSaathiId)}
+            >
+              Continue to Dashboard <ChevronRight size={18} />
+            </button>
           </motion.div>
         )}
       </div>

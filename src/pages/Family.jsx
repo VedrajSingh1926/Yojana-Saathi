@@ -88,15 +88,22 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
           {/* SUBTAB 1: Household Overview */}
           {subtab === 'overview' && (
             <div className="animate-fade-in">
-              <div className="overview-grid">
+              <div className="overview-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
                 <div className="glass-card stat-summary-card">
                   <h3>Household Income Group</h3>
                   <div className="highlight-stat text-gold">₹{(user.family.reduce((acc, curr) => acc + curr.income, 0)).toLocaleString()}/yr</div>
                   <p>Eligible for Low-Income Group (LIG) & BPL benefits.</p>
                 </div>
                 <div className="glass-card stat-summary-card">
+                  <h3>Linked Mobile</h3>
+                  <div className="highlight-stat text-cyan" style={{ letterSpacing: '2px' }}>
+                    {user.mobileNumber ? 'X'.repeat(Math.max(0, user.mobileNumber.length - 2)) + user.mobileNumber.slice(-2) : 'XXXXXXXXXX'}
+                  </div>
+                  <p>Used for OTPs & alerts.</p>
+                </div>
+                <div className="glass-card stat-summary-card">
                   <h3>Passport Status</h3>
-                  <div className="highlight-stat text-cyan">Active</div>
+                  <div className="highlight-stat text-success">Active</div>
                   <p>Encrypted verification matches 6 state and central programs.</p>
                 </div>
                 <div className="glass-card stat-summary-card">

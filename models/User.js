@@ -2,18 +2,15 @@ import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
   saathiId: { type: String, unique: true },
-  personal: {
-    name: String,
-    phone: String,
-    email: String,
-    age: Number,
-    gender: String,
-    state: String,
-    district: String
-  },
+  fullName: { type: String, required: true },
+  mobileNumber: { type: String, required: true, unique: true },
+  email: { type: String },
+  state: { type: String },
+  district: { type: String },
   household: {
-    isHead: String,
-    familyType: String,
+    headName: { type: String },
+    totalMembers: { type: Number },
+    annualIncome: { type: Number },
     members: [{
       name: String,
       age: Number,
@@ -35,7 +32,11 @@ const userSchema = new mongoose.Schema({
     bank: String,
     land: String
   },
-  goals: [String]
+  goals: [String],
+  documents: [{
+    name: String,
+    verified: { type: Boolean, default: false }
+  }]
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);

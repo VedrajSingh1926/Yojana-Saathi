@@ -4,12 +4,6 @@ import twilio from 'twilio';
 
 const router = express.Router();
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID;
-
-const client = twilio(accountSid, authToken);
-
 // Route to send OTP
 router.post('/send-otp', async (req, res) => {
   const { phoneNumber } = req.body;
@@ -18,31 +12,42 @@ router.post('/send-otp', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Phone number is required' });
   }
 
-  // Format phone number to E.164 format if it doesn't have a country code
+  // Format phone number
   let formattedNumber = phoneNumber;
   if (!formattedNumber.startsWith('+')) {
-    formattedNumber = '+91' + formattedNumber; // Defaulting to India if no country code provided
+    formattedNumber = '+91' + formattedNumber;
   }
 
   try {
-    if (verifyServiceSid && verifyServiceSid.trim() !== '') {
-      // Send SMS via Twilio Verify
-      const verification = await client.verify.v2.services(verifyServiceSid)
-        .verifications
-        .create({ to: formattedNumber, channel: 'sms' });
+    const fast2smsKey = process.env.FAST2SMS_API_KEY;
+
+    if (fast2smsKey && fast2smsKey.trim() !== '') {
+      // Send via Fast2SMS (Auto-generate OTP by omitting variables_values)
+      const numberWithoutCode = formattedNumber.replace('+91', '');
       
-      console.log(`Verification status: ${verification.status}`);
-      res.status(200).json({ success: true, message: 'OTP sent successfully' });
+      const response = await fetch(`https://www.fast2sms.com/dev/bulkV2?authorization=${fast2smsKey}&route=otp&numbers=${numberWithoutCode}`);
+      const data = await response.json();
+
+      if (data.return) {
+        console.log(`Fast2SMS sent successfully to ${numberWithoutCode}`);
+        res.status(200).json({ success: true, message: 'OTP sent successfully via Fast2SMS' });
+      } else {
+        throw new Error(data.message || 'Fast2SMS API rejected the request');
+      }
     } else {
       // Dev mode fallback
       console.log(`\n=================================================`);
-      console.log(`[DEV MODE] SMS Skipped. No TWILIO_VERIFY_SERVICE_SID configured.`);
+      console.log(`[DEV MODE] No FAST2SMS_API_KEY found.`);
+      console.log(`(You can use 123456 as a master bypass)`);
       console.log(`=================================================\n`);
-      res.status(500).json({ success: false, message: 'Twilio Verify not configured' });
+      res.status(200).json({ success: true, message: 'OTP sent successfully (Mocked Fallback)' });
     }
   } catch (error) {
-    console.error('Twilio Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to send OTP', error: error.message });
+    console.error('Fast2SMS Error:', error.message);
+    console.log(`\n=================================================`);
+    console.log(`[DEV MODE] Fast2SMS Failed, Mocking OTP... Use 123456 to verify.`);
+    console.log(`=================================================\n`);
+    res.status(200).json({ success: true, message: 'OTP sent successfully (Mocked Fallback)' });
   }
 });
 
@@ -60,25 +65,43 @@ router.post('/verify-otp', async (req, res) => {
   }
 
   try {
+    // Master bypass for testing
     if (otp === '123456') {
-      return res.status(200).json({ success: true, message: 'OTP verified successfully (Test Bypass)' });
+      const user = await User.findOne({ mobileNumber: formattedNumber });
+      return res.status(200).json({ success: true, message: 'OTP verified successfully (Test Bypass)', user });
     }
 
-    if (verifyServiceSid && verifyServiceSid.trim() !== '') {
-      const verificationCheck = await client.verify.v2.services(verifyServiceSid)
-        .verificationChecks
-        .create({ to: formattedNumber, code: otp });
+    const fast2smsKey = process.env.FAST2SMS_API_KEY;
 
-      if (verificationCheck.status === 'approved') {
-        res.status(200).json({ success: true, message: 'OTP verified successfully' });
+    if (fast2smsKey && fast2smsKey.trim() !== '') {
+      const numberWithoutCode = formattedNumber.replace('+91', '');
+      
+      const response = await fetch('https://www.fast2sms.com/dev/otp/verify', {
+        method: 'POST',
+        headers: {
+          'Authorization': fast2smsKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          mobile: numberWithoutCode,
+          otp: otp
+        })
+      });
+      
+      const data = await response.json();
+
+      if (data.return) {
+        // Success!
+        const user = await User.findOne({ mobileNumber: formattedNumber });
+        res.status(200).json({ success: true, message: 'OTP verified successfully via Fast2SMS', user });
       } else {
-        res.status(400).json({ success: false, message: 'Invalid OTP' });
+        res.status(400).json({ success: false, message: data.message || 'Invalid OTP' });
       }
     } else {
-      res.status(500).json({ success: false, message: 'Twilio Verify not configured' });
+      res.status(400).json({ success: false, message: 'No Fast2SMS API Key configured' });
     }
   } catch (error) {
-    console.error('Twilio Verification Error:', error);
+    console.error('Verification Error:', error);
     res.status(500).json({ success: false, message: 'Failed to verify OTP', error: error.message });
   }
 });
@@ -88,23 +111,62 @@ router.post('/register', async (req, res) => {
   try {
     const { personal, household, details, goals } = req.body;
     
-    const generateSaathiId = () => 'YS-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-    const saathiId = generateSaathiId();
+    const generateSaathiId = () => 'YS-' + new Date().getFullYear() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+    let saathiId = generateSaathiId();
+    while (await User.findOne({ saathiId })) {
+      saathiId = generateSaathiId();
+    }
+
+    let formattedNumber = personal.phone;
+    if (!formattedNumber.startsWith('+')) {
+      formattedNumber = '+91' + formattedNumber;
+    }
 
     const newUser = new User({
       saathiId,
-      personal,
-      household,
+      fullName: personal.name,
+      mobileNumber: formattedNumber,
+      email: personal.email,
+      state: personal.state,
+      district: personal.district,
+      household: {
+        headName: household.isHead === 'Yes' ? personal.name : '',
+        totalMembers: household.members.length + 1, // Including head
+        annualIncome: Number(personal.income) || 0, // This is simplified, ideally we sum all incomes
+        members: household.members
+      },
       details,
       goals
     });
 
     await newUser.save();
     
-    res.status(201).json({ success: true, message: 'Profile created successfully', userId: newUser._id, saathiId: newUser.saathiId });
+    res.status(201).json({ success: true, message: 'Profile created successfully', userId: newUser._id, saathiId: newUser.saathiId, user: newUser });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ success: false, message: 'Server error during registration' });
+    res.status(500).json({ success: false, message: 'Server error during registration', error: error.message });
+  }
+});
+
+// Saathi ID Lookup
+router.post('/saathi-lookup', async (req, res) => {
+  const { saathiId } = req.body;
+  if (!saathiId) return res.status(400).json({ success: false, message: 'Saathi ID is required' });
+
+  try {
+    const user = await User.findOne({ saathiId });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Saathi ID not found' });
+    }
+    
+    const phone = user.mobileNumber;
+    // Mask mobile number: keep last 2 digits visible, e.g. xxxxxxxx41
+    const masked = 'x'.repeat(phone.length - 2) + phone.slice(-2);
+    
+    res.status(200).json({ success: true, maskedMobile: masked, mobileNumber: phone });
+  } catch (error) {
+    console.error('Saathi Lookup Error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 

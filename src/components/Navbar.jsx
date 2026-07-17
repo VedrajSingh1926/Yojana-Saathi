@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Languages, MapPin, Bell, Menu, X, ChevronDown, ArrowRight } from 'lucide-react';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { Languages, MapPin, Bell, Menu, X, ChevronDown, ArrowRight, User } from 'lucide-react';
 import './Navbar.css';
 
 export default function Navbar({ 
@@ -246,22 +245,23 @@ export default function Navbar({
             {/* Auth Buttons */}
             {!user ? (
               <>
-                <SignedOut>
-                  <SignInButton mode="modal">
-                    <button className="lux-login-btn">Login</button>
-                  </SignInButton>
-                </SignedOut>
+                <button className="lux-login-btn" onClick={() => onTriggerAuth(false)}>Login</button>
                 <button className="lux-cta-btn" onClick={() => onTriggerAuth(true)}>
                   Get Started
                   <ArrowRight size={18} className="arrow-icon" />
                 </button>
               </>
             ) : (
-              <SignedIn>
-                <div style={{ paddingLeft: '8px' }}>
-                  <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: { width: 44, height: 44 } } }} />
-                </div>
-              </SignedIn>
+              <div style={{ paddingLeft: '8px', position: 'relative' }}>
+                <button 
+                  className="lux-pill"
+                  onClick={() => onNavigate('family')}
+                  style={{ background: 'var(--lux-primary)', color: 'white', border: 'none' }}
+                >
+                  <User size={18} />
+                  <span>{user.name.split(' ')[0]}</span>
+                </button>
+              </div>
             )}
 
             {/* Mobile Toggle */}

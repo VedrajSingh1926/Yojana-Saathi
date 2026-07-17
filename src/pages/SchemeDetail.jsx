@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Landmark, Info, Banknote, ListChecks, FileText, Compass, HelpCircle, Globe, Download, Bookmark } from 'lucide-react';
+import { ArrowLeft, Landmark, Info, Banknote, ListChecks, FileText, Compass, HelpCircle, Globe, Download, Bookmark, Sparkles } from 'lucide-react';
 import { SCHEMES_DB } from '../data/schemes';
 
 export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveScheme }) {
@@ -45,8 +45,11 @@ export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveSchem
             <button className="btn btn-outline" onClick={() => onSaveScheme(scheme)}>
               <Bookmark size={16} /> Save
             </button>
-            <button className="btn btn-primary" onClick={() => window.open(scheme.official_url, '_blank')}>
-              Open Official Website <Globe size={16} />
+            <button className="btn btn-primary" onClick={() => onNavigate('form-assistant')}>
+              Apply with AI Assistant <Sparkles size={16} />
+            </button>
+            <button className="btn btn-outline" onClick={() => window.open(scheme.official_url, '_blank')}>
+              Official Web <Globe size={16} />
             </button>
           </div>
         </div>

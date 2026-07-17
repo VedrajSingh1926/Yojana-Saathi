@@ -13,6 +13,7 @@ import AIPlanner from './pages/AIPlanner';
 import Family from './pages/Family';
 import ScamShield from './pages/ScamShield';
 import Onboarding from './pages/Onboarding';
+import GovFormAssistant from './pages/GovFormAssistant';
 
 export default function App() {
   const [activeView, setActiveView] = useState('home');
@@ -39,7 +40,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding'].includes(hash)) {
+      if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant'].includes(hash)) {
         setActiveView(hash);
       }
     };
@@ -111,6 +112,7 @@ export default function App() {
         occupation: registeredData.personal.occupation || 'N/A',
         income: parseInt(registeredData.personal.income) || 0,
         saathiId: saathiId,
+        mobileNumber: registeredData.personal.phone || '9999999999',
         family: familyMembers,
         documents: [
           { name: "Aadhaar Card", verified: true }
@@ -133,6 +135,7 @@ export default function App() {
         occupation: "Farmer",
         income: 240000,
         saathiId: "YS-9824",
+        mobileNumber: "9876543210",
         family: [
           { name: "Ramesh Kumar", relation: "Head", age: 42, occupation: "Farmer", income: 240000, status: "Verified" },
           { name: "Pooja Kumar", relation: "Spouse", age: 38, occupation: "Housewife", income: 0, status: "Verified" },
@@ -273,6 +276,8 @@ export default function App() {
         {activeView === 'planner' && (
           <AIPlanner 
             initialPrompt={plannerPrompt}
+            user={user}
+            lang={lang}
           />
         )}
 
@@ -296,6 +301,13 @@ export default function App() {
               handleLoginSuccess(data, saathiId);
               handleNavigate('home');
             }} 
+          />
+        )}
+
+        {activeView === 'form-assistant' && (
+          <GovFormAssistant 
+            user={user}
+            onBack={() => handleNavigate('schemes')}
           />
         )}
       </main>
