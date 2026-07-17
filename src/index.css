@@ -2987,8 +2987,12 @@ button, input, select, textarea {
 .starter-card-inline:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(217, 119, 54, 0.15); border-color: var(--primary); }
 
 /* AI Planner Redesign */
-.planner-two-col { display: flex; gap: 1.5rem; height: calc(100vh - var(--nav-height) - 150px); min-height: 600px; max-width: 1600px; margin: 0 auto; }
-.planner-chat-panel { flex: 0 0 420px; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-.planner-preview-panel { flex: 1; display: flex; flex-direction: column; height: 100%; overflow-y: auto; padding-right: 8px; }
-.empty-state-preview { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text-muted); opacity: 0.7; }
-@media (max-width: 1024px) { .planner-two-col { flex-direction: column; height: auto; } .planner-chat-panel { flex: none; height: 600px; max-height: 60vh; width: 100%; } .planner-preview-panel { flex: none; min-height: 500px; overflow: visible; } }
+
+/* ChatGPT Style Layout */
+.gpt-layout-container { display: flex; gap: 1.5rem; height: calc(100vh - var(--nav-height) - 130px); min-height: 600px; max-width: 1400px; margin: 0 auto; }
+.gpt-sidebar { flex: 0 0 25%; max-width: 320px; min-width: 250px; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; }
+.gpt-sidebar-btn { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid transparent; background: transparent; color: var(--text-secondary); cursor: pointer; transition: var(--transition); text-align: left; font-size: 0.95rem; font-weight: 500; }
+.gpt-sidebar-btn:hover { background: rgba(255, 255, 255, 0.5); border-color: var(--border-color); color: var(--text-primary); }
+.gpt-sidebar-btn.active { background: var(--bg-card); border-color: var(--primary); color: var(--primary); }
+.gpt-main-chat { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+@media (max-width: 1024px) { .gpt-sidebar { display: none; } }
