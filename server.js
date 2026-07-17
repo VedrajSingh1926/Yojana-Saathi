@@ -23,14 +23,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Verify essential environment variables (Strict Check)
+// Verify essential environment variables (Warning only, so Render deploy doesn't fail)
 const requiredEnv = ['GEMINI_API_KEY', 'GNANI_API_KEY', 'MEM0_API_KEY', 'ALCHEMYST_API_KEY', 'MONGODB_URI'];
 const missingEnv = requiredEnv.filter(key => !process.env[key]);
 if (missingEnv.length > 0) {
-  logger.error(`CRITICAL: Missing essential environment variables: ${missingEnv.join(', ')}`);
-  process.exit(1);
+  logger.warn(`WARNING: Missing essential environment variables: ${missingEnv.join(', ')}. APIs may not function correctly.`);
+} else {
+  logger.info('Environment variables successfully verified.');
 }
-logger.info('Environment variables successfully verified.');
 
 // MongoDB connection
 let mongoServer;
@@ -44,30 +44,20 @@ const connectDB = async () => {
       dbUri = mongoServer.getUri();
       logger.info(`MongoMemoryServer started at: ${dbUri}`);
     } catch (err) {
-      logger.error('Failed to start MongoMemoryServer', err);
-      process.exit(1);
+      logger.error('Failed to start MongoMemoryServer (likely missing in production). APIs requiring DB will fail.', err);
+      dbUri = null;
     }
   }
 
-  try {
-    await mongoose.connect(dbUri, { serverSelectionTimeoutMS: 3000 });
-    logger.info('MongoDB connection established successfully');
-  } catch (err) {
-    logger.error('MongoDB connection error', err);
-    if (!mongoServer && process.env.NODE_ENV !== 'production') {
-      logger.info('Falling back to MongoMemoryServer...');
-      try {
-        const { MongoMemoryServer } = await import('mongodb-memory-server');
-        mongoServer = await MongoMemoryServer.create();
-        const fallbackUri = mongoServer.getUri();
-        await mongoose.connect(fallbackUri);
-        logger.info('Connected to fallback MongoMemoryServer successfully');
-      } catch (fallbackErr) {
-        logger.error('Failed to connect to fallback MongoMemoryServer', fallbackErr);
-      }
-    } else {
-      process.exit(1);
+  if (dbUri) {
+    try {
+      await mongoose.connect(dbUri, { serverSelectionTimeoutMS: 3000 });
+      logger.info('MongoDB connection established successfully');
+    } catch (err) {
+      logger.error('MongoDB connection error', err);
     }
+  } else {
+    logger.warn('Running without MongoDB connection.');
   }
 };
 connectDB();
