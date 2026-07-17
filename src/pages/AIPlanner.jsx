@@ -176,25 +176,27 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
       </div>
 
       <div className="planner-workspace">
-        {/* Sidebar Prompt Starters */}
-        <div className="planner-starters">
-          {starters.map((st, idx) => (
-            <div key={idx} className="starter-card" onClick={() => handleSendPrompt(st.text)}>
-              <div className="starter-icon">{st.icon}</div>
-              <h4>"{st.text.slice(0, 30)}..."</h4>
-              <p>{st.desc}</p>
-            </div>
-          ))}
-        </div>
-
         {/* Chat area */}
-        <div className="chat-container glass-card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div className="chat-messages" style={{ flex: 1 }}>
+        <div className="chat-container glass-card" style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '1000px', margin: '0 auto' }}>
+          <div className="chat-messages" style={{ flex: 1, padding: '1.5rem', overflowY: 'auto' }}>
             {chat.map(msg => (
               <div key={msg.id} className={`message ${msg.sender === 'user' ? 'user-message' : 'system-message'}`}>
                 {msg.sender === 'system' && <div className="bot-avatar"><Sparkles size={16} /></div>}
                 <div className="message-bubble" style={{ maxWidth: msg.roadmap ? '850px' : undefined, width: msg.roadmap ? '100%' : 'auto' }}>
                   <p>{msg.text}</p>
+                  
+                  {/* Starter Suggestions inside the chat for the first message */}
+                  {msg.id === 1 && chat.length === 1 && (
+                    <div className="planner-starters-inline" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '1.5rem' }}>
+                      {starters.map((st, idx) => (
+                        <div key={idx} className="starter-card-inline" onClick={() => handleSendPrompt(st.text)} style={{ flex: '1 1 calc(50% - 10px)', minWidth: '250px', background: 'var(--bg-darkest)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1rem', cursor: 'pointer', transition: 'all 0.3s ease' }}>
+                          <div className="starter-icon" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{st.icon}</div>
+                          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: 'var(--text-primary)' }}>"{st.text.length > 40 ? st.text.slice(0, 40) + '...' : st.text}"</h4>
+                          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{st.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   
                   {msg.roadmap && msg.roadmap.schemes && msg.roadmap.schemes.length > 0 && (
                     <motion.div 
