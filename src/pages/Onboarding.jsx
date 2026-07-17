@@ -19,6 +19,7 @@ export default function Onboarding({ stateLocation, onChangeState, onComplete, o
     if (formData.personal.state && onChangeState && formData.personal.state !== stateLocation) {
       onChangeState(formData.personal.state);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.personal.state]);
 
   const [isSendingOtp, setIsSendingOtp] = useState(false);

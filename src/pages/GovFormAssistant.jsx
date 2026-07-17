@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Check, ChevronLeft, ShieldAlert, ArrowRight, AlertTriangle } from 'lucide-react';
+import { Sparkles, Check, ChevronLeft, ShieldAlert, AlertTriangle } from 'lucide-react';
 
 export default function GovFormAssistant({ onBack, user }) {
   const [activeField, setActiveField] = useState(null);

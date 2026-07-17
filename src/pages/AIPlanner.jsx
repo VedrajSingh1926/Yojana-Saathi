@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Sparkles, Download, Compass, Mic, FileText, CheckCircle2, AlertTriangle, HelpCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export default function AIPlanner({ initialPrompt, user, lang }) {
   const [chat, setChat] = useState([
@@ -18,6 +18,7 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
     if (initialPrompt) {
       handleSendPrompt(initialPrompt);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialPrompt]);
 
   const scrollToBottom = () => {

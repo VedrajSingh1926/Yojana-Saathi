@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ArrowRight, Sparkles, ChevronRight, Landmark, Brain, IdCard } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export default function Home({ onNavigate, onTriggerAuth }) {
 

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Server, AlertCircle, RefreshCw, Layers, Brain, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldCheck, Server, AlertCircle, RefreshCw, Layers, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Partners() {
-  const [partners, setPartners] = useState([
+  const [partners] = useState([
     { id: 'gemini', name: 'Google Gemini', type: 'Core AI Engine', status: 'connected', latency: '450ms', desc: 'Powers scheme recommendations and reasoning.' },
     { id: 'gnani', name: 'Gnani.ai', type: 'Voice Intelligence', status: 'connected', latency: '120ms', desc: 'Handles multilingual speech-to-text and voice navigation.' },
     { id: 'alchemyst', name: 'Alchemyst AI', type: 'Orchestrator', status: 'connected', latency: '80ms', desc: 'Chains memories and LLM calls in a logical pipeline.' },

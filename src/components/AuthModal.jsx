@@ -6,35 +6,10 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [phone, setPhone] = useState('');
   const [saathiId, setSaathiId] = useState('');
   const [password, setPassword] = useState('');
-  const [maskedPhone, setMaskedPhone] = useState('');
   const [recoveryInput, setRecoveryInput] = useState('');
   const [recoveredData, setRecoveredData] = useState(null);
 
   if (!isOpen) return null;
-
-  const handleLookupSaathi = async (e) => {
-    e.preventDefault();
-    if (!saathiId.trim()) return alert("Enter Saathi ID");
-
-    try {
-      const res = await fetch('/api/auth/saathi-lookup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ saathiId })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setPhone(data.mobileNumber);
-        setMaskedPhone(data.maskedMobile);
-        setStep(2);
-      } else {
-        alert(data.message || "Saathi ID not found.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error looking up Saathi ID.");
-    }
-  };
 
   const handleRecovery = async (e) => {
     e.preventDefault();
