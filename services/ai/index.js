@@ -15,11 +15,29 @@ export class GeminiService {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: `Context: ${JSON.stringify(context)}\nPrompt: ${prompt}` }] }]
+          system_instruction: {
+            parts: [{
+              text: "You are Yojana Saathi's AI Welfare Planner, an expert in Indian government schemes. Analyze the citizen's context and prompt. You MUST output ONLY valid JSON matching exactly this structure: { \"text\": \"Conversational greeting and summary of eligibility\", \"roadmap\": { \"schemes\": [{ \"name\": \"Scheme Name\", \"benefit\": \"Subsidy or benefit detail\", \"status\": \"Highly Eligible or Pending\" }], \"steps\": [{ \"num\": \"1\", \"name\": \"Step Title\", \"desc\": \"Step explanation\" }], \"reqDocs\": [\"Doc 1\", \"Doc 2\"], \"missingDocs\": [\"Doc 1\"], \"faqs\": [{ \"q\": \"Question?\", \"a\": \"Answer.\" }] } }"
+            }]
+          },
+          generationConfig: {
+            responseMimeType: "application/json"
+          },
+          contents: [{ parts: [{ text: `Context: ${JSON.stringify(context)}\nUser Request: ${prompt}` }] }]
         })
       });
       const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm sorry, I couldn't generate a response.";
+      const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (textResponse) {
+        try {
+          return JSON.parse(textResponse);
+        } catch (e) {
+          console.error('[Gemini] Failed to parse JSON', e, textResponse);
+          return { text: textResponse, roadmap: null };
+        }
+      }
+      return { text: "I'm sorry, I couldn't generate a response.", roadmap: null };
     } catch (error) {
       console.error('[Gemini] Error:', error);
       return "An error occurred while connecting to Gemini.";

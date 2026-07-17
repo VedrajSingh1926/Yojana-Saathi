@@ -11,6 +11,8 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   const [isListening, setIsListening] = useState(false);
 
   const messagesEndRef = useRef(null);
+  const mediaRecorder = useRef(null);
+  const audioChunks = useRef([]);
 
   useEffect(() => {
     if (initialPrompt) {
@@ -33,18 +35,53 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
     { text: 'My father is turning 60 this month and has no pension', icon: '👴', desc: 'AI links pension funds and health insurance plans.' }
   ];
 
-  const handleVoiceInput = () => {
-    // Gnani.ai Voice Integration (Simulated Web Audio capture for now)
-    setIsListening(true);
-    setInput('Listening via Gnani.ai...');
-    
-    // Simulate Gnani STT processing
-    setTimeout(() => {
+  const handleVoiceInput = async () => {
+    if (isListening) {
+      if (mediaRecorder.current) mediaRecorder.current.stop();
       setIsListening(false);
-      const simulatedTranscript = "I want to start a dairy business in my village.";
-      setInput(simulatedTranscript);
-      handleSendPrompt(simulatedTranscript);
-    }, 3000);
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder.current = new MediaRecorder(stream);
+      audioChunks.current = [];
+
+      mediaRecorder.current.ondataavailable = (event) => {
+        audioChunks.current.push(event.data);
+      };
+
+      mediaRecorder.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'audio.webm');
+        formData.append('language', lang);
+
+        setInput('Transcribing via Gnani...');
+        try {
+          const response = await fetch('/api/ai/stt', { method: 'POST', body: formData });
+          const data = await response.json();
+          if (data.success) {
+            setInput(data.transcript);
+            handleSendPrompt(data.transcript);
+          } else {
+            alert('Speech to text failed: ' + data.message);
+            setInput('');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Error connecting to STT service.');
+          setInput('');
+        }
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.current.start();
+      setIsListening(true);
+      setInput('Listening via Gnani.ai... (Click mic to stop)');
+    } catch (err) {
+      console.error('Microphone access error:', err);
+      alert('Could not access microphone.');
+    }
   };
 
   const handleSendPrompt = async (promptText) => {
