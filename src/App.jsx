@@ -127,7 +127,7 @@ export default function App() {
           { name: "Aadhaar Card", verified: true }
         ],
         events: [
-          { date: new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }), title: "Welfare Passport Created", desc: "Profile successfully registered." }
+          { date: isFromDB && registeredData.createdAtIST ? registeredData.createdAtIST.split(',')[0] : new Date().toLocaleDateString('en-GB'), title: "Welfare Passport Created", desc: "Profile successfully registered." }
         ]
       });
 
@@ -158,6 +158,8 @@ export default function App() {
           { name: "Land Registry Copy", verified: true }
         ],
         events: [
+          { date: new Date().toLocaleDateString('en-GB'), title: "Welfare Passport Created", desc: "Initial registration approved by Gram Panchayat." },
+          { date: new Date().toLocaleDateString('en-GB'), title: "PM Kisan Installment", desc: "₹2,000 received in registered bank account." },
           { date: "Jun 2026", title: "Amit joined College (Education)", desc: "Triggered recommendations for central post-matric higher education grants." },
           { date: "Mar 2026", title: "Applied for PM Awas (Housing)", desc: "Document checklist completed. Application registered with rural development office." },
           { date: "Jan 2024", title: "Mohan Kumar turned 60 (Senior)", desc: "Triggered Old Age Pension claim and registration for Senior Medical Health Cards." }
