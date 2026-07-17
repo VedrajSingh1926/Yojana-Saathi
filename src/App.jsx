@@ -15,6 +15,7 @@ import ScamShield from './pages/ScamShield';
 import Onboarding from './pages/Onboarding';
 import GovFormAssistant from './pages/GovFormAssistant';
 import Partners from './pages/Partners';
+import OutlierDashboard from './pages/OutlierDashboard';
 
 export default function App() {
   const [activeView, setActiveView] = useState('home');
@@ -41,7 +42,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant', 'partners'].includes(hash)) {
+      if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant', 'partners', 'outlier'].includes(hash)) {
         setActiveView(hash);
       }
     };
@@ -327,6 +328,10 @@ export default function App() {
 
         {activeView === 'partners' && (
           <Partners />
+        )}
+
+        {activeView === 'outlier' && (
+          <OutlierDashboard />
         )}
       </main>
 
