@@ -189,7 +189,7 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
                   {msg.id === 1 && chat.length === 1 && (
                     <div className="planner-starters-inline" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '1.5rem' }}>
                       {starters.map((st, idx) => (
-                        <div key={idx} className="starter-card-inline" onClick={() => handleSendPrompt(st.text)} style={{ flex: '1 1 calc(50% - 10px)', minWidth: '250px', background: 'var(--bg-darkest)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1rem', cursor: 'pointer', transition: 'all 0.3s ease' }}>
+                        <div key={idx} className="starter-card-inline" onClick={() => handleSendPrompt(st.text)}>
                           <div className="starter-icon" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{st.icon}</div>
                           <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: 'var(--text-primary)' }}>"{st.text.length > 40 ? st.text.slice(0, 40) + '...' : st.text}"</h4>
                           <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{st.desc}</p>
