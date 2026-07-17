@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Users, User, Check, Network, IdCard, FolderOpen, Calendar, ShieldCheck, QrCode as QrCodeIcon, Plus, CloudLightning } from 'lucide-react';
+import { Users, User, Check, Network, IdCard, FolderOpen, Calendar, ShieldCheck, Plus } from 'lucide-react';
 import QRCode from 'react-qr-code';
-import { motion } from 'framer-motion';
 
 export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }) {
   const [subtab, setSubtab] = useState('overview');

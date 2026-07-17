@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HelpCircle, ChevronUp, ChevronDown, CheckCircle2, Sparkles } from 'lucide-react';
+import { HelpCircle, ChevronUp, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { SCHEMES_DB } from '../data/schemes';
 
 export default function EligibilityPopup({ onRegisterLead }) {

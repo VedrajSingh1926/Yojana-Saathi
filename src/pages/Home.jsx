@@ -1,8 +1,23 @@
-import React from 'react';
-import { ArrowRight, Sparkles, ChevronRight, Landmark, Brain, Shield, IdCard } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { ArrowRight, Sparkles, ChevronRight, Landmark, Brain, IdCard } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const HERO_IMAGES = [
+  'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2000',
+  'https://images.unsplash.com/photo-1596395819057-e37f55a8516d?auto=format&fit=crop&q=80&w=2000',
+  'https://images.unsplash.com/photo-1627885060195-021bdeea6438?auto=format&fit=crop&q=80&w=2000'
+];
 
 export default function Home({ onNavigate, onTriggerAuth }) {
+  const [bgIndex, setBgIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBgIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
   const milestones = [
     { id: 'child', icon: '👶', title: 'Child Born', desc: 'Maternity relief, baby supplies, nutritional support.', cat: 'Women', color: 'bg-soft-blue' },
     { id: 'education', icon: '🎓', title: 'Education', desc: 'Scholarships, study loans, books, laptop grants.', cat: 'Student', color: 'bg-soft-purple' },
@@ -19,15 +34,29 @@ export default function Home({ onNavigate, onTriggerAuth }) {
   };
 
   return (
-    <div className="view-section animate-fade-in">
+    <div className="view-section animate-fade-in" style={{ padding: 0, maxWidth: '100%' }}>
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
+      <section className="hero-section hero-carousel">
+        <AnimatePresence mode="popLayout">
+          <motion.div
+            key={bgIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5 }}
+            className="hero-carousel-bg"
+            style={{ backgroundImage: `url(${HERO_IMAGES[bgIndex]})` }}
+          />
+        </AnimatePresence>
+        
+        <div className="hero-carousel-overlay"></div>
+
+        <div className="hero-content hero-carousel-content">
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="pill-badge"
+            className="pill-badge pill-badge-light"
           >
             <span className="badge-dot"></span> AI-POWERED • TRUSTED • SECURE
           </motion.div>
@@ -36,7 +65,7 @@ export default function Home({ onNavigate, onTriggerAuth }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="hero-title"
+            className="hero-title text-white"
           >
             Every Family Deserves <br />
             <span className="text-gradient">Every Benefit.</span>
@@ -46,7 +75,7 @@ export default function Home({ onNavigate, onTriggerAuth }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="hero-subtitle"
+            className="hero-subtitle text-white-alpha"
           >
             Yojana Saathi uses AI to match your household with government schemes, simplifying criteria, avoiding scams, and managing applications end-to-end.
           </motion.p>
@@ -60,22 +89,17 @@ export default function Home({ onNavigate, onTriggerAuth }) {
             <button className="btn btn-primary btn-lg" onClick={() => onTriggerAuth(true)}>
               Get Started <ArrowRight size={18} />
             </button>
-            <button className="btn btn-outline btn-lg" onClick={() => onNavigate('planner')}>
+            <button className="btn btn-outline btn-outline-light btn-lg" onClick={() => onNavigate('planner')}>
               <Sparkles size={18} className="text-gold" /> Try AI Planner
             </button>
-            <button className="btn btn-text btn-lg" onClick={() => onNavigate('schemes')}>
+            <button className="btn btn-text btn-text-light btn-lg" onClick={() => onNavigate('schemes')}>
               Explore Schemes <ChevronRight size={18} />
             </button>
           </motion.div>
 
-          <p className="hero-footer-text">
+          <p className="hero-footer-text text-white-alpha">
             🇮🇳 Made for India. Built for Every Family.
           </p>
-        </div>
-
-        {/* Hero Graphic - Aesthetic Image */}
-        <div className="hero-graphic-container">
-          <img src="/hero-image.png" alt="Happy Indian Family receiving welfare schemes" className="hero-image" style={{ width: '100%', maxWidth: '500px', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} />
         </div>
       </section>
 

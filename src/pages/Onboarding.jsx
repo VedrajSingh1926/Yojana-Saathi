@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, ChevronRight, User, Home, FileText, Upload, Target, Sparkles, Loader2, Plus, X, Users } from 'lucide-react';
+import { Check, ChevronRight, User, Home, Upload, Target, Sparkles, Loader2, Plus, X, Users } from 'lucide-react';
 
 export default function Onboarding({ onComplete, onTriggerAuth }) {
   const [step, setStep] = useState(1);
   const [otpSent, setOtpSent] = useState(false);
   const [mobileOtp, setMobileOtp] = useState(['', '', '', '', '', '']);
-  const [emailOtp, setEmailOtp] = useState(['', '', '', '', '', '']);
+
   const [formData, setFormData] = useState({
     personal: { name: '', age: '', gender: 'Male', occupation: '', income: '', phone: '', email: '', state: '', district: '' },
     household: { isHead: 'Yes', members: [] },
@@ -42,11 +42,29 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
         setLoadingMsg(messages[i]);
       } else {
         clearInterval(interval);
-        setTimeout(() => {
-          onComplete(formData);
-        }, 1500);
       }
     }, 1200);
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      
+      // Wait for the animation to finish roughly
+      setTimeout(() => {
+        if (data.success) {
+          onComplete(formData, data.saathiId);
+        } else {
+          alert("Registration failed: " + data.message);
+        }
+      }, messages.length * 1200);
+    } catch (err) {
+      console.error(err);
+      alert("Error saving data to server.");
+    }
   };
 
   const handleAddMember = () => {
@@ -76,7 +94,15 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
   };
 
   return (
-    <div className="view-section animate-fade-in" style={{ maxWidth: '900px', margin: '0 auto', paddingTop: '2rem' }}>
+    <div className="onboarding-split-layout">
+      <div className="onboarding-split-image" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=1000)' }}>
+        <div className="onboarding-split-overlay">
+           <h2 className="text-white mb-2" style={{ fontSize: '2.5rem' }}>Your Unified Family Welfare Passport</h2>
+           <p className="text-white-alpha" style={{ fontSize: '1.15rem' }}>Create your family profile securely to instantly discover all government schemes you are eligible for, with step-by-step AI guidance.</p>
+        </div>
+      </div>
+      <div className="onboarding-split-content">
+        <div className="view-section animate-fade-in" style={{ maxWidth: '900px', margin: '0 auto', paddingTop: '2rem' }}>
       {step < 7 && (
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '50%', left: '0', right: '0', height: '2px', background: 'var(--border-color)', zIndex: -1 }}></div>
@@ -144,8 +170,8 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
                   value={formData.personal.phone} onChange={(e) => setFormData({...formData, personal: {...formData.personal, phone: e.target.value}})} />
               </div>
               <div className="form-group">
-                <label>Email <span className="text-gold">* Required</span></label>
-                <input type="email" className="form-input" required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
+                <label>Email</label>
+                <input type="email" className="form-input" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)' }} 
                   value={formData.personal.email} onChange={(e) => setFormData({...formData, personal: {...formData.personal, email: e.target.value}})} />
               </div>
               <div className="form-group">
@@ -160,12 +186,35 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
               </div>
             </div>
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-              <button type="button" className="btn btn-primary" onClick={() => {
-                if (!formData.personal.phone || !formData.personal.email) {
-                  alert("Please enter both phone number and email.");
+              <button type="button" className="btn btn-primary" disabled={isSendingOtp} onClick={async () => {
+                if (!formData.personal.phone) {
+                  alert("Please enter your phone number.");
                   return;
                 }
+                
                 nextStep();
+
+                if (!otpSent) {
+                  setIsSendingOtp(true);
+                  try {
+                    const res = await fetch('/api/auth/send-otp', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ phoneNumber: formData.personal.phone })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                      setOtpSent(true);
+                    } else {
+                      alert(data.message || "Failed to send OTP.");
+                    }
+                  } catch (err) {
+                    console.error(err);
+                    alert("Error connecting to server to send OTP.");
+                  } finally {
+                    setIsSendingOtp(false);
+                  }
+                }
               }}>Next <ChevronRight size={18} /></button>
             </div>
           </motion.div>
@@ -179,7 +228,7 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
             </h2>
             <p className="text-muted mb-4">Verify your phone and email to secure your account</p>
             
-            <div className="grid-2-col" style={{ gap: '2rem', marginBottom: '2rem' }}>
+            <div style={{ gap: '2rem', marginBottom: '2rem', maxWidth: '500px' }}>
               <div style={{ background: 'var(--bg-darkest)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                 <h4 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Mobile OTP</h4>
                 <p className="text-sm text-muted mb-3">Sent to {formData.personal.phone}</p>
@@ -202,61 +251,34 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
                   ))}
                 </div>
                 {!otpSent ? (
-                  <button type="button" className="btn btn-outline btn-sm" disabled={isSendingOtp} onClick={async () => {
-                    setIsSendingOtp(true);
-                    try {
-                      const res = await fetch('/api/auth/send-otp', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ phoneNumber: formData.personal.phone })
-                      });
-                      const data = await res.json();
-                      if (data.success) {
-                        setOtpSent(true);
-                        alert("SMS OTP Sent successfully!");
-                      } else {
-                        alert(data.message || "Failed to send OTP.");
+                  <button type="button" className="btn btn-outline btn-sm" disabled={true}>
+                    {isSendingOtp ? "Sending OTP Automatically..." : "Preparing..."}
+                  </button>
+                ) : (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="text-success text-sm" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Check size={14}/> Sent successfully</span>
+                    <button type="button" className="btn btn-text btn-sm text-gold" disabled={isSendingOtp} onClick={async () => {
+                      setIsSendingOtp(true);
+                      try {
+                        const res = await fetch('/api/auth/send-otp', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ phoneNumber: formData.personal.phone })
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                          alert("OTP Resent successfully!");
+                        } else {
+                          alert(data.message || "Failed to resend OTP.");
+                        }
+                      } catch (err) {
+                        console.error(err);
+                        alert("Error connecting to server.");
+                      } finally {
+                        setIsSendingOtp(false);
                       }
-                    } catch (err) {
-                      alert("Error connecting to server to send OTP.");
-                    } finally {
-                      setIsSendingOtp(false);
-                    }
-                  }}>
-                    {isSendingOtp ? "Sending..." : "Send Verification OTP"}
-                  </button>
-                ) : (
-                  <span className="text-success text-sm" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Check size={14}/> Sent successfully</span>
-                )}
-              </div>
-
-              <div style={{ background: 'var(--bg-darkest)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <h4 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Email OTP</h4>
-                <p className="text-sm text-muted mb-3">Sent to {formData.personal.email}</p>
-                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                  {[0, 1, 2, 3, 4, 5].map(i => (
-                    <input 
-                      key={i} 
-                      type="text" 
-                      maxLength="1" 
-                      className="form-input" 
-                      value={emailOtp[i]}
-                      onChange={(e) => {
-                        const newOtp = [...emailOtp];
-                        newOtp[i] = e.target.value;
-                        setEmailOtp(newOtp);
-                        if (e.target.value && e.target.nextSibling) e.target.nextSibling.focus();
-                      }}
-                      style={{ width: '45px', height: '45px', textAlign: 'center', fontSize: '1.2rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)' }} 
-                    />
-                  ))}
-                </div>
-                {!otpSent ? (
-                  <button type="button" className="btn btn-outline btn-sm" disabled={isSendingOtp} onClick={() => alert("Please click 'Send Verification OTP' under Mobile OTP first. It will send both simultaneously!")}>
-                    Send OTP
-                  </button>
-                ) : (
-                  <span className="text-success text-sm" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Check size={14}/> Sent successfully</span>
+                    }}>{isSendingOtp ? "Resending..." : "Resend OTP"}</button>
+                  </div>
                 )}
               </div>
             </div>
@@ -285,6 +307,7 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
                     alert(data.message || "Invalid OTP code.");
                   }
                 } catch (err) {
+                  console.error(err);
                   alert("Error connecting to server to verify OTP.");
                 } finally {
                   setIsVerifying(false);
@@ -508,6 +531,8 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
             )}
           </motion.div>
         )}
+      </div>
+      </div>
       </div>
     </div>
   );

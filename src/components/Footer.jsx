@@ -1,5 +1,5 @@
 import React from 'react';
-import { Landmark, Globe, Link, Video, Camera } from 'lucide-react';
+import { Globe, Link, Video, Camera } from 'lucide-react';
 
 export default function Footer({ onNavigate, onTriggerAuth }) {
   return (

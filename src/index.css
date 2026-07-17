@@ -598,23 +598,58 @@ button, input, select, textarea {
 
 /* ==================== HOME PAGE VIEW ==================== */
 .hero-section {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 4rem;
-  align-items: center;
-  padding: 4rem 0 6rem;
-}
-.hero-content {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 8rem 2rem 6rem;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
 }
+
+.hero-carousel-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+}
+
+.hero-carousel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 15, 30, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 2;
+}
+
+.hero-carousel-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .hero-title {
   font-family: var(--font-heading);
   font-size: 4rem;
   line-height: 1.15;
   margin-bottom: 1.5rem;
   font-weight: 600;
+}
+.hero-title.text-white {
+  color: #fff;
 }
 .text-gradient {
   background: linear-gradient(135deg, #ffffff 0%, var(--primary) 60%, #b89327 100%);
@@ -625,13 +660,33 @@ button, input, select, textarea {
   font-size: 1.15rem;
   color: var(--text-secondary);
   margin-bottom: 2.5rem;
-  max-width: 580px;
+  max-width: 650px;
+}
+.hero-subtitle.text-white-alpha {
+  color: rgba(255, 255, 255, 0.85);
 }
 .hero-ctas {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1.5rem;
   margin-bottom: 3.5rem;
+  flex-wrap: wrap;
+}
+.btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+.btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.btn-text-light {
+  color: rgba(255, 255, 255, 0.8);
+}
+.btn-text-light:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
 }
 .hero-footer-text {
   font-size: 0.85rem;
@@ -639,13 +694,19 @@ button, input, select, textarea {
   font-weight: 600;
   letter-spacing: 0.5px;
 }
+.hero-footer-text.text-white-alpha {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.pill-badge-light {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
 
 /* AI Welfare Hub Visualizer */
 .hero-graphic-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
+  display: none;
 }
 .welfare-hub-vis {
   width: 400px;
@@ -2368,6 +2429,87 @@ button, input, select, textarea {
 }
 .modal-md { width: 500px; }
 .modal-xl { width: 1100px; }
+
+/* Split Screen Modal */
+.modal-split {
+  width: 900px;
+  max-width: 95vw;
+  flex-direction: row;
+  padding: 0;
+}
+@keyframes gradientSweep {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==================== SPLIT LAYOUT ==================== */
+.onboarding-split-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  flex-direction: row;
+}
+.onboarding-split-image {
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+.onboarding-split-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+  width: 100%;
+  padding: 4rem 3rem 2rem;
+}
+.onboarding-split-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-darkest);
+  overflow-y: auto;
+  max-height: 100vh;
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .onboarding-split-layout {
+    flex-direction: column;
+  }
+  .onboarding-split-image {
+    display: none;
+  }
+}
+.modal-split-image {
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+.modal-split-image-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+  width: 100%;
+  padding: 3rem 2rem 2rem;
+}
+.modal-split-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-darker);
+}
+
+@media (max-width: 768px) {
+  .modal-split {
+    flex-direction: column;
+    width: 95vw;
+  }
+  .modal-split-image {
+    display: none;
+  }
+}
 .modal-header {
   padding: 1.25rem 2rem;
   border-bottom: 1px solid var(--border-color);

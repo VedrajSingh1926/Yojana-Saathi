@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, ShieldAlert, CheckCircle2, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, ShieldCheck } from 'lucide-react';
 
 export default function ScamShield() {
   const [text, setText] = useState('');

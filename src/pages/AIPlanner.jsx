@@ -8,7 +8,7 @@ export default function AIPlanner({ initialPrompt }) {
   ]);
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
-  const [roadmap, setRoadmap] = useState(null);
+
   const messagesEndRef = useRef(null);
 
   useEffect(() => {

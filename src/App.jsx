@@ -77,38 +77,87 @@ export default function App() {
     }
   };
 
-  const handleLoginSuccess = () => {
-    // Load default Ramesh Kumar demo profile matching standard specs
-    setUser({
-      name: "Ramesh Kumar",
-      relation: "Head",
-      age: 42,
-      occupation: "Farmer",
-      income: 240000,
-      family: [
-        { name: "Ramesh Kumar", relation: "Head", age: 42, occupation: "Farmer", income: 240000, status: "Verified" },
-        { name: "Pooja Kumar", relation: "Spouse", age: 38, occupation: "Housewife", income: 0, status: "Verified" },
-        { name: "Amit Kumar", relation: "Son", age: 19, occupation: "Student", income: 0, status: "Verified" },
-        { name: "Mohan Kumar", relation: "Father", age: 62, occupation: "Retired", income: 0, status: "Verified" }
-      ],
-      documents: [
-        { name: "Aadhaar Card", verified: true },
-        { name: "Income Certificate", verified: true },
-        { name: "SBI Passbook", verified: true },
-        { name: "Land Registry Copy", verified: true }
-      ],
-      events: [
-        { date: "Jun 2026", title: "Amit joined College (Education)", desc: "Triggered recommendations for central post-matric higher education grants." },
-        { date: "Mar 2026", title: "Applied for PM Awas (Housing)", desc: "Document checklist completed. Application registered with rural development office." },
-        { date: "Jan 2024", title: "Mohan Kumar turned 60 (Senior)", desc: "Triggered Old Age Pension claim and registration for Senior Medical Health Cards." }
-      ]
-    });
-    
-    // Send notification
-    setNotifications(prev => [
-      { id: Date.now(), title: "Welfare Passport Activated", text: "Welcome Ramesh Kumar! Your household details have been verified.", time: "Just now", read: false },
-      ...prev
-    ]);
+  const handleLoginSuccess = (registeredData = null, saathiId = null) => {
+    if (registeredData && saathiId) {
+      // Create dynamic user profile from registration data
+      const familyMembers = [
+        { 
+          name: registeredData.personal.name || 'User', 
+          relation: "Head", 
+          age: parseInt(registeredData.personal.age) || 0, 
+          occupation: registeredData.personal.occupation || 'N/A', 
+          income: parseInt(registeredData.personal.income) || 0, 
+          status: "Verified" 
+        }
+      ];
+
+      if (registeredData.household && registeredData.household.members) {
+        registeredData.household.members.forEach(m => {
+          familyMembers.push({
+            name: m.name,
+            relation: m.relation || 'Member',
+            age: parseInt(m.age) || 0,
+            occupation: m.occupation || 'N/A',
+            income: parseInt(m.income) || 0,
+            status: "Pending"
+          });
+        });
+      }
+
+      setUser({
+        name: registeredData.personal.name || 'User',
+        relation: "Head",
+        age: parseInt(registeredData.personal.age) || 0,
+        occupation: registeredData.personal.occupation || 'N/A',
+        income: parseInt(registeredData.personal.income) || 0,
+        saathiId: saathiId,
+        family: familyMembers,
+        documents: [
+          { name: "Aadhaar Card", verified: true }
+        ],
+        events: [
+          { date: new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }), title: "Welfare Passport Created", desc: "Profile successfully registered." }
+        ]
+      });
+
+      setNotifications(prev => [
+        { id: Date.now(), title: "Welfare Passport Activated", text: `Welcome ${registeredData.personal.name}! Your Saathi ID is ${saathiId}.`, time: "Just now", read: false },
+        ...prev
+      ]);
+    } else {
+      // Load default Ramesh Kumar demo profile matching standard specs
+      setUser({
+        name: "Ramesh Kumar",
+        relation: "Head",
+        age: 42,
+        occupation: "Farmer",
+        income: 240000,
+        saathiId: "YS-9824",
+        family: [
+          { name: "Ramesh Kumar", relation: "Head", age: 42, occupation: "Farmer", income: 240000, status: "Verified" },
+          { name: "Pooja Kumar", relation: "Spouse", age: 38, occupation: "Housewife", income: 0, status: "Verified" },
+          { name: "Amit Kumar", relation: "Son", age: 19, occupation: "Student", income: 0, status: "Verified" },
+          { name: "Mohan Kumar", relation: "Father", age: 62, occupation: "Retired", income: 0, status: "Verified" }
+        ],
+        documents: [
+          { name: "Aadhaar Card", verified: true },
+          { name: "Income Certificate", verified: true },
+          { name: "SBI Passbook", verified: true },
+          { name: "Land Registry Copy", verified: true }
+        ],
+        events: [
+          { date: "Jun 2026", title: "Amit joined College (Education)", desc: "Triggered recommendations for central post-matric higher education grants." },
+          { date: "Mar 2026", title: "Applied for PM Awas (Housing)", desc: "Document checklist completed. Application registered with rural development office." },
+          { date: "Jan 2024", title: "Mohan Kumar turned 60 (Senior)", desc: "Triggered Old Age Pension claim and registration for Senior Medical Health Cards." }
+        ]
+      });
+      
+      // Send notification
+      setNotifications(prev => [
+        { id: Date.now(), title: "Welfare Passport Activated", text: "Welcome Ramesh Kumar! Your household details have been verified.", time: "Just now", read: false },
+        ...prev
+      ]);
+    }
   };
 
   const handleLogout = () => {
@@ -243,8 +292,8 @@ export default function App() {
         {activeView === 'onboarding' && (
           <Onboarding 
             onTriggerAuth={() => setIsAuthOpen(true)}
-            onComplete={(data) => {
-              handleLoginSuccess();
+            onComplete={(data, saathiId) => {
+              handleLoginSuccess(data, saathiId);
               handleNavigate('home');
             }} 
           />
