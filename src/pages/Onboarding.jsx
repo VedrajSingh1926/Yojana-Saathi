@@ -110,7 +110,7 @@ export default function Onboarding({ onComplete, onTriggerAuth }) {
 
   return (
     <div className="onboarding-split-layout">
-      <div className="onboarding-split-image" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=1000)' }}>
+      <div className="onboarding-split-image" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1603792907191-89e55f70099a?auto=format&fit=crop&q=80&w=1000)' }}>
         <div className="onboarding-split-overlay">
            <h2 className="text-white mb-2" style={{ fontSize: '2.5rem' }}>Your Unified Family Welfare Passport</h2>
            <p className="text-white-alpha" style={{ fontSize: '1.15rem' }}>Create your family profile securely to instantly discover all government schemes you are eligible for, with step-by-step AI guidance.</p>

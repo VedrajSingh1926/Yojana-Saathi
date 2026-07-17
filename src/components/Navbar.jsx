@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Languages, MapPin, Bell, Menu, X, ChevronDown, ArrowRight, User } from 'lucide-react';
+import { Languages, MapPin, Bell, Menu, X, ChevronDown, ArrowRight, User, LogOut } from 'lucide-react';
 import './Navbar.css';
 
 export default function Navbar({ 
@@ -22,6 +22,7 @@ export default function Navbar({
   const [stateOpen, setStateOpen] = useState(false);
   const [notiOpen, setNotiOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [stateSearch, setStateSearch] = useState('');
 
   const langMap = { en: "English", hi: "हिन्दी", ta: "தமிழ்", te: "తెలుగు", bn: "বাংলা" };
@@ -154,7 +155,7 @@ export default function Navbar({
             <div style={{ position: 'relative' }}>
               <button 
                 className="lux-pill" 
-                onClick={() => { setStateOpen(!stateOpen); setLangOpen(false); setNotiOpen(false); }}
+                onClick={() => { setStateOpen(!stateOpen); setLangOpen(false); setNotiOpen(false); setProfileOpen(false); }}
               >
                 <MapPin size={18} />
                 <span>{stateLocation}</span>
@@ -198,7 +199,7 @@ export default function Navbar({
             <div style={{ position: 'relative' }}>
               <button 
                 className="lux-icon-btn" 
-                onClick={() => { setNotiOpen(!notiOpen); setLangOpen(false); setStateOpen(false); }}
+                onClick={() => { setNotiOpen(!notiOpen); setLangOpen(false); setStateOpen(false); setProfileOpen(false); }}
               >
                 <Bell size={20} className="bell-icon" />
                 {unreadCount > 0 && <span className="lux-badge" />}
@@ -255,12 +256,39 @@ export default function Navbar({
               <div style={{ paddingLeft: '8px', position: 'relative' }}>
                 <button 
                   className="lux-pill"
-                  onClick={() => onNavigate('family')}
-                  style={{ background: 'var(--lux-primary)', color: 'white', border: 'none' }}
+                  onClick={() => { setProfileOpen(!profileOpen); setLangOpen(false); setStateOpen(false); setNotiOpen(false); }}
+                  style={{ background: 'var(--lux-accent)', color: 'white', border: 'none' }}
                 >
                   <User size={18} />
                   <span>{user.name.split(' ')[0]}</span>
+                  <ChevronDown size={16} className="chevron-icon" />
                 </button>
+                
+                <AnimatePresence>
+                  {profileOpen && (
+                    <motion.div 
+                      className="lux-dropdown"
+                      variants={dropdownVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                    >
+                      <div 
+                        className="lux-dropdown-item"
+                        onClick={() => { onNavigate('family'); setProfileOpen(false); }}
+                      >
+                        <User size={16} /> My Family
+                      </div>
+                      <div 
+                        className="lux-dropdown-item"
+                        style={{ color: 'var(--danger)', marginTop: '4px', borderTop: '1px solid var(--lux-border)', paddingTop: '14px', borderRadius: '0 0 12px 12px' }}
+                        onClick={() => { onLogout(); setProfileOpen(false); }}
+                      >
+                        <LogOut size={16} /> Logout
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
 

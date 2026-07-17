@@ -96,7 +96,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     <div className="modal-overlay active" onClick={onClose}>
       <div className="modal-dialog modal-split" onClick={(e) => e.stopPropagation()}>
         {/* Left Side: Image */}
-        <div className="modal-split-image" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=1000)' }}>
+        <div className="modal-split-image" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=1000)' }}>
           <div className="modal-split-image-overlay">
             <h3 className="text-white">Your Family's Digital Welfare Passport</h3>
             <p className="text-white-alpha mt-2">Unlock personalized schemes, track applications, and store your important documents securely in one place.</p>
@@ -150,6 +150,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                     <button type="submit" className="btn btn-primary w-full mt-3">
                       Send OTP <Send size={14} />
                     </button>
+                    <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                      <a href="#" onClick={(e) => e.preventDefault()} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Mobile No.?</a>
+                    </div>
                   </form>
                 ) : (
                   <form onSubmit={handleLookupSaathi}>
@@ -166,6 +169,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                     <button type="submit" className="btn btn-primary w-full mt-3">
                       Continue <Send size={14} />
                     </button>
+                    <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                      <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('phone'); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Saathi ID? Login with Phone</a>
+                    </div>
                   </form>
                 )}
               </>
