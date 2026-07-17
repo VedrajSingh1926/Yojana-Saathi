@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import compression from 'compression';
 import 'dotenv/config';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import { logger } from './utils/logger.js';
 import authRoutes from './routes/auth.js';
@@ -78,6 +80,20 @@ app.get('/api/health', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'dist')));
+  app.get('*', (req, res) => {
+    // Exclude /api routes from being caught by the static server routing
+    if (req.originalUrl.startsWith('/api')) {
+      return res.status(404).json({ success: false, message: 'API Route Not Found' });
+    }
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  });
+}
 
 // Global Error Handling Middleware
 app.use((err, req, res, next) => {

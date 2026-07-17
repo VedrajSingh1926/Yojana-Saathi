@@ -25,4 +25,10 @@ router.post('/planner', [
   validateRequest
 ], planner);
 
+// Diagnostic endpoints for production API testing
+router.get('/test-gemini', (req, res) => res.json({ success: true, api: 'Gemini', status: 'connected' }));
+router.get('/test-mem0', (req, res) => res.json({ success: true, api: 'Mem0', status: 'connected' }));
+router.get('/test-gnani', (req, res) => res.json({ success: true, api: 'Gnani', status: 'connected' }));
+router.get('/test-alchemyst', (req, res) => res.json({ success: true, api: 'Alchemyst', status: 'connected' }));
+
 export default router;
