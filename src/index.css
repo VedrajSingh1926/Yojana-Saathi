@@ -2985,3 +2985,10 @@ button, input, select, textarea {
 
 .starter-card-inline { background: var(--bg-darkest); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; cursor: pointer; transition: all 0.3s ease; flex: 1 1 calc(50% - 10px); min-width: 250px; }
 .starter-card-inline:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(217, 119, 54, 0.15); border-color: var(--primary); }
+
+/* AI Planner Redesign */
+.planner-two-col { display: flex; gap: 1.5rem; height: calc(100vh - var(--nav-height) - 150px); min-height: 600px; max-width: 1600px; margin: 0 auto; }
+.planner-chat-panel { flex: 0 0 420px; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.planner-preview-panel { flex: 1; display: flex; flex-direction: column; height: 100%; overflow-y: auto; padding-right: 8px; }
+.empty-state-preview { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text-muted); opacity: 0.7; }
+@media (max-width: 1024px) { .planner-two-col { flex-direction: column; height: auto; } .planner-chat-panel { flex: none; height: 600px; max-height: 60vh; width: 100%; } .planner-preview-panel { flex: none; min-height: 500px; overflow: visible; } }
