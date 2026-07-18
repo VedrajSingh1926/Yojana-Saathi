@@ -106,8 +106,8 @@ export default function ScamShield({ lang }) {
           ) : (
             <div className="diagnostic-report w-full">
               <div className="safety-gauge-wrapper">
-                <span className="safety-title">Safety Score Index</span>
-                <div className={`safety-percent ${report.verdictClass}`}>{report.safetyIndex}%</div>
+                <span className="safety-title">Danger Level</span>
+                <div className={`safety-percent ${report.verdictClass}`}>{100 - report.safetyIndex}%</div>
                 <div className={`safety-verdict ${report.verdictClass}`}>{report.verdict}</div>
               </div>
 
