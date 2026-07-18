@@ -269,9 +269,18 @@ export default function Schemes({
                     </div>
 
                     <div className="scheme-card-actions">
-                      <a href="#" className="card-learn-more" onClick={(e) => { e.preventDefault(); onNavigate('detail', { schemeId: s.id }); }}>
-                        Learn More <ArrowRight size={14} />
-                      </a>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button 
+                          className="btn btn-primary btn-sm" 
+                          style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                          onClick={() => onNavigate('form-assistant')}
+                        >
+                          <Sparkles size={12} /> Fill with AI
+                        </button>
+                        <a href="#" className="card-learn-more" onClick={(e) => { e.preventDefault(); onNavigate('detail', { schemeId: s.id }); }} style={{ display: 'flex', alignItems: 'center' }}>
+                          Learn More <ArrowRight size={14} />
+                        </a>
+                      </div>
                       <label className="compare-checkbox-label">
                         <input 
                           type="checkbox"

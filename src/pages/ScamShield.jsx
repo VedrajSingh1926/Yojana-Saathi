@@ -23,7 +23,8 @@ export default function ScamShield({ lang }) {
     setReport({ loading: true });
 
     try {
-      const response = await fetch(import.meta.env.VITE_API_URL + '/api/ai/scam-scan', {
+      const API_URL = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${API_URL}/api/ai/scam-scan`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text })

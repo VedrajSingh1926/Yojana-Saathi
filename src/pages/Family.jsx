@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Users, User, Check, Network, IdCard, FolderOpen, Calendar, ShieldCheck, Plus } from 'lucide-react';
+import { Users, User, Check, Network, IdCard, FolderOpen, Calendar, ShieldCheck, Plus, Download } from 'lucide-react';
 import QRCode from 'react-qr-code';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import { translations } from '../data/translations';
 
 export default function Family({ lang, user, onAddMember, onUploadDoc, onTriggerAuth }) {
@@ -55,6 +57,24 @@ export default function Family({ lang, user, onAddMember, onUploadDoc, onTrigger
     const file = e.target.files[0];
     if (file) {
       onUploadDoc(file.name);
+    }
+  };
+
+  const downloadPassportPDF = async () => {
+    const input = document.getElementById('passport-card-capture');
+    if (!input) return;
+    try {
+      const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight);
+      pdf.save(`${user?.saathiId || 'Welfare'}_Passport.pdf`);
+    } catch (err) {
+      console.error('Failed to generate PDF', err);
+      alert('Error generating PDF.');
     }
   };
 
@@ -260,17 +280,18 @@ export default function Family({ lang, user, onAddMember, onUploadDoc, onTrigger
             <div className="passport-workspace animate-fade-in" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
               
               {/* Saathi Card Container */}
-              <div style={{
-                width: '100%',
-                maxWidth: '650px',
-                background: '#fffcf5', // warm off-white
-                borderRadius: '24px',
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
-                border: '1px solid #e5e7eb',
-                fontFamily: '"Plus Jakarta Sans", sans-serif'
-              }}>
+              <div>
+                <div id="passport-card-capture" style={{
+                  width: '100%',
+                  maxWidth: '650px',
+                  background: '#fffcf5', // warm off-white
+                  borderRadius: '24px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
+                  border: '1px solid #e5e7eb',
+                  fontFamily: '"Plus Jakarta Sans", sans-serif'
+                }}>
                 
                 {/* Background Waves (Tricolor) */}
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '180px', zIndex: 0, overflow: 'hidden' }}>
@@ -387,9 +408,15 @@ export default function Family({ lang, user, onAddMember, onUploadDoc, onTrigger
                       </div>
                     </div>
                   </div>
-
+                </div>
+                
+                <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
+                  <button className="btn btn-primary" onClick={downloadPassportPDF}>
+                    <Download size={18} /> Download Passport as PDF
+                  </button>
                 </div>
               </div>
+            </div>
             </div>
           )}
 

@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { convertWebmToWav } from '../utils/audioHelper';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import { translations } from '../data/translations';
 
 export default function AIPlanner({ initialPrompt, user, lang }) {
@@ -13,6 +15,15 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  
+  const [sessionId, setSessionId] = useState(Date.now());
+  const [history, setHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem('planner_history');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
 
   const messagesEndRef = useRef(null);
   const mediaRecorder = useRef(null);
@@ -39,8 +50,26 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
   }, [initialPrompt]);
 
   const scrollToBottom = () => {
+    // Only scroll if we are actively typing or if user sent a message
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    if (chat.length > 1) {
+      setHistory(prev => {
+        const existingIdx = prev.findIndex(h => h.id === sessionId);
+        const newHistory = [...prev];
+        const title = chat[1]?.text.slice(0, 30) + '...' || 'New Session';
+        if (existingIdx >= 0) {
+          newHistory[existingIdx] = { id: sessionId, title, chat, timestamp: Date.now() };
+        } else {
+          newHistory.unshift({ id: sessionId, title, chat, timestamp: Date.now() });
+        }
+        localStorage.setItem('planner_history', JSON.stringify(newHistory));
+        return newHistory;
+      });
+    }
+  }, [chat, sessionId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -73,10 +102,8 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
         const webmBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
         
         try {
-          setInput(t.transcribing || 'Transcribing via Gnani...');
-          // Convert WebM to true WAV so Gnani ffmpeg backend can decode it
+          setIsTranscribing(true);
           const trueWavBlob = await convertWebmToWav(webmBlob);
-          
           const formData = new FormData();
           formData.append('audio', trueWavBlob, 'audio.wav');
           formData.append('language', lang);
@@ -84,26 +111,42 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
           const response = await fetch(`${API_URL}/api/ai/stt`, { method: 'POST', body: formData });
           const data = await response.json();
           if (data.success) {
-            setInput(data.transcript);
-            handleSendPrompt(data.transcript);
+            setInput(prev => prev + (prev ? ' ' : '') + data.transcript);
           } else {
             alert('Speech to text failed: ' + data.message);
-            setInput('');
           }
         } catch (err) {
           console.error(err);
           alert('Error connecting to STT service.');
-          setInput('');
+        } finally {
+          setIsTranscribing(false);
         }
         stream.getTracks().forEach(track => track.stop());
       };
 
       mediaRecorder.current.start();
       setIsListening(true);
-      setInput(t.listening || 'Listening via Gnani.ai... (Click mic to stop)');
     } catch (err) {
       console.error('Microphone access error:', err);
       alert('Could not access microphone.');
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    const input = document.querySelector('.chat-messages');
+    if (!input) return;
+    try {
+      const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight);
+      pdf.save(`Welfare_Roadmap_${sessionId}.pdf`);
+    } catch (err) {
+      console.error('Failed to generate PDF', err);
+      alert('Error generating PDF.');
     }
   };
 
@@ -185,22 +228,38 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
       <div className="gpt-layout-container">
         {/* Left Sidebar */}
         <div className="gpt-sidebar glass-card" style={{ padding: '1.25rem' }}>
-          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="btn btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.85rem', borderRadius: '12px' }} onClick={() => setChat([chat[0]])}>
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="btn btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.85rem', borderRadius: '12px' }} onClick={() => {
+            setSessionId(Date.now());
+            setChat([{ id: 1, sender: 'system', text: lang === 'hi' ? "नमस्ते! मैं योजना साथी का एआई कल्याण योजनाकार हूं।" : "Hello! I am Yojana Saathi's AI Welfare Planner. Describe what your household needs or plans, or select one of the cards below, and I will generate a step-by-step Welfare Roadmap for you." }]);
+          }}>
             <Plus size={18} /> New Planning Session
           </motion.button>
           
           <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>History</span>
-            <button className="gpt-sidebar-btn active"><MessageSquare size={16} /> Current Session</button>
-            <button className="gpt-sidebar-btn"><MessageSquare size={16} /> Education Grant Query</button>
-            <button className="gpt-sidebar-btn"><MessageSquare size={16} /> Housing Subsidy (PMAY)</button>
+            {history.length === 0 ? (
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', paddingLeft: '0.5rem' }}>No history yet.</span>
+            ) : (
+              history.map(h => (
+                <button 
+                  key={h.id} 
+                  className={`gpt-sidebar-btn ${h.id === sessionId ? 'active' : ''}`}
+                  onClick={() => {
+                    setSessionId(h.id);
+                    setChat(h.chat);
+                  }}
+                >
+                  <MessageSquare size={16} /> {h.title}
+                </button>
+              ))
+            )}
           </div>
 
           <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>Assets</span>
-            <button className="gpt-sidebar-btn"><Bookmark size={16} /> Saved Roadmaps</button>
-            <button className="gpt-sidebar-btn"><History size={16} /> Welfare History</button>
-            <button className="gpt-sidebar-btn"><Users size={16} /> Family Profiles</button>
+            <button className="gpt-sidebar-btn" onClick={handleDownloadPDF}><Bookmark size={16} /> Download Roadmap PDF</button>
+            <button className="gpt-sidebar-btn" onClick={() => window.location.hash = 'family'}><History size={16} /> Welfare History</button>
+            <button className="gpt-sidebar-btn" onClick={() => window.location.hash = 'family'}><Users size={16} /> Family Profiles</button>
           </div>
         </div>
 
@@ -222,7 +281,32 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
                   <div className="message-bubble" style={{ maxWidth: msg.sender === 'system' ? '100%' : '85%', overflow: 'hidden' }}>
                     {msg.sender === 'system' ? (
                       <div className="markdown-body" style={{ margin: 0, whiteSpace: 'normal', lineHeight: '1.6', fontSize: '1rem', color: 'var(--text-primary)' }}>
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+                        <ReactMarkdown 
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            a: ({node, ...props}) => {
+                              const text = props.children?.[0];
+                              const isApply = text === 'Apply Now';
+                              const isLearn = text === 'Learn More';
+                              if (isApply || isLearn) {
+                                return (
+                                  <a 
+                                    {...props} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className={`btn ${isApply ? 'btn-primary' : 'btn-outline'} btn-sm`}
+                                    style={{ display: 'inline-flex', margin: '8px 8px 8px 0', textDecoration: 'none' }}
+                                  >
+                                    {props.children}
+                                  </a>
+                                );
+                              }
+                              return <a {...props} target="_blank" rel="noopener noreferrer" />;
+                            }
+                          }}
+                        >
+                          {msg.text}
+                        </ReactMarkdown>
                       </div>
                     ) : (
                       <p style={{ margin: 0, whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>{msg.text}</p>
@@ -269,7 +353,8 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder={t.askPlaceholder || "Ask AI: e.g. 'I want to open a small shop...'"}
+              placeholder={isListening ? "🔴 Recording... Click mic to stop" : isTranscribing ? "⏳ Transcribing audio..." : (t.askPlaceholder || "Ask AI: e.g. 'I want to open a small shop...'")}
+              disabled={isListening || isTranscribing}
               style={{ flex: 1, padding: '0 1.5rem', borderRadius: '30px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)', fontSize: '1.05rem', outline: 'none', color: 'var(--text-primary)' }}
             />
             <button 

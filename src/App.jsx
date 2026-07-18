@@ -141,10 +141,11 @@ export default function App() {
       }
 
       setUser({
-        name: userName,
+        name: userRelation === "Applicant" ? headName : userName,
+        applicantName: userName,
         relation: "Head",
-        age: userAge,
-        occupation: userOccupation,
+        age: userRelation === "Applicant" ? 0 : userAge,
+        occupation: userRelation === "Applicant" ? "N/A" : userOccupation,
         income: userIncome,
         saathiId: saathiId,
         mobileNumber: userPhone,
@@ -318,6 +319,7 @@ export default function App() {
             onBack={() => handleNavigate('schemes')}
             onNavigate={handleNavigate}
             onSaveScheme={handleSaveScheme}
+            lang={lang}
           />
         )}
 
@@ -359,15 +361,16 @@ export default function App() {
           <GovFormAssistant 
             user={user}
             onBack={() => handleNavigate('schemes')}
+            lang={lang}
           />
         )}
 
         {activeView === 'partners' && (
-          <Partners />
+          <Partners lang={lang} />
         )}
 
         {activeView === 'outlier' && (
-          <OutlierDashboard />
+          <OutlierDashboard lang={lang} />
         )}
       </main>
 

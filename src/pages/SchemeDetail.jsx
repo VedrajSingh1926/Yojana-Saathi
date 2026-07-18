@@ -3,9 +3,8 @@ import { ArrowLeft, Landmark, Info, Banknote, ListChecks, FileText, Compass, Hel
 import { triggerLocalDownload } from '../utils/downloadHelper';
 import { SCHEMES_DB } from '../data/schemes';
 
-export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveScheme }) {
+export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveScheme, lang }) {
   const scheme = SCHEMES_DB.find(s => s.id === schemeId) || SCHEMES_DB[0];
-  const [lang, setLang] = useState('en');
   const [activeFaq, setActiveFaq] = useState(null);
 
   // Language based AI Summary selection
