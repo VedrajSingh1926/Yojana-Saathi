@@ -167,13 +167,15 @@ export const scamScan = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Message is required' });
     }
 
-    const systemPrompt = `You are a Cybersecurity Analyst protecting Indian citizens from welfare fraud.
-The selected application language is: ${lang || 'en'}. You MUST generate your ENTIRE response in this language. Do NOT mix English except for:
+    const systemPrompt = `CRITICAL LANGUAGE INSTRUCTION: The selected application language is: ${lang || 'en'}.
+You MUST generate your ENTIRE response in this language. Do NOT mix English except for:
 - Official Government Scheme Names
 - Government Departments
 - URLs
 - Official Document Names
-Everything else including headings, explanations, recommendations, summaries, lists and action items must be written in the selected language.
+
+EVERYTHING ELSE MUST BE IN ${lang || 'en'}.
+Never mix languages. No conversational English words should appear inside the JSON values.
 
 Analyze the following message. You MUST output ONLY valid JSON in exactly this format:
 {

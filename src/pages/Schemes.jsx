@@ -57,9 +57,13 @@ export default function Schemes({
 
   // Filter schemes
   let filtered = SCHEMES_DB.filter(scheme => {
-    const matchesSearch = scheme.name.toLowerCase().includes(search.toLowerCase()) ||
-                          scheme.description.toLowerCase().includes(search.toLowerCase()) ||
-                          scheme.category.toLowerCase().includes(search.toLowerCase());
+    const locName = scheme.translations?.[lang]?.name || scheme.name;
+    const locDesc = scheme.translations?.[lang]?.description || scheme.description;
+    const locCat = scheme.translations?.[lang]?.category || scheme.category;
+
+    const matchesSearch = locName.toLowerCase().includes(search.toLowerCase()) ||
+                          locDesc.toLowerCase().includes(search.toLowerCase()) ||
+                          locCat.toLowerCase().includes(search.toLowerCase());
     const matchesType = types.length === 0 ? true : types.includes(scheme.type);
     const matchesCategory = category === 'all' || scheme.category === category;
     return matchesSearch && matchesType && matchesCategory;
@@ -116,6 +120,44 @@ export default function Schemes({
     bn: "অনুগ্রহ করে ফিল্টার রিসেট করুন অথবা অন্য কিছু লিখে সার্চ করুন।"
   };
 
+  const getCentralHeading = (lang) => {
+    const map = {
+      en: "Central Government Schemes",
+      hi: "केंद्र सरकार की योजनाएँ",
+      ta: "மத்திய அரசு திட்டங்கள்",
+      te: "కేంద్ర ప్రభుత్వ పథకాలు",
+      bn: "কেন্দ্রীয় সরকারের স্কিম"
+    };
+    return map[lang] || map.en;
+  };
+
+  const getStateHeading = (state, lang) => {
+    const stateStr = state === 'All States' ? 'State' : state;
+    const stateLoc = {
+      hi: { "State": "राज्य", "Rajasthan": "राजस्थान", "Madhya Pradesh": "मध्य प्रदेश", "Tamil Nadu": "तमिलनाडु", "Maharashtra": "महाराष्ट्र" },
+      ta: { "State": "மாநில", "Rajasthan": "ராஜஸ்தான்", "Madhya Pradesh": "மத்தியப் பிரதேசம்", "Tamil Nadu": "தமிழ்நாடு", "Maharashtra": "மகாராஷ்டிரா" },
+      te: { "State": "రాష్ట్ర", "Rajasthan": "రాజస్థాన్", "Madhya Pradesh": "మధ్యప్రదేశ్", "Tamil Nadu": "తమిళనాడు", "Maharashtra": "మహారాష్ట్ర" },
+      bn: { "State": "রাজ্য", "Rajasthan": "রাজস্থান", "Madhya Pradesh": "মধ্যপ্রদেশ", "Tamil Nadu": "তামিলনাড়ু", "Maharashtra": "মহারাষ্ট্র" }
+    };
+    const localizedState = stateLoc[lang]?.[stateStr] || stateStr;
+    
+    const suffix = {
+      en: "Government Schemes",
+      hi: "सरकार की योजनाएँ",
+      ta: "அரசு திட்டங்கள்",
+      te: "ప్రభుత్వ పథకాలు",
+      bn: "সরকারের স্কিম"
+    };
+    return `${localizedState} ${suffix[lang] || suffix.en}`;
+  };
+
+  const localizedStates = {
+    hi: { "All States": "सभी राज्य", "Rajasthan": "राजस्थान", "Madhya Pradesh": "मध्य प्रदेश", "Tamil Nadu": "तमिलनाडु", "Maharashtra": "महाराष्ट्र" },
+    ta: { "All States": "அனைத்து மாநிலங்கள்", "Rajasthan": "ராஜஸ்தான்", "Madhya Pradesh": "மத்தியப் பிரதேசம்", "Tamil Nadu": "தமிழ்நாடு", "Maharashtra": "மகாராஷ்டிரா" },
+    te: { "All States": "అన్ని రాష్ట్రాలు", "Rajasthan": "రాజస్థాన్", "Madhya Pradesh": "మధ్యప్రదేశ్", "Tamil Nadu": "తమిళనాడు", "Maharashtra": "మహారాష్ట్ర" },
+    bn: { "All States": "সমস্ত রাজ্য", "Rajasthan": "রাজস্থান", "Madhya Pradesh": "মধ্যপ্রদেশ", "Tamil Nadu": "তামিলনাড়ু", "Maharashtra": "মহারাষ্ট্র" }
+  };
+
   const centralSchemes = filtered.filter(s => s.type === 'Central');
   const stateSchemes = filtered.filter(s => s.type === 'State' && (selectedState === 'All States' || s.state === selectedState));
 
@@ -135,18 +177,18 @@ export default function Schemes({
           <div className="scheme-emoji">{s.emoji}</div>
           <div className="scheme-badges">
             <span className={`badge ${s.type === 'Central' ? 'badge-type-central' : 'badge-type-state'}`}>
-              {s.type === 'Central' ? '🟢 Central Government' : `🟠 ${s.state || 'State'} Government`}
+              {s.type === 'Central' ? (t.centralBadge || '🟢 Central Government') : `🟠 ${s.state || 'State'} ${(t.stateBadgeSuffix || 'Government')}`}
             </span>
             <span className="badge badge-tag">{localizedCategories[lang]?.[s.category] || s.category}</span>
           </div>
         </div>
-        <h3>{s.name}</h3>
-        <p className="scheme-desc">{s.description}</p>
+        <h3>{s.translations?.[lang]?.name || s.name}</h3>
+        <p className="scheme-desc">{s.translations?.[lang]?.description || s.description}</p>
         
         <div className="scheme-stats">
           <div className="stat-box">
             <span className="stat-label">{t.estimatedBenefit || "Benefit"}</span>
-            <span className="stat-val text-gold">{s.benefit}</span>
+            <span className="stat-val text-gold">{s.translations?.[lang]?.benefit || s.benefit}</span>
           </div>
           <div className="stat-box">
             <span className="stat-label">{verificationTimeText[lang] || verificationTimeText.en}</span>
@@ -161,7 +203,7 @@ export default function Schemes({
               style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
               onClick={() => onNavigate('form-assistant')}
             >
-              <Sparkles size={12} /> Fill with AI
+              <Sparkles size={12} /> {t.fillWithAI || "Fill with AI"}
             </button>
             <a 
               href={`https://www.google.com/search?q=${encodeURIComponent(s.name + ' CSC near me')}`}
@@ -170,7 +212,7 @@ export default function Schemes({
               className="btn btn-outline btn-sm" 
               style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
-              📍 Find Nearby CSC
+              📍 {t.findNearbyCsc || "Find Nearby CSC"}
             </a>
             <a href="#" className="card-learn-more" onClick={(e) => { e.preventDefault(); onNavigate('detail', { schemeId: s.id }); }} style={{ display: 'flex', alignItems: 'center' }}>
               {learnMoreText[lang] || learnMoreText.en} <ArrowRight size={14} />
@@ -206,7 +248,7 @@ export default function Schemes({
           />
           {search && (
             <button className="btn btn-primary search-clear-btn" onClick={() => setSearch('')}>
-              {lang === 'en' ? 'Clear' : lang === 'hi' ? 'साफ़ करें' : lang === 'ta' ? 'அழி' : lang === 'te' ? 'క్లియర్' : 'মুছুন'}
+              {t.clear || "Clear"}
             </button>
           )}
         </div>
@@ -219,7 +261,7 @@ export default function Schemes({
               className="suggestion-tag"
               onClick={() => setSearch(tag === 'Startup India' ? 'Startup' : tag)}
             >
-              {tag}
+              {t[tag.replace(/\s+/g, '')] || tag}
             </span>
           ))}
         </div>
@@ -256,23 +298,21 @@ export default function Schemes({
             </div>
           </div>
 
-          {types.includes('State') && (
             <div className="filter-group">
-              <h4>State Selection</h4>
+              <h4>{t.stateSelection || "State Selection"}</h4>
               <select 
                 className="input-field w-full"
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
                 style={{ padding: '0.5rem', marginTop: '0.5rem' }}
               >
-                <option value="All States">All States</option>
-                <option value="Rajasthan">Rajasthan</option>
-                <option value="Madhya Pradesh">Madhya Pradesh</option>
-                <option value="Tamil Nadu">Tamil Nadu</option>
-                <option value="Maharashtra">Maharashtra</option>
+                <option value="All States">{localizedStates[lang]?.["All States"] || "All States"}</option>
+                <option value="Rajasthan">{localizedStates[lang]?.["Rajasthan"] || "Rajasthan"}</option>
+                <option value="Madhya Pradesh">{localizedStates[lang]?.["Madhya Pradesh"] || "Madhya Pradesh"}</option>
+                <option value="Tamil Nadu">{localizedStates[lang]?.["Tamil Nadu"] || "Tamil Nadu"}</option>
+                <option value="Maharashtra">{localizedStates[lang]?.["Maharashtra"] || "Maharashtra"}</option>
               </select>
             </div>
-          )}
 
 
           {/* Category Filters */}
@@ -369,7 +409,7 @@ export default function Schemes({
             {centralSchemes.length > 0 && (
               <div style={{ marginBottom: '3rem' }}>
                 <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)', borderBottom: '2px solid var(--primary-glow)', paddingBottom: '0.5rem', fontSize: '1.4rem' }}>
-                  Central Government Schemes
+                  {getCentralHeading(lang)}
                 </h3>
                 <div className="schemes-cards-grid">
                   <AnimatePresence>
@@ -382,7 +422,7 @@ export default function Schemes({
             {stateSchemes.length > 0 && (
               <div style={{ marginBottom: '3rem' }}>
                 <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)', borderBottom: '2px solid var(--secondary-glow)', paddingBottom: '0.5rem', fontSize: '1.4rem' }}>
-                  State-Specific Schemes
+                  {getStateHeading(selectedState, lang)}
                 </h3>
                 <div className="schemes-cards-grid">
                   <AnimatePresence>

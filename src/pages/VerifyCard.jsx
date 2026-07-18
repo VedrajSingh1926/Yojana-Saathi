@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, ShieldAlert, Key, Calendar, Loader } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+
 export default function VerifyCard({ cardId, onLogin }) {
+  const { lang, t } = useLanguage();
   const API_URL = import.meta.env.VITE_API_URL || '';
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
@@ -61,18 +64,18 @@ export default function VerifyCard({ cardId, onLogin }) {
           <h2 style={{ color: 'var(--text-primary)', margin: 0, fontSize: '1.75rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
             <span style={{ color: 'var(--primary)' }}>Yojana</span> Saathi
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Official Digital Identity Verification</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>{t.verifyCardSubtitle || "Official Digital Identity Verification"}</p>
         </div>
 
         {loading ? (
           <div style={{ padding: '3rem 0' }}>
             <Loader size={48} className="spin" style={{ color: 'var(--primary)', margin: '0 auto' }} />
-            <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>Verifying blockchain records...</p>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>{t.verifying || "Verifying blockchain records..."}</p>
           </div>
         ) : error ? (
           <div style={{ padding: '2rem 0' }}>
             <ShieldAlert size={64} style={{ color: 'var(--danger)', margin: '0 auto 1rem auto' }} />
-            <h3 style={{ color: 'var(--danger)' }}>Verification Failed</h3>
+            <h3 style={{ color: 'var(--danger)' }}>{t.verifyFailed || "Verification Failed"}</h3>
             <p style={{ color: 'var(--text-secondary)' }}>{error}</p>
           </div>
         ) : (
@@ -92,7 +95,7 @@ export default function VerifyCard({ cardId, onLogin }) {
               margin: '0 auto 2rem auto'
             }}>
               <ShieldCheck size={20} />
-              <span style={{ fontWeight: '600' }}>Authentic Card Verified</span>
+              <span style={{ fontWeight: '600' }}>{t.cardValid || "Authentic Card Verified"}</span>
             </div>
 
             <div style={{ 
@@ -104,20 +107,20 @@ export default function VerifyCard({ cardId, onLogin }) {
             }}>
               <div style={{ display: 'grid', gap: '1.25rem' }}>
                 <div>
-                  <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>Household Head Name</label>
+                  <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>{t.householdHead || "Household Head Name"}</label>
                   <div style={{ fontSize: '1.25rem', color: 'var(--text-primary)', fontWeight: '500' }}>{data.maskedHeadName}</div>
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>Saathi ID</label>
+                  <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>{t.saathiId || "Saathi ID"}</label>
                   <div style={{ fontSize: '1.1rem', color: 'var(--gold)', fontFamily: 'monospace' }}>{data.maskedSaathiId}</div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div>
-                    <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>Status</label>
+                    <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px' }}>{t.status || "Status"}</label>
                     <div style={{ color: '#10b981' }}>{data.cardStatus}</div>
                   </div>
                   <div>
-                    <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '4px' }}><Calendar size={12}/> Issue Date</label>
+                    <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 'bold', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '4px' }}><Calendar size={12}/> {t.issueDate || "Issue Date"}</label>
                     <div style={{ color: 'var(--text-secondary)' }}>{data.issueDate}</div>
                   </div>
                 </div>
@@ -134,7 +137,7 @@ export default function VerifyCard({ cardId, onLogin }) {
             }}>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
                 <ShieldCheck size={14} style={{ display: 'inline', marginRight: '4px', position: 'relative', top: '2px' }}/>
-                This page only verifies that this Household Card is authentic. Sensitive information is protected for privacy.
+                {t.verifyWarning || "This page only verifies that this Household Card is authentic. Sensitive information is protected for privacy."}
               </p>
             </div>
 

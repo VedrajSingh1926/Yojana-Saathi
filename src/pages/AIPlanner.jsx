@@ -329,18 +329,18 @@ export default function AIPlanner({ initialPrompt, user, stateLocation }) {
             const nextSessionId = Date.now();
             setSessionId(nextSessionId);
             setActiveSession('current');
-            setChat([{ id: 1, sender: 'system', text: lang === 'hi' ? "नमस्ते! मैं योजना साथी का एआई कल्याण योजनाकार हूं।" : "Hello! I am Yojana Saathi's AI Welfare Planner. Describe what your household needs or plans, or select one of the cards below, and I will generate a step-by-step Welfare Roadmap for you." }]);
+            setChat([{ id: 1, sender: 'system', text: t.plannerSubtitle || "Hello! I am Yojana Saathi's AI Welfare Planner. Describe what your household needs or plans, or select one of the cards below, and I will generate a step-by-step Welfare Roadmap for you." }]);
           }}>
-            <Plus size={18} /> New Planning Session
+            <Plus size={18} /> {t.newSession || "New Planning Session"}
           </motion.button>
           
           <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>History</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>{t.history || "History"}</span>
             {history.length === 0 ? (
               <div style={{ padding: '1.5rem 1rem', textAlign: 'center', background: 'rgba(0,0,0,0.02)', borderRadius: '12px', border: '1px dashed var(--border-color)', margin: '0.5rem 0' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>📂</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>No conversations yet</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Start your first AI planning session.</div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>{t.noConversations || "No conversations yet"}</div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t.startFirstSession || "Start your first AI planning session."}</div>
               </div>
             ) : (
               history.map(h => (
@@ -360,13 +360,13 @@ export default function AIPlanner({ initialPrompt, user, stateLocation }) {
           </div>
 
           <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>Assets</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>{t.assets || "Assets"}</span>
             <button className="action-btn-vertical" onClick={handleDownloadPDF}>
               <Download size={24} /> 
-              <span>Download Roadmap PDF</span>
+              <span>{t.downloadPdf || "Download Roadmap PDF"}</span>
             </button>
-            <button className="gpt-sidebar-btn" onClick={() => window.location.hash = 'family'}><History size={16} /> Welfare History</button>
-            <button className="gpt-sidebar-btn" onClick={() => window.location.hash = 'family'}><Users size={16} /> Family Profiles</button>
+            <button className="gpt-sidebar-btn" onClick={() => window.location.hash = 'family'}><History size={16} /> {t.welfareHistory || "Welfare History"}</button>
+            <button className="gpt-sidebar-btn" onClick={() => window.location.hash = 'family'}><Users size={16} /> {t.familyProfiles || "Family Profiles"}</button>
           </div>
         </div>
 
@@ -427,7 +427,7 @@ export default function AIPlanner({ initialPrompt, user, stateLocation }) {
                           onMouseEnter={(e) => e.target.style.color = 'var(--text-primary)'}
                           onMouseLeave={(e) => e.target.style.color = 'var(--text-muted)'}
                         >
-                          <Copy size={12} /> Copy
+                          <Copy size={12} /> {t.copy || "Copy"}
                         </button>
                         <button 
                           className="btn-action-small" 
@@ -456,7 +456,7 @@ export default function AIPlanner({ initialPrompt, user, stateLocation }) {
                           onMouseEnter={(e) => e.target.style.color = 'var(--text-primary)'}
                           onMouseLeave={(e) => e.target.style.color = 'var(--text-muted)'}
                         >
-                          <Download size={12} /> Download Plan
+                          <Download size={12} /> {t.downloadPdf || "Download PDF"}
                         </button>
                       </div>
                     )}
@@ -465,9 +465,9 @@ export default function AIPlanner({ initialPrompt, user, stateLocation }) {
                   </motion.div>
                   {index === 0 && chat.length <= 1 && (
                     <div className="planner-hero" style={{ marginTop: '2rem' }}>
-                      <div className="planner-hero-badge">AI Welfare Planner</div>
-                      <h2>Plan your next welfare step with confidence</h2>
-                      <p>Describe your household goal or pick a starter prompt to generate a tailored roadmap.</p>
+                      <div className="planner-hero-badge">{t.plannerBadge || "AI Welfare Planner"}</div>
+                      <h2>{t.plannerTitle || "Plan your next welfare step with confidence"}</h2>
+                      <p>{t.plannerSubtitle || "Describe your household goal or pick a starter prompt to generate a tailored roadmap."}</p>
                       <div className="planner-starters">
                         {starters.map((starter) => (
                           <button key={starter.text} type="button" className="starter-card-inline" onClick={() => handleStarterClick(starter.text)}>

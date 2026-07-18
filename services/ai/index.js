@@ -204,14 +204,20 @@ export class AlchemystService {
     const langNames = { en: "English", hi: "Hindi", ta: "Tamil", te: "Telugu", bn: "Bengali" };
     const requestedLanguage = langNames[lang] || lang;
     
-    localizedQuery = `The selected application language is: ${requestedLanguage}.
+    localizedQuery = `CRITICAL LANGUAGE INSTRUCTION: The selected application language is: ${requestedLanguage}.
 You MUST generate your ENTIRE response in this language.
 Do NOT mix English except for:
 - Official Government Scheme Names
 - Government Departments
 - URLs
 - Official Document Names
-Everything else including headings, explanations, recommendations, summaries, lists and action items must be written in the selected language.
+
+EVERYTHING ELSE MUST BE IN ${requestedLanguage}.
+Translate every heading.
+Translate every table.
+Translate every bullet.
+Translate every recommendation.
+Never mix languages. No conversational English words should appear inside ${requestedLanguage} responses.
 
 User Request:
 ${query}`;
