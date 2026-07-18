@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import { body, validationResult } from 'express-validator';
-import { stt, planner, tts, scamScan } from '../controllers/aiController.js';
+import { stt, planner, tts, scamScan, testGemini, testMem0, testGnani, testAlchemyst } from '../controllers/aiController.js';
 import { logger } from '../utils/logger.js';
 
 const router = express.Router();
@@ -28,9 +28,9 @@ router.post('/planner', [
 ], planner);
 
 // Diagnostic endpoints for production API testing
-router.get('/test-gemini', (req, res) => res.json({ success: true, api: 'Gemini', status: 'connected' }));
-router.get('/test-mem0', (req, res) => res.json({ success: true, api: 'Mem0', status: 'connected' }));
-router.get('/test-gnani', (req, res) => res.json({ success: true, api: 'Gnani', status: 'connected' }));
-router.get('/test-alchemyst', (req, res) => res.json({ success: true, api: 'Alchemyst', status: 'connected' }));
+router.post('/test-gemini', testGemini);
+router.post('/test-mem0', testMem0);
+router.post('/test-gnani', testGnani);
+router.post('/test-alchemyst', testAlchemyst);
 
 export default router;

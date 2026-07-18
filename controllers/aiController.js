@@ -1,4 +1,4 @@
-import { AlchemystService, GeminiService } from '../services/ai/index.js';
+import { AlchemystService, GeminiService, Mem0Service } from '../services/ai/index.js';
 import { logger } from '../utils/logger.js';
 import { fetchWithTimeoutAndRetry } from '../utils/http.js';
 
@@ -156,6 +156,59 @@ export const testAlchemyst = async (req, res, next) => {
     return res.status(200).json({ success: true, result });
   } catch (error) {
     console.error('[Alchemyst Test] Error:', error);
+    next(error);
+  }
+};
+
+export const scamScan = async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message) {
+      return res.status(400).json({ success: false, message: 'Message is required' });
+    }
+
+    const prompt = `You are a Cybersecurity Analyst protecting Indian citizens from welfare fraud. 
+Analyze the following message. You MUST output ONLY valid JSON in exactly this format:
+{
+  "safetyIndex": 85, // 0-100, where 100 is completely safe
+  "urlScore": 90, // 0-100 based on presence of official .gov.in domains or suspicious links
+  "paymentScore": 100, // 0-100 based on demands for UPI/money/deposits
+  "urgencyScore": 100, // 0-100 based on manipulative urgency/scarcity
+  "verdict": "SAFE or WARNING or DANGER",
+  "reason": "Short explanation of the analysis."
+}
+
+Message to analyze:
+"${message}"`;
+
+    const response = await GeminiService.generateRecommendation({ type: "scam_analysis" }, prompt);
+    
+    // Fallback if the AI fails to return the exact format
+    const result = {
+      success: true,
+      data: {
+        safetyIndex: response.safetyIndex || 50,
+        urlScore: response.urlScore || 50,
+        paymentScore: response.paymentScore || 50,
+        urgencyScore: response.urgencyScore || 50,
+        verdict: response.verdict || 'WARNING',
+        reason: response.reason || 'Analysis completed.'
+      }
+    };
+    
+    res.json(result);
+  } catch (error) {
+    logger.error('Scam Scan error', error);
+    res.status(500).json({ success: false, message: 'Error analyzing message.' });
+  }
+};
+
+export const testGemini = async (req, res, next) => {
+  try {
+    const result = await GeminiService.generateRecommendation({ type: "test" }, "Respond with OK");
+    return res.status(200).json({ success: true, result });
+  } catch (error) {
+    console.error('[Gemini Test] Error:', error);
     next(error);
   }
 };
