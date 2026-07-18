@@ -14,6 +14,9 @@ export default {
   download: "Download",
   verified: "Verified",
   pending: "Pending",
+  dashboardLocked: "Dashboard Locked",
+  lockedDesc: "Please login to view and manage your family profile.",
+  signInNow: "Sign In Now",
   
   // Home Page
   heroTitlePrefix: "Every Family Deserves ",
@@ -136,6 +139,9 @@ export default {
   fieldIncome: "Annual Income",
   autoFilled: "Auto-filled from vault",
   submitApplication: "Submit Application",
+  prototypeNoticeTitle: "Prototype Demonstration",
+  prototypeNoticeDesc: "This is a simulated Government Application Form created for the hackathon demo. It demonstrates how Yojana Saathi's AI can understand government forms, guide users field-by-field, detect common mistakes, and auto-fill information using verified citizen data. The production version will integrate with official government portals and APIs wherever permitted.",
+
   
   // Verification
   verifyCardTitle: "Official Verification",

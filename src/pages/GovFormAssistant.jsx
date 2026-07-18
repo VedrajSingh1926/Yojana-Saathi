@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Check, ChevronLeft, ShieldAlert, AlertTriangle } from 'lucide-react';
+import { Sparkles, Check, ChevronLeft, ShieldAlert, AlertTriangle, Info } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function GovFormAssistant({ onBack, user }) {
@@ -46,12 +46,27 @@ export default function GovFormAssistant({ onBack, user }) {
         </button>
         
         <div style={{ background: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', maxWidth: '800px', margin: '0 auto', width: '100%', borderTop: '6px solid #2c3e50' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid #eee', paddingBottom: '1rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid #eee', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
             <div>
               <h2 style={{ color: '#2c3e50', margin: '0 0 0.5rem 0' }}>National Welfare Portal</h2>
               <p style={{ color: '#666', margin: 0, fontSize: '0.9rem' }}>Official Government of India Application Form</p>
             </div>
             <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem" style={{ height: '60px', opacity: 0.8 }} />
+          </div>
+
+          <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '12px', padding: '1rem', marginBottom: '1.5rem', display: 'flex', gap: '12px' }}>
+            <div style={{ background: '#DBEAFE', color: '#2563EB', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Info size={18} />
+            </div>
+            <div>
+              <h4 style={{ margin: '0 0 0.25rem 0', color: '#1E3A8A', fontSize: '0.95rem' }}>
+                <span style={{ marginRight: '6px' }}>🧪</span>
+                {t.prototypeNoticeTitle || "Prototype Demonstration"}
+              </h4>
+              <p style={{ margin: 0, color: '#3B82F6', fontSize: '0.85rem', lineHeight: '1.4' }}>
+                {t.prototypeNoticeDesc || "This is a simulated Government Application Form created for the hackathon demo. It demonstrates how Yojana Saathi's AI can understand government forms, guide users field-by-field, detect common mistakes, and auto-fill information using verified citizen data. The production version will integrate with official government portals and APIs wherever permitted."}
+              </p>
+            </div>
           </div>
 
           <div style={{ background: '#fff3cd', border: '1px solid #ffeeba', color: '#856404', padding: '1rem', borderRadius: '4px', marginBottom: '2rem', fontSize: '0.9rem', display: 'flex', gap: '12px' }}>

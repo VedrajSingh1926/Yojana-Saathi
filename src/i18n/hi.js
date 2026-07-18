@@ -14,6 +14,9 @@ export default {
   download: "डाउनलोड",
   verified: "सत्यापित",
   pending: "लंबित",
+  dashboardLocked: "डैशबोर्ड लॉक है",
+  lockedDesc: "अपनी पारिवारिक प्रोफ़ाइल देखने और प्रबंधित करने के लिए कृपया लॉगिन करें।",
+  signInNow: "अभी साइन इन करें",
   
   // Home Page
   heroTitlePrefix: "हर परिवार का अधिकार, ",

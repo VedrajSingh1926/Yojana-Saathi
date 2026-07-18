@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Sliders, Scale, Trash2, ArrowRight } from 'lucide-react';
+import { Search, Sliders, Scale, Trash2, ArrowRight, Sparkles } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { SCHEMES_DB } from '../data/schemes';
 import { motion, AnimatePresence } from 'framer-motion';

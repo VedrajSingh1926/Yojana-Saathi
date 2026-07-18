@@ -6,7 +6,51 @@ import html2canvas from 'html2canvas';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  
+  // Define fallback labels (f) to prevent crashes on undefined properties
+  const f = {
+    registeredMembers: t.registeredMembers || "Registered Members",
+    addMember: t.addMember || "Add Member",
+    newMemberReg: t.newMemberReg || "New Member Registration",
+    relationSpouse: t.relationSpouse || "Spouse",
+    relationSon: t.relationSon || "Son",
+    relationDaughter: t.relationDaughter || "Daughter",
+    relationFather: t.relationFather || "Father",
+    relationMother: t.relationMother || "Mother",
+    occStudent: t.occStudent || "Student",
+    occFarmer: t.occFarmer || "Farmer",
+    occHousewife: t.occHousewife || "Housewife",
+    occUnemployed: t.occUnemployed || "Unemployed",
+    occBusiness: t.occBusiness || "Business",
+    occSalaried: t.occSalaried || "Salaried",
+    cancel: t.cancel || "Cancel",
+    nameCol: t.nameCol || "Name",
+    relationCol: t.relationCol || "Relation",
+    ageCol: t.ageCol || "Age",
+    occupationCol: t.occupationCol || "Occupation",
+    incomeCol: t.incomeCol || "Income",
+    statusCol: t.statusCol || "Status",
+    headLabel: t.headLabel || "Head",
+    verifiedLabel: t.verifiedLabel || "Verified",
+    pendingLabel: t.pendingLabel || "Pending",
+    secureInfo: t.secureInfo || "Secured by Blockchain",
+    welfarePassportUpper: t.welfarePassportUpper || "WELFARE PASSPORT",
+    onePlatform: t.onePlatform || "One Nation, One Platform",
+    householdHead: t.householdHead || "HOUSEHOLD HEAD",
+    members: t.members || "MEMBERS",
+    status: t.status || "STATUS",
+    yojanaId: t.yojanaId || "YOJANA ID",
+    saathiCard: t.saathiCard || "SAATHI CARD",
+    createdOn: t.createdOn || "Created On",
+    validity: t.validity || "Validity",
+    lifetime: t.lifetime || "Lifetime",
+    uploadNewDoc: t.uploadNewDoc || "Upload New Document",
+    uploadLimits: t.uploadLimits || "PDF, JPG, PNG up to 5MB",
+    familyTimeline: t.familyTimeline || "Family Welfare Timeline",
+    ...t
+  };
+
   const [subtab, setSubtab] = useState('overview');
   
   // Member Form State
@@ -112,26 +156,26 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
             <div className="animate-fade-in">
               <div className="overview-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
                 <div className="glass-card stat-summary-card">
-                  <h3>{t.incomeGroup}</h3>
+                  <h3>{t.incomeGroup || "Income Group"}</h3>
                   <div className="highlight-stat text-gold">₹{(user.family.reduce((acc, curr) => acc + curr.income, 0)).toLocaleString()}/yr</div>
-                  <p>{t.incomeDesc}</p>
+                  <p>{t.incomeDesc || "Household Annual"}</p>
                 </div>
                 <div className="glass-card stat-summary-card">
-                  <h3>{f.linkedMobile}</h3>
+                  <h3>{t.linkedMobile || "Linked Mobile"}</h3>
                   <div className="highlight-stat text-cyan" style={{ letterSpacing: '2px' }}>
                     {user.mobileNumber ? 'X'.repeat(Math.max(0, user.mobileNumber.length - 2)) + user.mobileNumber.slice(-2) : 'XXXXXXXXXX'}
                   </div>
-                  <p>{f.mobileDesc}</p>
+                  <p>{t.mobileDesc || "Verified for SMS alerts"}</p>
                 </div>
                 <div className="glass-card stat-summary-card">
-                  <h3>{f.passportStatus}</h3>
-                  <div className="highlight-stat text-success">{f.active}</div>
-                  <p>{t.activePassportDesc}</p>
+                  <h3>{t.passportStatus || "Passport Status"}</h3>
+                  <div className="highlight-stat text-success">{t.active || "Active"}</div>
+                  <p>{t.activePassportDesc || "Valid across all states"}</p>
                 </div>
                 <div className="glass-card stat-summary-card">
-                  <h3>{f.lockerSpace}</h3>
-                  <div className="highlight-stat text-gold">{user.documents.length} {f.verifiedLabel}</div>
-                  <p>{f.lockerDesc}</p>
+                  <h3>{t.lockerSpace || "Locker Space"}</h3>
+                  <div className="highlight-stat text-gold">{user.documents.length} {t.verifiedLabel || "Verified"}</div>
+                  <p>{t.lockerDesc || "Secured by DigiLocker"}</p>
                 </div>
               </div>
 
@@ -261,7 +305,7 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
                     </div>
                     <div className="node-details">
                       <strong>{user.name} ({f.headLabel})</strong>
-                      <span>{t.ageLabel}: {user.age} | {lang === 'en' ? user.occupation : (localizedFamily[lang]?.[`occ${user.occupation}`] || user.occupation)}</span>
+                      <span>{t.ageLabel || "Age"}: {user.age} | {f[`occ${user.occupation}`] || user.occupation}</span>
                     </div>
                   </div>
                   

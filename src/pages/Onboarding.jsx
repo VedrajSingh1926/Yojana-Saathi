@@ -639,14 +639,14 @@ export default function Onboarding({ stateLocation, onChangeState, onComplete, o
                     const content = `
 YOJANA SAATHI DIGITAL ID
 ------------------------
-Saathi ID: ${saathiId}
+Saathi ID: ${generatedSaathiId}
 Name: ${formData.personal.name}
 State: ${formData.personal.state}
 Date Issued: ${new Date().toLocaleDateString('en-GB')}
 
 Keep this ID safe. It is your single access point to track all government welfare schemes and disbursements.
                     `.trim();
-                    triggerLocalDownload(`Saathi_Card_${saathiId}.txt`, content);
+                    triggerLocalDownload(`Saathi_Card_${generatedSaathiId}.txt`, content);
                   }}
                 >
                   Download Card

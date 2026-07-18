@@ -17,10 +17,21 @@ import GovFormAssistant from './pages/GovFormAssistant';
 import Partners from './pages/Partners';
 import OutlierDashboard from './pages/OutlierDashboard';
 import VerifyCard from './pages/VerifyCard';
+import SplashLoader from './components/SplashLoader';
 
 export default function App() {
   const { lang, t } = useLanguage();
-  const [activeView, setActiveView] = useState('home');
+  const [showSplash, setShowSplash] = useState(true);
+  const [activeView, setActiveView] = useState(() => {
+    if (typeof window === 'undefined') return 'home';
+
+    const hash = window.location.hash.replace('#', '');
+    if (hash.startsWith('verify/')) return 'verify';
+    if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant', 'partners', 'outlier'].includes(hash)) {
+      return hash;
+    }
+    return 'home';
+  });
   const [detailSchemeId, setDetailSchemeId] = useState(null);
   const [plannerPrompt, setPlannerPrompt] = useState('');
   const [catalogCategory, setCatalogCategory] = useState('all');
@@ -51,6 +62,7 @@ export default function App() {
         setActiveView(hash);
       }
     };
+    handleHashChange();
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [lang]);
@@ -262,6 +274,8 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      {showSplash && <SplashLoader onComplete={() => setShowSplash(false)} />}
+      
       {/* Background Glowing Ambient Orbs */}
       <div className="glowing-orb orb-primary"></div>
       <div className="glowing-orb orb-secondary"></div>
@@ -367,15 +381,17 @@ export default function App() {
       </main>
 
       {/* Bottom Sticky Footer */}
-      <Footer 
-        user={user}
-        onNavigate={handleNavigate}
-        onTriggerAuth={(isRegister) => {
-          if (isRegister) handleNavigate('onboarding');
-          else setIsAuthOpen(true);
-        }}
-        lang={lang}
-      />
+      {activeView !== 'planner' && (
+        <Footer 
+          user={user}
+          onNavigate={handleNavigate}
+          onTriggerAuth={(isRegister) => {
+            if (isRegister) handleNavigate('onboarding');
+            else setIsAuthOpen(true);
+          }}
+          lang={lang}
+        />
+      )}
 
       {/* Modals & Overlays */}
       <AuthModal 
@@ -392,9 +408,11 @@ export default function App() {
         lang={lang}
       />
 
-      <EligibilityPopup 
-        onRegisterLead={() => setIsAuthOpen(true)}
-      />
+      {activeView !== 'planner' && (
+        <EligibilityPopup 
+          onRegisterLead={() => setIsAuthOpen(true)}
+        />
+      )}
     </div>
   );
 }

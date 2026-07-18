@@ -22,6 +22,7 @@ export default function AIPlanner({ initialPrompt, user }) {
   const [typing, setTyping] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [activeSession, setActiveSession] = useState('current');
   
   const [sessionId, setSessionId] = useState(() => {
     try {
@@ -60,9 +61,21 @@ export default function AIPlanner({ initialPrompt, user }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialPrompt]);
 
-  const scrollToBottom = () => {
-    // Only scroll if we are actively typing or if user sent a message
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const isInitialMount = useRef(true);
+  const prevSessionId = useRef(sessionId);
+  const prevChatLength = useRef(chat.length);
+
+  const scrollToBottom = (force = false) => {
+    if (!messagesEndRef.current) return;
+
+    const container = messagesEndRef.current.parentElement;
+    if (!container) return;
+
+    const isNearBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 60;
+    
+    if (force || isNearBottom || typing) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   useEffect(() => {
@@ -83,8 +96,27 @@ export default function AIPlanner({ initialPrompt, user }) {
   }, [chat, sessionId]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [chat, typing]);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      prevSessionId.current = sessionId;
+      prevChatLength.current = chat.length;
+      return;
+    }
+
+    if (sessionId !== prevSessionId.current) {
+      prevSessionId.current = sessionId;
+      prevChatLength.current = chat.length;
+      return;
+    }
+
+    if (chat.length > prevChatLength.current) {
+      scrollToBottom(true);
+    } else {
+      scrollToBottom();
+    }
+
+    prevChatLength.current = chat.length;
+  }, [chat, typing, sessionId]);
 
   const starters = [
     { text: t.starter1 || 'I want to build my first house', icon: '🏠', desc: t.starter1Desc || 'AI will analyze PMAY and state housing subsidies.' },
@@ -92,6 +124,10 @@ export default function AIPlanner({ initialPrompt, user }) {
     { text: t.starter3 || 'I want to start a dairy business in my village', icon: '🚜', desc: t.starter3Desc || 'AI maps mudra loans, dairy enterprise schemes.' },
     { text: t.starter4 || 'My father is turning 60 this month and has no pension', icon: '👴', desc: t.starter4Desc || 'AI links pension funds and health insurance plans.' }
   ];
+
+  const handleStarterClick = (starterText) => {
+    handleSendPrompt(starterText);
+  };
 
   const handleVoiceInput = async () => {
     if (isListening) {
@@ -265,12 +301,14 @@ export default function AIPlanner({ initialPrompt, user }) {
   };
 
   return (
-    <div className="view-section planner-view-section animate-fade-in" style={{ padding: 0, margin: 0, maxWidth: '100%' }}>
+    <div className="view-section planner-view-section animate-fade-in" style={{ padding: 0, margin: 0, maxWidth: '100%', minHeight: 0 }}>
       <div className="gpt-layout-container">
         {/* Left Sidebar */}
         <div className="gpt-sidebar glass-card" style={{ padding: '1.25rem' }}>
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="btn btn-primary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.85rem', borderRadius: '12px' }} onClick={() => {
-            setSessionId(Date.now());
+            const nextSessionId = Date.now();
+            setSessionId(nextSessionId);
+            setActiveSession('current');
             setChat([{ id: 1, sender: 'system', text: lang === 'hi' ? "नमस्ते! मैं योजना साथी का एआई कल्याण योजनाकार हूं।" : "Hello! I am Yojana Saathi's AI Welfare Planner. Describe what your household needs or plans, or select one of the cards below, and I will generate a step-by-step Welfare Roadmap for you." }]);
           }}>
             <Plus size={18} /> New Planning Session
@@ -291,6 +329,7 @@ export default function AIPlanner({ initialPrompt, user }) {
                   className={`gpt-sidebar-btn ${h.id === sessionId ? 'active' : ''}`}
                   onClick={() => {
                     setSessionId(h.id);
+                    setActiveSession(h.id);
                     setChat(h.chat);
                   }}
                 >
@@ -312,23 +351,21 @@ export default function AIPlanner({ initialPrompt, user }) {
         </div>
 
         {/* Main Chat Area */}
-        <div className="gpt-main-chat glass-card" style={{ padding: 0 }}>
-          <div className="chat-messages">
-            <AnimatePresence>
+        <div className="gpt-main-chat glass-card" style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
+          <div className="chat-messages" role="log" aria-live="polite" style={{ flex: 1, overflowY: 'auto' }}>
               {chat.map((msg, index) => (
-                <motion.div 
-                  key={msg.id} 
-                  initial={index > 0 ? { opacity: 0, y: 15 } : false}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                  className={`message ${msg.sender === 'user' ? 'user-message' : 'system-message'}`} 
-                  style={{ marginBottom: 0, maxWidth: '100%', display: 'flex', gap: '1rem', flexDirection: msg.sender === 'user' ? 'row-reverse' : 'row' }}
-                >
-                  {msg.sender === 'system' && <div className="bot-avatar" style={{ marginTop: '0.5rem', width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--gold) 0%, var(--primary) 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Sparkles size={16} /></div>}
+                <React.Fragment key={msg.id}>
+                  <motion.div 
+                    initial={index > 0 ? { opacity: 0, y: 15 } : false}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className={`message ${msg.sender === 'user' ? 'user-message' : 'system-message'}`} 
+                  >
+                  {msg.sender === 'system' && <div className="bot-avatar"><Sparkles size={16} /></div>}
                   
-                  <div className={`message-bubble ${msg.sender} animate-slide-up`} style={{ maxWidth: msg.sender === 'system' ? '100%' : '85%', overflow: 'hidden', padding: '1.25rem 1.5rem', borderRadius: msg.sender === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px', background: msg.sender === 'user' ? 'linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(212,175,55,0.03) 100%)' : 'rgba(255,255,255,0.03)', border: msg.sender === 'user' ? '1px solid rgba(212,175,55,0.25)' : '1px solid rgba(255,255,255,0.06)' }}>
+                  <div className={`message-bubble ${msg.sender} animate-slide-up`}>
                     {msg.sender === 'system' ? (
-                      <div className="markdown-body" style={{ margin: 0, whiteSpace: 'normal', lineHeight: '1.6', fontSize: '1rem', color: 'var(--text-primary)' }}>
+                      <div className="markdown-body">
                         <ReactMarkdown 
                           remarkPlugins={[remarkGfm]}
                           components={{
@@ -395,10 +432,28 @@ export default function AIPlanner({ initialPrompt, user }) {
                       </div>
                     )}
                   </div>
-                    {msg.sender === 'user' && <div className="user-avatar" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👤</div>}
+                    {msg.sender === 'user' && <div className="user-avatar">👤</div>}
                   </motion.div>
-                ))}
-              </AnimatePresence>
+                  {index === 0 && chat.length <= 1 && (
+                    <div className="planner-hero" style={{ marginTop: '2rem' }}>
+                      <div className="planner-hero-badge">AI Welfare Planner</div>
+                      <h2>Plan your next welfare step with confidence</h2>
+                      <p>Describe your household goal or pick a starter prompt to generate a tailored roadmap.</p>
+                      <div className="planner-starters">
+                        {starters.map((starter) => (
+                          <button key={starter.text} type="button" className="starter-card-inline" onClick={() => handleStarterClick(starter.text)}>
+                            <div className="starter-card-icon">{starter.icon}</div>
+                            <div className="starter-card-content">
+                              <h4>{starter.text}</h4>
+                              <p>{starter.desc}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </React.Fragment>
+              ))}
             {typing && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="typing-indicator" style={{ margin: 0 }}>
                 <span className="dot"></span>
