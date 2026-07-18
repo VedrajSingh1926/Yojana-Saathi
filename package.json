@@ -10,7 +10,7 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:api:record": "keploy record -c \"npm run server\"",
     "test:api:test": "keploy test -c \"npm run server\"",
     "test-local-api": "node /Users/apple/.gemini/antigravity-ide/brain/f7a1461c-002f-4404-88b8-51e7505e0fa2/scratch/test-endpoints.js"

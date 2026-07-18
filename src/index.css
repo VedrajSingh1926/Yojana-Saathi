@@ -2999,21 +2999,181 @@ button, input, select, textarea {
 
 
 /* Premium AI Planner UI Tweaks */
-.planner-view-section { padding-top: 0 !important; background: radial-gradient(circle at center, rgba(212,175,55,0.03) 0%, transparent 60%); }
-.planner-hero { margin-bottom: 1rem !important; }
-.gpt-layout-container { height: calc(100vh - var(--nav-height) - 80px) !important; max-width: 1500px !important; position: relative; }
-.gpt-layout-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at center, rgba(255,255,255,0.4) 0%, transparent 70%); filter: blur(40px); z-index: -1; pointer-events: none; }
-.gpt-sidebar { flex: 0 0 20% !important; min-width: 220px !important; gap: 1.25rem !important; }
-.gpt-sidebar-btn { padding: 1rem !important; border-radius: 12px !important; transition: all 0.3s ease !important; }
-.gpt-sidebar-btn:hover { transform: scale(1.02); background: rgba(255, 255, 255, 0.7) !important; }
-.gpt-sidebar-btn.active { background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(212,175,55,0.02) 100%) !important; box-shadow: 0 4px 15px rgba(212,175,55,0.1) !important; border-color: rgba(212,175,55,0.3) !important; }
-.starter-card-inline { border-radius: 20px !important; transition: all 0.3s ease !important; cursor: pointer; }
-.starter-card-inline:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.06) !important; border-color: rgba(212,175,55,0.4) !important; }
-.chat-messages { -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%); }
-.chat-input-bar input { height: 60px; border-radius: 30px !important; transition: all 0.3s ease; }
-.chat-input-bar input:focus { box-shadow: 0 0 0 3px rgba(212,175,55,0.2) !important; border-color: var(--primary) !important; }
-.chat-input-bar .btn { border-radius: 50% !important; transition: all 0.3s ease !important; }
-.chat-input-bar .btn:hover { transform: scale(1.08); box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; }
-.chat-input-bar .btn:active { transform: scale(0.95); }
+.main-content.main-content-planner {
+  padding-bottom: 0 !important;
+  margin-top: var(--nav-height) !important;
+  min-height: calc(100vh - var(--nav-height)) !important;
+  height: calc(100vh - var(--nav-height)) !important;
+  overflow: hidden;
+}
 
-.markdown-body { font-family: inherit; } .markdown-body p { margin-bottom: 1em; } .markdown-body ul, .markdown-body ol { margin-left: 1.5em; margin-bottom: 1em; } .markdown-body li { margin-bottom: 0.5em; } .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1em; } .markdown-body th, .markdown-body td { border: 1px solid var(--border-color); padding: 8px; text-align: left; } .markdown-body th { background: rgba(255,255,255,0.05); } .markdown-body a { color: var(--primary); text-decoration: underline; }
+.planner-view-section {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  background: radial-gradient(circle at 50% 20%, rgba(212,175,55,0.08) 0%, transparent 60%);
+}
+
+.gpt-layout-container {
+  height: 100% !important;
+  max-width: 100% !important;
+  gap: 0 !important;
+  position: relative;
+}
+
+.gpt-sidebar {
+  flex: 0 0 270px !important;
+  min-width: 270px !important;
+  background: rgba(18, 18, 18, 0.6) !important;
+  backdrop-filter: blur(20px) !important;
+  border-right: 1px solid var(--border-color) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  height: 100% !important;
+}
+
+.gpt-main-chat {
+  flex: 1;
+  background: rgba(12, 12, 12, 0.4) !important;
+  backdrop-filter: blur(20px) !important;
+  border-radius: 0 !important;
+  border: none !important;
+  height: 100% !important;
+}
+
+.gpt-sidebar-btn {
+  padding: 0.85rem 1rem !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.gpt-sidebar-btn:hover {
+  transform: translateX(3px) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.gpt-sidebar-btn.active {
+  background: linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(212,175,55,0.02) 100%) !important;
+  box-shadow: 0 4px 15px rgba(212,175,55,0.08) !important;
+  border-color: rgba(212,175,55,0.3) !important;
+  color: var(--primary) !important;
+}
+
+/* Chat bubble enhancements */
+.message {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.message.user-message {
+  justify-content: flex-end;
+}
+
+.message.system-message {
+  justify-content: flex-start;
+}
+
+.bot-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.message-bubble {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+
+.message-bubble:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+  border-color: rgba(212,175,55,0.2) !important;
+}
+
+.chat-input-bar input {
+  height: 52px;
+  border-radius: 26px !important;
+  transition: all 0.3s ease;
+}
+
+.chat-input-bar input:focus {
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.15) !important;
+  border-color: var(--primary) !important;
+  background: rgba(0,0,0,0.4) !important;
+}
+
+.btn-action-small:hover {
+  color: var(--text-primary) !important;
+  text-shadow: 0 0 8px rgba(212,175,55,0.4);
+}
+
+.starter-card-premium {
+  border-color: rgba(255,255,255,0.06) !important;
+}
+
+.starter-card-premium:hover {
+  background: rgba(212,175,55,0.04) !important;
+  border-color: rgba(212,175,55,0.35) !important;
+  box-shadow: 0 8px 30px rgba(212,175,55,0.12) !important;
+}
+
+.markdown-body {
+  font-family: inherit;
+}
+
+.markdown-body p {
+  margin-bottom: 1em;
+}
+
+.markdown-body ul, .markdown-body ol {
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.markdown-body li {
+  margin-bottom: 0.5em;
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.25rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.markdown-body th, .markdown-body td {
+  border: 1px solid var(--border-color);
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.markdown-body th {
+  background: rgba(212, 175, 55, 0.08);
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.markdown-body tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.markdown-body a {
+  color: var(--primary);
+  text-decoration: underline;
+}

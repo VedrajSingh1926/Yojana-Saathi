@@ -44,11 +44,11 @@ export default function Navbar({
 
   const navLinks = [
     { id: 'home', label: t.home || 'Home' },
-    { id: 'planner', label: t.planner || 'Planner' },
+    ...(lang === 'en' ? [{ id: 'planner', label: t.planner || 'Planner' }] : []),
     { id: 'schemes', label: t.schemes || 'Schemes' },
     { id: 'family', label: t.family || 'Family' },
     { id: 'scam-shield', label: t.scamShield || 'Scam Shield' }
-  ];
+  ].filter(Boolean);
 
   const dropdownVariants = {
     hidden: { opacity: 0, y: 15, scale: 0.95 },

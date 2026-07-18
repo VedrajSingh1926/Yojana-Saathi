@@ -43,12 +43,16 @@ export default function App() {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
       if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant', 'partners', 'outlier'].includes(hash)) {
-        setActiveView(hash);
+        if (hash === 'planner' && lang !== 'en') {
+          handleNavigate('home');
+        } else {
+          setActiveView(hash);
+        }
       }
     };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  }, [lang]);
 
   const handleNavigate = (view, params = {}) => {
     setActiveView(view);
@@ -238,7 +242,12 @@ export default function App() {
         activeView={activeView}
         onNavigate={handleNavigate}
         lang={lang}
-        onChangeLang={setLang}
+        onChangeLang={(newLang) => {
+          setLang(newLang);
+          if (newLang !== 'en' && activeView === 'planner') {
+            handleNavigate('home');
+          }
+        }}
         stateLocation={stateLocation}
         onChangeState={setStateLocation}
         notifications={notifications}
@@ -256,7 +265,7 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="main-content">
+      <main className={`main-content ${activeView === 'planner' ? 'main-content-planner' : ''}`}>
         {activeView === 'home' && (
           <Home 
             lang={lang}
@@ -339,16 +348,15 @@ export default function App() {
       </main>
 
       {/* Bottom Sticky Footer */}
-      {activeView !== 'planner' && (
-        <Footer 
-          user={user}
-          onNavigate={handleNavigate}
-          onTriggerAuth={(isRegister) => {
-            if (isRegister) handleNavigate('onboarding');
-            else setIsAuthOpen(true);
-          }}
-        />
-      )}
+      <Footer 
+        user={user}
+        onNavigate={handleNavigate}
+        onTriggerAuth={(isRegister) => {
+          if (isRegister) handleNavigate('onboarding');
+          else setIsAuthOpen(true);
+        }}
+        lang={lang}
+      />
 
       {/* Modals & Overlays */}
       <AuthModal 
@@ -362,6 +370,7 @@ export default function App() {
         onClose={() => setIsCompareOpen(false)}
         compareList={compareList}
         onNavigateToPlanner={handleNavigateToPlannerFromCompare}
+        lang={lang}
       />
 
       <EligibilityPopup 

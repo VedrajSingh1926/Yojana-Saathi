@@ -22,6 +22,22 @@ export default function Home({ lang, onNavigate, onTriggerAuth }) {
     onNavigate('schemes', { category });
   };
 
+  const badgeTextMap = {
+    en: "AI-POWERED • TRUSTED • SECURE",
+    hi: "एआई-संचालित • विश्वसनीय • सुरक्षित",
+    ta: "AI-இயக்கப்படும் • நம்பகமான • பாதுகாப்பானது",
+    te: "AI-ఆధారిత • విశ్వసనీయ • సురక్షితం",
+    bn: "AI-চালিত • বিশ্বস্ত • সুরক্ষিত"
+  };
+
+  const findSchemesLinkText = {
+    en: "Find Schemes",
+    hi: "योजनाएं खोजें",
+    ta: "திட்டங்களைக் கண்டறியவும்",
+    te: "పథకాలను కనుగొనండి",
+    bn: "স্কিম খুঁজুন"
+  };
+
   return (
     <div className="view-section animate-fade-in" style={{ padding: 0, maxWidth: '100%' }}>
       {/* Hero Section */}
@@ -38,7 +54,7 @@ export default function Home({ lang, onNavigate, onTriggerAuth }) {
         </video>
         
         <div className="hero-carousel-overlay"></div>
-
+ 
         <div className="hero-content hero-carousel-content">
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
@@ -46,7 +62,7 @@ export default function Home({ lang, onNavigate, onTriggerAuth }) {
             transition={{ duration: 0.6 }}
             className="pill-badge pill-badge-light"
           >
-            <span className="badge-dot"></span> AI-POWERED • TRUSTED • SECURE
+            <span className="badge-dot"></span> {badgeTextMap[lang] || badgeTextMap.en}
           </motion.div>
           
           <motion.h1 
@@ -77,9 +93,11 @@ export default function Home({ lang, onNavigate, onTriggerAuth }) {
             <button className="btn btn-primary btn-lg" onClick={() => onTriggerAuth(true)}>
               {t.getStarted || "Get Started"} <ArrowRight size={18} />
             </button>
-            <button className="btn btn-outline btn-outline-light btn-lg" onClick={() => onNavigate('planner')}>
-              <Sparkles size={18} className="text-gold" /> {t.tryPlanner || "Try AI Planner"}
-            </button>
+            {lang === 'en' && (
+              <button className="btn btn-outline btn-outline-light btn-lg" onClick={() => onNavigate('planner')}>
+                <Sparkles size={18} className="text-gold" /> {t.tryPlanner || "Try AI Planner"}
+              </button>
+            )}
             <button className="btn btn-text btn-text-light btn-lg" onClick={() => onNavigate('schemes')}>
               {t.exploreSchemes || "Explore Schemes"} <ChevronRight size={18} />
             </button>
@@ -113,7 +131,7 @@ export default function Home({ lang, onNavigate, onTriggerAuth }) {
               <div className={`event-icon ${m.color}`}>{m.icon}</div>
               <h3>{m.title}</h3>
               <p>{m.desc}</p>
-              <span className="event-link">Find Schemes <ArrowRight size={14} /></span>
+              <span className="event-link">{findSchemesLinkText[lang] || findSchemesLinkText.en} <ArrowRight size={14} /></span>
             </motion.div>
           ))}
         </div>
@@ -122,17 +140,17 @@ export default function Home({ lang, onNavigate, onTriggerAuth }) {
       {/* Interactive Process Section */}
       <section className="section-container bg-dark-gradient">
         <div className="section-header text-center">
-          <span className="section-tagline">HOW YOJANA SAATHI WORKS</span>
-          <h2 className="section-title">Simple Steps. Maximum Benefits.</h2>
+          <span className="section-tagline">{t.howItWorks || "HOW YOJANA SAATHI WORKS"}</span>
+          <h2 className="section-title">{t.howItWorksTitle || "Simple Steps. Maximum Benefits."}</h2>
         </div>
         
         <div className="steps-grid">
           {[
-            { num: 1, icon: 'users', title: 'Create Profile', desc: 'Tell us about your family size, income, land status, and needs.' },
-            { num: 2, icon: 'brain', title: 'AI Understands', desc: 'Our engine matches your background to hundreds of government rules.' },
-            { num: 3, icon: 'search', title: 'Find Schemes', desc: 'Instantly discover central and state schemes you qualify for.' },
-            { num: 4, icon: 'file-signature', title: 'Apply Smarter', desc: 'Detailed document checklists and instructions show you how to apply.' },
-            { num: 5, icon: 'circle-check', title: 'Receive Benefits', desc: 'Track steps from validation to final direct bank transfer.' }
+            { num: 1, icon: 'users', title: t.step1Title || 'Create Profile', desc: t.step1Desc || 'Tell us about your family size, income, land status, and needs.' },
+            { num: 2, icon: 'brain', title: t.step2Title || 'AI Understands', desc: t.step2Desc || 'Our engine matches your background to hundreds of government rules.' },
+            { num: 3, icon: 'search', title: t.step3Title || 'Find Schemes', desc: t.step3Desc || 'Instantly discover central and state schemes you qualify for.' },
+            { num: 4, icon: 'file-signature', title: t.step4Title || 'Apply Smarter', desc: t.step4Desc || 'Detailed document checklists and instructions show you how to apply.' },
+            { num: 5, icon: 'circle-check', title: t.step5Title || 'Receive Benefits', desc: t.step5Desc || 'Track steps from validation to final direct bank transfer.' }
           ].map((st, idx) => (
             <motion.div 
               key={st.num}
@@ -162,28 +180,28 @@ export default function Home({ lang, onNavigate, onTriggerAuth }) {
         <div className="metrics-row">
           <div className="metric-item">
             <h2>700+</h2>
-            <p>Government Schemes Mapped</p>
+            <p>{t.metricSchemes || "Government Schemes Mapped"}</p>
           </div>
           <div className="metric-item">
             <h2>25 Cr+</h2>
-            <p>Families Can Benefit</p>
+            <p>{t.metricFamilies || "Families Can Benefit"}</p>
           </div>
           <div className="metric-item">
             <h2>23</h2>
-            <p>Languages Supported</p>
+            <p>{t.metricLanguages || "Languages Supported"}</p>
           </div>
           <div className="metric-item">
             <h2>100%</h2>
-            <p>Secure & Private</p>
+            <p>{t.metricSecure || "Secure & Private"}</p>
           </div>
           <div className="metric-item">
             <h2>AI</h2>
-            <p>Built for Bharat</p>
+            <p>{t.metricBharat || "Built for Bharat"}</p>
           </div>
         </div>
 
         <div className="partner-section">
-          <span className="partner-tagline">BUILDING THE FUTURE OF WELFARE WITH INDIA'S BEST</span>
+          <span className="partner-tagline">{t.partnerTagline || "BUILDING THE FUTURE OF WELFARE WITH INDIA'S BEST"}</span>
           <div className="partner-logos">
             <div className="logo-box"><span className="logo-text">⚡ Slashy</span><span className="sub-logo">Automation</span></div>
             <div className="logo-box"><span className="logo-text">🎯 Keploy</span><span className="sub-logo">API Testing</span></div>
