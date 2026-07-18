@@ -15,8 +15,9 @@ export const stt = async (req, res, next) => {
     }
 
     const formData = new FormData();
-    const audioBlob = new Blob([req.file.buffer], { type: req.file.mimetype || 'audio/webm' });
-    formData.append('audio_file', audioBlob, req.file.originalname || 'audio.webm');
+    // Vachana explicitly rejects .webm extension. We spoof it as .wav which most APIs accept and transcode implicitly.
+    const audioBlob = new Blob([req.file.buffer], { type: 'audio/wav' });
+    formData.append('audio_file', audioBlob, 'audio.wav');
     
     let langCode = req.body.language || 'en';
     if (langCode.length === 2) langCode += '-IN';
