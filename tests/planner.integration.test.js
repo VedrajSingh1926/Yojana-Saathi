@@ -1,6 +1,5 @@
 import request from 'supertest';
-import app from '../server.js';
-import mongoose from 'mongoose';
+import app, { closeDB } from '../server.js';
 
 describe('Planner Flow Integration Tests', () => {
   beforeAll(async () => {
@@ -8,7 +7,7 @@ describe('Planner Flow Integration Tests', () => {
   });
 
   afterAll(async () => {
-    await mongoose.connection.close();
+    await closeDB();
   });
 
   it('should validate the prompt for the planner endpoint', async () => {

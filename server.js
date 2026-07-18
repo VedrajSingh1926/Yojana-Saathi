@@ -62,6 +62,29 @@ const connectDB = async () => {
 };
 connectDB();
 
+// Clean up MongoMemoryServer on disconnect
+mongoose.connection.on('disconnected', async () => {
+  if (mongoServer) {
+    try {
+      await mongoServer.stop();
+      if (process.env.NODE_ENV !== 'test') {
+        logger.info('MongoMemoryServer stopped successfully');
+      }
+    } catch (err) {
+      if (process.env.NODE_ENV !== 'test') {
+        logger.error('Failed to stop MongoMemoryServer', err);
+      }
+    }
+  }
+});
+
+export const closeDB = async () => {
+  await mongoose.connection.close();
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
+};
+
 // Health check route
 app.get('/api/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });

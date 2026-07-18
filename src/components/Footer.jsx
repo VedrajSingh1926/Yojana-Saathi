@@ -16,7 +16,7 @@ export default function Footer({ user, onNavigate, onTriggerAuth }) {
             </div>
           </a>
           <p className="brand-desc text-muted">
-            Empowering every Indian family to discover, apply, and receive every government benefit they deserve, backed by encrypted security.
+            {brandDescMap[lang] || brandDescMap.en}
           </p>
           <div className="social-links">
             <a href="#" className="social-icon"><Globe size={16} /></a>
@@ -29,40 +29,40 @@ export default function Footer({ user, onNavigate, onTriggerAuth }) {
 
         {/* Column 1 */}
         <div className="footer-nav-col">
-          <h3>Quick Links</h3>
-          <span className="footer-link" onClick={() => onNavigate('home')}>Home</span>
-          <span className="footer-link" onClick={() => onNavigate('planner')}>AI Planner</span>
-          <span className="footer-link" onClick={() => onNavigate('schemes')}>Schemes Catalog</span>
-          <span className="footer-link" onClick={() => onNavigate('family')}>Family Hub</span>
-          <span className="footer-link" onClick={() => onNavigate('scam-shield')}>Scam Shield</span>
-          <div>
-            <h4 style={{ color: 'var(--lux-text)', marginBottom: '1.25rem', fontSize: '1.1rem' }}>Ecosystem</h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <li><a href="#" className="footer-link">Gram Panchayats</a></li>
-              <li><a href="#" className="footer-link">CSC Centers</a></li>
-              <li><a href="#partners" onClick={(e) => { e.preventDefault(); onNavigate('partners'); }} className="footer-link">Partner Integrations <span className="pill-badge" style={{ fontSize: '10px', padding: '2px 6px' }}>Live</span></a></li>
+          <h3>{t.quickLinks}</h3>
+          <span className="footer-link" onClick={() => onNavigate('home')}>{t.home}</span>
+          {lang === 'en' && <span className="footer-link" onClick={() => onNavigate('planner')}>{t.planner}</span>}
+          <span className="footer-link" onClick={() => onNavigate('schemes')}>{t.schemes}</span>
+          <span className="footer-link" onClick={() => onNavigate('family')}>{t.family}</span>
+          <span className="footer-link" onClick={() => onNavigate('scam-shield')}>{t.scamShield}</span>
+          <div style={{ marginTop: '1rem' }}>
+            <h4 style={{ color: 'var(--lux-text)', marginBottom: '0.75rem', fontSize: '1rem' }}>{t.ecosystem}</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <li><a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{ecosystemItems.gp[lang] || ecosystemItems.gp.en}</a></li>
+              <li><a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{ecosystemItems.csc[lang] || ecosystemItems.csc.en}</a></li>
+              <li><a href="#partners" onClick={(e) => { e.preventDefault(); onNavigate('partners'); }} className="footer-link">{partnerIntegrationsMap[lang] || partnerIntegrationsMap.en} <span className="pill-badge" style={{ fontSize: '10px', padding: '2px 6px' }}>Live</span></a></li>
             </ul>
           </div>
         </div>
 
         {/* Column 2 */}
         <div className="footer-nav-col">
-          <h3>Resources</h3>
-          <span className="footer-link" onClick={() => onNavigate('schemes')}>Schemes List</span>
-          <a href="#" className="footer-link">Help Center</a>
-          <a href="#" className="footer-link">Welfare Guides</a>
-          <a href="#" className="footer-link">Blog & News</a>
-          <a href="#" className="footer-link">Privacy Policy</a>
+          <h3>{t.resources}</h3>
+          <span className="footer-link" onClick={() => onNavigate('schemes')}>{t.schemes}</span>
+          <a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{t.helpCenter}</a>
+          <a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{t.welfareGuides}</a>
+          <a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{t.blogNews}</a>
+          <a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{t.privacyPolicy}</a>
         </div>
 
         {/* CTA Column */}
         {!user && (
           <div className="footer-brand-action">
             <div className="footer-cta-card">
-              <h3>Ready to Get Started?</h3>
-              <p className="text-sm text-muted mb-3">Create your verified household profile and unlock all matching welfare benefits.</p>
+              <h3>{t.readyToGetStarted}</h3>
+              <p className="text-sm text-muted mb-3">{t.getStartedDesc}</p>
               <button className="btn btn-primary w-full" onClick={() => onTriggerAuth(true)}>
-                Get Started Now
+                {getStartedBtnText[lang] || getStartedBtnText.en}
               </button>
             </div>
           </div>
@@ -71,7 +71,7 @@ export default function Footer({ user, onNavigate, onTriggerAuth }) {
       </div>
 
       <div className="footer-bottom text-center">
-        <p>&copy; 2026 Yojana Saathi. All rights reserved. <span className="mx-2">•</span> Made with <span className="text-red">❤️</span> for India.</p>
+        <p>&copy; 2026 Yojana Saathi. {t.allRightsReserved}</p>
       </div>
     </footer>
   );
