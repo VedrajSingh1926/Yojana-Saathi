@@ -179,7 +179,26 @@ export const translations = {
     madeForIndia: "🇮🇳 இந்தியாவிற்காக உருவாக்கப்பட்டது.",
     discoverMilestones: "வாழ்க்கை நிகழ்வுகள் மூலம் கண்டறியவும்",
     findSchemesMilestone: "வாழ்க்கை நிகழ்வுகளின்படி திட்டங்கள்",
-    chooseMilestone: "உதவிகரமான அரசு திட்டங்களை பார்க்க கீழே ஒரு நிகழ்வைத் தேர்ந்தெடுக்கவும்."
+    chooseMilestone: "உதவிகரமான அரசு திட்டங்களை பார்க்க கீழே ஒரு நிகழ்வைத் தேர்ந்தெடுக்கவும்.",
+    
+    // AI Planner
+    plannerTitle: "AI திட்டமிடுபவர்",
+    plannerSubtitle: "உங்கள் மொழியில் கேள்விகளைக் கேளுங்கள். AI உங்களுக்கான சிறந்த திட்டங்களைக் கண்டறியும்.",
+    
+    // Catalog
+    catalogTitle: "அனைத்து திட்டங்கள்",
+    catalogSubtitle: "மத்திய மற்றும் மாநில அரசு திட்டங்களை ஆராயுங்கள்.",
+    
+    // Family Center
+    familyHeroTitle: "குடும்ப நல மையம்",
+    familyHeroSubtitle: "உங்கள் குடும்ப விவரங்களை நிர்வகிக்கவும், உறுப்பினர்களைச் சேர்க்கவும்.",
+    tabOverview: "கண்ணோட்டம்",
+    tabTree: "குடும்ப மரம்",
+    tabPassport: "நலன்புரி பாஸ்போர்ட்",
+    
+    // Scam Shield
+    scamTitle: "ஸ்கேம் ஷீல்டு",
+    scamSubtitle: "மோசடிகளிலிருந்து உங்கள் குடும்பத்தைப் பாதுகாக்க எந்த செய்தியையும் சரிபார்க்கவும்."
   },
   te: {
     // Telugu Translations
@@ -199,7 +218,26 @@ export const translations = {
     madeForIndia: "🇮🇳 భారతదేశం కోసం తయారు చేయబడింది.",
     discoverMilestones: "జీవిత మైలురాళ్ల ద్వారా కనుగొనండి",
     findSchemesMilestone: "జీవిత సంఘటనల ద్వారా పథకాలు",
-    chooseMilestone: "సహాయకరమైన ప్రభుత్వ పథకాలను చూడటానికి క్రింది మైలురాయిని ఎంచుకోండి."
+    chooseMilestone: "సహాయకరమైన ప్రభుత్వ పథకాలను చూడటానికి క్రింది మైలురాయిని ఎంచుకోండి.",
+    
+    // AI Planner
+    plannerTitle: "AI ప్లానర్",
+    plannerSubtitle: "మీ భాషలో అడగండి. AI మీ కోసం ఉత్తమ పథకాలను కనుగొంటుంది.",
+    
+    // Catalog
+    catalogTitle: "అన్ని పథకాలు",
+    catalogSubtitle: "కేంద్ర మరియు రాష్ట్ర ప్రభుత్వ పథకాలను అన్వేషించండి.",
+    
+    // Family Center
+    familyHeroTitle: "కుటుంబ సంక్షేమ కేంద్రం",
+    familyHeroSubtitle: "మీ కుటుంబ ప్రొఫైల్‌ను నిర్వహించండి, సభ్యులను జోడించండి.",
+    tabOverview: "అవలోకనం",
+    tabTree: "కుటుంబ వృక్షం",
+    tabPassport: "సంక్షేమ పాస్‌పోర్ట్",
+    
+    // Scam Shield
+    scamTitle: "స్కామ్ షీల్డ్",
+    scamSubtitle: "మోసాల నుండి మీ కుటుంబాన్ని రక్షించడానికి సందేశాలను తనిఖీ చేయండి."
   },
   bn: {
     // Bengali Translations
@@ -219,6 +257,25 @@ export const translations = {
     madeForIndia: "🇮🇳 ভারতের জন্য নির্মিত।",
     discoverMilestones: "জীবনের ঘটনা অনুযায়ী খুঁজুন",
     findSchemesMilestone: "জীবনের ঘটনা অনুযায়ী স্কিম খুঁজুন",
-    chooseMilestone: "সাহায্যকারী সরকারি প্রকল্পগুলি দেখতে নিচের যেকোনো একটি বিষয় বেছে নিন।"
+    chooseMilestone: "সাহায্যকারী সরকারি প্রকল্পগুলি দেখতে নিচের যেকোনো একটি বিষয় বেছে নিন.",
+    
+    // AI Planner
+    plannerTitle: "এআই প্ল্যানার",
+    plannerSubtitle: "আপনার ভাষায় প্রশ্ন করুন। এআই আপনার জন্য সেরা স্কিম খুঁজে বের করবে।",
+    
+    // Catalog
+    catalogTitle: "সকল প্রকল্প",
+    catalogSubtitle: "কেন্দ্রীয় এবং রাজ্য সরকারের প্রকল্পগুলি অনুসন্ধান করুন।",
+    
+    // Family Center
+    familyHeroTitle: "পরিবার কল্যাণ কেন্দ্র",
+    familyHeroSubtitle: "আপনার পরিবারের প্রোফাইল পরিচালনা করুন এবং সদস্যদের যোগ করুন।",
+    tabOverview: "ওভারভিউ",
+    tabTree: "পারিবারিক গাছ",
+    tabPassport: "কল্যাণ পাসপোর্ট",
+    
+    // Scam Shield
+    scamTitle: "স্ক্যাম শিল্ড",
+    scamSubtitle: "প্রতারণার হাত থেকে বাঁচতে যে কোনো মেসেজ যাচাই করুন।"
   }
 };

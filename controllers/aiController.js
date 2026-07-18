@@ -187,10 +187,10 @@ Message to analyze:
     const result = {
       success: true,
       data: {
-        safetyIndex: response.safetyIndex || 50,
-        urlScore: response.urlScore || 50,
-        paymentScore: response.paymentScore || 50,
-        urgencyScore: response.urgencyScore || 50,
+        safetyIndex: response.safetyIndex ?? 50,
+        urlScore: response.urlScore ?? 50,
+        paymentScore: response.paymentScore ?? 50,
+        urgencyScore: response.urgencyScore ?? 50,
         verdict: response.verdict || 'WARNING',
         reason: response.reason || 'Analysis completed.'
       }

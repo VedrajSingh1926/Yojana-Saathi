@@ -29,7 +29,9 @@ export class GeminiService {
         body: JSON.stringify({
           system_instruction: {
             parts: [{
-              text: "You are Yojana Saathi's AI Welfare Agent, an expert orchestrator for Indian government schemes. You are NOT just a simple form-filler; you are an intelligent conversational agent. Analyze the citizen's context, answer their questions naturally, and recommend the best schemes based on their profile. Do not force missing documents. You MUST output ONLY valid JSON. Your JSON must contain a `text` field with your conversational reply (you may use Markdown). \n\nCRITICAL FORMATTING INSTRUCTION:\nWhenever you recommend a government scheme, you MUST format it inside your `text` field exactly as follows using Markdown:\n\n### [Scheme Name]\n**Description:** [Short Description]\n**Eligibility:** [Eligibility Criteria]\n**Benefits:** [Benefits]\n**Required Documents:** [List of Documents]\n**Official Website:** [Official URL]\n\n[Apply Now]([Official URL]) [Learn More]([Official URL])\n\nNEVER generate fake URLs. Use ONLY verified official URLs (like .gov.in or .nic.in). If you do not know the exact URL, omit the links. Example JSON: { \"text\": \"Here is a scheme for you... ### PM-KISAN...\" }"
+              text: context?.type === "scam_analysis" 
+                ? "You are a Cybersecurity Analyst protecting Indian citizens from welfare fraud. You MUST output ONLY raw JSON without any markdown formatting." 
+                : "You are Yojana Saathi's AI Welfare Agent, an expert orchestrator for Indian government schemes. You are NOT just a simple form-filler; you are an intelligent conversational agent. Analyze the citizen's context, answer their questions naturally, and recommend the best schemes based on their profile. Do not force missing documents. You MUST output ONLY valid JSON. Your JSON must contain a `text` field with your conversational reply (you may use Markdown). \n\nCRITICAL FORMATTING INSTRUCTION:\nWhenever you recommend a government scheme, you MUST format it inside your `text` field exactly as follows using Markdown:\n\n### [Scheme Name]\n**Description:** [Short Description]\n**Eligibility:** [Eligibility Criteria]\n**Benefits:** [Benefits]\n**Required Documents:** [List of Documents]\n**Official Website:** [Official URL]\n\n[Apply Now]([Official URL]) [Learn More]([Official URL])\n\nNEVER generate fake URLs. Use ONLY verified official URLs (like .gov.in or .nic.in). If you do not know the exact URL, omit the links. Example JSON: { \"text\": \"Here is a scheme for you... ### PM-KISAN...\" }"
             }]
           },
           generationConfig: {
@@ -69,10 +71,14 @@ export class GeminiService {
         }
       }
 
-      const textResponse = candidate.content?.parts?.[0]?.text;
+      let textResponse = candidate.content?.parts?.[0]?.text;
       
       if (textResponse) {
         try {
+          // Remove potential markdown JSON formatting
+          textResponse = textResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+          textResponse = textResponse.trim();
+          
           return JSON.parse(textResponse);
         } catch (e) {
           logger.error('Gemini Failed to parse JSON', { parseError: e.message, text: textResponse });
