@@ -15,8 +15,8 @@ export const stt = async (req, res, next) => {
     }
 
     const formData = new FormData();
-    const file = new File([req.file.buffer], req.file.originalname || 'audio.webm', { type: req.file.mimetype });
-    formData.append('audio_file', file);
+    const audioBlob = new Blob([req.file.buffer], { type: req.file.mimetype || 'audio/webm' });
+    formData.append('audio_file', audioBlob, req.file.originalname || 'audio.webm');
     formData.append('language_code', req.body.language || 'en-IN');
 
     logger.info('Calling Gnani STT API');
@@ -31,13 +31,54 @@ export const stt = async (req, res, next) => {
 
     if (!transcript) {
        logger.warn('Gnani STT returned no transcript', { data });
-       return res.status(422).json({ success: false, message: 'Could not process audio' });
+       return res.status(422).json({ success: false, message: 'Vachana API Error: ' + JSON.stringify(data) });
     }
 
     logger.info('Gnani STT successful', { transcriptLength: transcript.length });
     return res.status(200).json({ success: true, transcript });
   } catch (error) {
     logger.error('Gnani STT Error', error);
+    next(error);
+  }
+};
+
+export const tts = async (req, res, next) => {
+  try {
+    const { text, language } = req.body;
+    if (!text) return res.status(400).json({ success: false, message: 'Text is required' });
+
+    const apiKey = process.env.GNANI_API_KEY;
+    if (!apiKey) return res.status(400).json({ success: false, message: 'API Key missing' });
+
+    logger.info('Calling Gnani TTS API');
+    
+    // Guessing the Vachana TTS endpoint based on common patterns.
+    const response = await fetch('https://api.vachana.ai/tts/v1', {
+      method: 'POST',
+      headers: {
+        'X-API-Key-ID': apiKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: text,
+        language: language || 'en-IN',
+        gender: 'female'
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`TTS API Failed: ${response.status} ${errorText}`);
+    }
+
+    // Assuming it returns an audio stream
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
+    res.setHeader('Content-Type', 'audio/wav');
+    return res.send(buffer);
+  } catch (error) {
+    logger.error('Gnani TTS Error', error);
     next(error);
   }
 };

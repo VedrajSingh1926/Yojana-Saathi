@@ -132,6 +132,27 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
           sender: 'system', 
           text: replyText
         }]);
+
+        // Auto-play the response text via Gnani TTS
+        if (replyText) {
+          try {
+            const ttsRes = await fetch(`${API_URL}/api/ai/tts`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text: replyText, language: lang })
+            });
+            if (ttsRes.ok) {
+              const audioBlob = await ttsRes.blob();
+              const audioUrl = URL.createObjectURL(audioBlob);
+              const audio = new Audio(audioUrl);
+              audio.play().catch(e => console.error("Audio playback prevented:", e));
+            } else {
+              console.error("TTS returned error:", await ttsRes.text());
+            }
+          } catch (ttsErr) {
+            console.error("Failed to fetch TTS:", ttsErr);
+          }
+        }
       } else {
         setChat(prev => [...prev, { id: Date.now(), sender: 'system', text: "Error: " + (data.message || data.error) }]);
       }

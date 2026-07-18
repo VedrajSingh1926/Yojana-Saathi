@@ -4,7 +4,7 @@ dotenv.config();
 async function testGemini() {
   console.log('--- Testing Gemini API ---');
   const apiKey = process.env.GEMINI_API_KEY;
-  const isBearer = !apiKey.startsWith('AIza');
+  const isBearer = apiKey.startsWith('ya29.');
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent${isBearer ? '' : `?key=${apiKey}`}`;
   
   const headers = { 'Content-Type': 'application/json' };
@@ -27,34 +27,36 @@ async function testGemini() {
   }
 }
 
+import { MemoryClient } from 'mem0ai';
+
 async function testMem0() {
   console.log('\n--- Testing Mem0 API ---');
   const apiKey = process.env.MEM0_API_KEY;
+  const client = new MemoryClient({ apiKey });
   try {
-    const res = await fetch('https://api.mem0.ai/v1/memories', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: 'test_user', messages: [{ role: 'user', content: 'Test memory' }] })
-    });
-    console.log('Mem0 POST Status:', res.status);
-    const data = await res.json();
-    if (!res.ok) console.log('Mem0 Error:', JSON.stringify(data));
-    else console.log('Mem0 POST Success!');
+    const results = await client.add(
+      [{ role: 'user', content: 'Test memory' }],
+      { user_id: 'test_user' }
+    );
+    console.log('Mem0 SDK Add Success! Result:', results);
   } catch (e) {
-    console.log('Mem0 Fetch Error:', e.message);
+    console.log('Mem0 SDK Error:', e.message);
   }
 }
 
 async function testGnani() {
   console.log('\n--- Testing Gnani API ---');
   const apiKey = process.env.GNANI_API_KEY;
-  // Let's just do a basic GET or empty POST to see if auth works, or at least check the response
   try {
     const res = await fetch('https://api.vachana.ai/stt/v3', {
       method: 'POST',
-      headers: { 'token': apiKey }
+      headers: { 'X-API-Key-ID': apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ language_code: 'en-IN' })
     });
-    console.log('Gnani Status:', res.status); // 400 or something if auth passes but no file
+    console.log('Gnani Status:', res.status);
+    const data = await res.json();
+    if (!res.ok && res.status !== 400 && res.status !== 422) console.log('Gnani Auth Error (not just missing file):', data);
+    else console.log('Gnani Auth Success (got expected validation error instead of 401)! Status:', res.status);
   } catch (e) {
     console.log('Gnani Fetch Error:', e.message);
   }

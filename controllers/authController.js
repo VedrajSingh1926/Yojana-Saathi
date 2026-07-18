@@ -233,6 +233,10 @@ export const login = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
+    if (!user.password) {
+      return res.status(400).json({ success: false, message: 'This account was created before passwords were required. Please register again or reset.' });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ success: false, message: 'Invalid credentials' });

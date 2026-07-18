@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import { body, validationResult } from 'express-validator';
-import { stt, planner } from '../controllers/aiController.js';
+import { stt, planner, tts } from '../controllers/aiController.js';
 import { logger } from '../utils/logger.js';
 
 const router = express.Router();
@@ -18,6 +18,7 @@ const validateRequest = (req, res, next) => {
 };
 
 router.post('/stt', upload.single('audio'), stt);
+router.post('/tts', tts);
 
 router.post('/planner', [
   body('prompt').notEmpty().withMessage('Prompt is required').isString(),
