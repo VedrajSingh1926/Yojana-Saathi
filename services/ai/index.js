@@ -1,6 +1,7 @@
 import Document from '../../models/Document.js';
 import { logger } from '../../utils/logger.js';
 import { fetchWithTimeoutAndRetry } from '../../utils/http.js';
+import { MemoryClient } from 'mem0ai';
 
 // 1. Google Gemini Service
 export class GeminiService {
@@ -91,23 +92,25 @@ export class GeminiService {
 
 // 2. Mem0 Memory Layer
 export class Mem0Service {
-  static async storeContext(userId, contextData) {
+  static getClient() {
     const apiKey = process.env.MEM0_API_KEY;
-    if (!apiKey) {
+    if (!apiKey) return null;
+    return new MemoryClient({ apiKey });
+  }
+
+  static async storeContext(userId, contextData) {
+    const client = this.getClient();
+    if (!client) {
       logger.warn('MEM0_API_KEY is not set. Skipping context storage.');
       return false;
     }
 
     try {
       let memoryContent = typeof contextData === 'string' ? contextData : JSON.stringify(contextData);
-      await fetchWithTimeoutAndRetry('https://api.mem0.ai/v1/memories', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          user_id: userId, 
-          messages: [{ role: 'user', content: memoryContent }] 
-        })
-      }, 2, 500, 10000);
+      await client.add(
+        [{ role: 'user', content: memoryContent }],
+        { user_id: userId }
+      );
       logger.info('Mem0 Stored Context', { userId });
       return true;
     } catch (error) {
@@ -117,27 +120,24 @@ export class Mem0Service {
   }
 
   static async retrieveContext(userId) {
-    const apiKey = process.env.MEM0_API_KEY;
-    if (!apiKey) {
+    const client = this.getClient();
+    if (!client) {
       logger.warn('MEM0_API_KEY is not set. Skipping context retrieval.');
       return null;
     }
 
     try {
-      const res = await fetchWithTimeoutAndRetry(`https://api.mem0.ai/v1/memories?user_id=${userId}`, {
-        headers: { 'Authorization': `Bearer ${apiKey}` }
-      }, 2, 500, 10000);
+      // Use search to retrieve relevant context
+      const results = await client.search("What is the user's context and history?", { user_id: userId });
       
-      const data = await res.json();
-      if (data && Array.isArray(data)) {
-        return data.map(m => m.memory).join('\n');
-      } else if (data && data.data) {
-        return data.data.map(m => m.memory).join('\n');
+      if (results && Array.isArray(results)) {
+        return results.map(m => m.memory).join('\n');
+      } else if (results && results.data) {
+        return results.data.map(m => m.memory).join('\n');
       }
       return null;
     } catch (error) {
       logger.error('Mem0 Retrieve Error', error);
-      // Not throwing here, memory is not mission-critical for planning
       return null;
     }
   }
