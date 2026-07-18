@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ChevronRight, User, Home, Upload, Target, Sparkles, Loader2, Plus, X, Users, Fingerprint } from 'lucide-react';
 import { triggerLocalDownload } from '../utils/downloadHelper';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Onboarding({ stateLocation, onChangeState, onComplete, onTriggerAuth }) {
+  const { t } = useLanguage();
   const [step, setStep] = useState(1);
   const [otpSent, setOtpSent] = useState(false);
   const [mobileOtp, setMobileOtp] = useState(['', '', '', '', '', '']);

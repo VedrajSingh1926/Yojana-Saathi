@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { ArrowLeft, Landmark, Info, Banknote, ListChecks, FileText, Compass, HelpCircle, Globe, Download, Bookmark, Sparkles } from 'lucide-react';
 import { triggerLocalDownload } from '../utils/downloadHelper';
 import { SCHEMES_DB } from '../data/schemes';
+import { useLanguage } from '../context/LanguageContext';
 
-export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveScheme, lang }) {
+export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveScheme }) {
+  const { lang } = useLanguage();
   const scheme = SCHEMES_DB.find(s => s.id === schemeId) || SCHEMES_DB[0];
   const [activeFaq, setActiveFaq] = useState(null);
 
@@ -158,9 +160,7 @@ Next Steps:
               <h3>⚡ AI Unified Summary</h3>
               
               <div className="languages-tabs">
-                <button className={`lang-tab-btn ${lang === 'en' ? 'active' : ''}`} onClick={() => setLang('en')}>EN</button>
-                <button className={`lang-tab-btn ${lang === 'hi' ? 'active' : ''}`} onClick={() => setLang('hi')}>HI</button>
-                <button className={`lang-tab-btn ${lang === 'ta' ? 'active' : ''}`} onClick={() => setLang('ta')}>TA</button>
+                <span className="text-muted text-xs">Translated via AI</span>
               </div>
               
               <p>{summaryText}</p>

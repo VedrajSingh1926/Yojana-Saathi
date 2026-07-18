@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Server, AlertCircle, RefreshCw, Layers, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Partners() {
+  const { t } = useLanguage();
   const [partners] = useState([
     { id: 'gemini', name: 'Google Gemini', type: 'Core AI Engine', status: 'connected', latency: '450ms', desc: 'Powers scheme recommendations and reasoning.' },
     { id: 'gnani', name: 'Gnani.ai', type: 'Voice Intelligence', status: 'connected', latency: '120ms', desc: 'Handles multilingual speech-to-text and voice navigation.' },

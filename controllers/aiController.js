@@ -162,37 +162,40 @@ export const testAlchemyst = async (req, res, next) => {
 
 export const scamScan = async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, lang } = req.body;
     if (!message) {
       return res.status(400).json({ success: false, message: 'Message is required' });
     }
 
-    const prompt = `You are a Cybersecurity Analyst protecting Indian citizens from welfare fraud. 
+    const systemPrompt = `You are a Cybersecurity Analyst protecting Indian citizens from welfare fraud.
+The selected application language is: ${lang || 'en'}. You MUST generate your ENTIRE response in this language. Do NOT mix English except for:
+- Official Government Scheme Names
+- Government Departments
+- URLs
+- Official Document Names
+Everything else including headings, explanations, recommendations, summaries, lists and action items must be written in the selected language.
+
 Analyze the following message. You MUST output ONLY valid JSON in exactly this format:
 {
-  "safetyIndex": 85, // 0-100, where 100 is completely safe
-  "urlScore": 90, // 0-100 based on presence of official .gov.in domains or suspicious links
-  "paymentScore": 100, // 0-100 based on demands for UPI/money/deposits
-  "urgencyScore": 100, // 0-100 based on manipulative urgency/scarcity
-  "verdict": "SAFE or WARNING or DANGER",
-  "reason": "Short explanation of the analysis."
+  "riskScore": 92,
+  "category": "phishing",
+  "reason": "Short explanation in ${lang || 'en'}.",
+  "recommendation": "Short action item in ${lang || 'en'}."
 }
 
 Message to analyze:
 "${message}"`;
 
-    const response = await GeminiService.generateRecommendation({ type: "scam_analysis" }, prompt);
+    const response = await GeminiService.generateRecommendation({ type: "scam_analysis" }, systemPrompt);
     
     // Fallback if the AI fails to return the exact format
     const result = {
       success: true,
       data: {
-        safetyIndex: response.safetyIndex ?? 50,
-        urlScore: response.urlScore ?? 50,
-        paymentScore: response.paymentScore ?? 50,
-        urgencyScore: response.urgencyScore ?? 50,
-        verdict: response.verdict || 'WARNING',
-        reason: response.reason || 'Analysis completed.'
+        riskScore: response.riskScore ?? 50,
+        category: response.category || 'unknown',
+        reason: response.reason || 'Analysis completed.',
+        recommendation: response.recommendation || ''
       }
     };
     

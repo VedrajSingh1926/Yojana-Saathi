@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Activity, CheckCircle2, ShieldCheck, AlertTriangle, TrendingUp, Search } from 'lucide-react';
+import { Activity, CheckCircle2, ShieldCheck, AlertTriangle, TrendingUp, Search, Map } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion';
 
 export default function OutlierDashboard() {
+  const { t } = useLanguage();
   const [metrics] = useState({
     accuracy: 94.2,
     relevance: 98.1,

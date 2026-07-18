@@ -1,7 +1,9 @@
 import React from 'react';
 import { Globe, Link, Video, Camera } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Footer({ user, onNavigate, onTriggerAuth }) {
+  const { t } = useLanguage();
   return (
     <footer className="glass-footer">
       <div className="footer-container">

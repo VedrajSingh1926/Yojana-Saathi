@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
-import { translations } from '../data/translations';
+import { useLanguage } from '../context/LanguageContext';
 
-export default function ScamShield({ lang }) {
+export default function ScamShield() {
+  const { lang, t } = useLanguage();
   const [text, setText] = useState('');
-  const [report, setReport] = useState(null);
-
-  const t = translations[lang] || translations.en;
 
   const sampleScam = "Urgently claim your PM Awas Yojana subsidy of Rs. 2,500 by paying a processing deposit via UPI to pm-awas-verify@upi immediately. Verify your card here: http://pm-awas-subsidy.in/claim";
 
@@ -32,25 +30,30 @@ export default function ScamShield({ lang }) {
       const data = await response.json();
       
       if (data.success) {
-        const { safetyIndex, urlScore, paymentScore, urgencyScore, verdict, reason } = data.data;
+        const { riskScore, category, reason, recommendation } = data.data;
         
         let verdictClass = 'color-success';
         let fillClass = 'bg-success';
-        if (safetyIndex < 40) {
+        let localizedVerdict = t.safe || 'SAFE';
+
+        if (riskScore > 80) {
           verdictClass = 'color-danger';
           fillClass = 'bg-danger';
-        } else if (safetyIndex < 80) {
+          localizedVerdict = t.danger || 'DANGER';
+        } else if (riskScore > 40) {
           verdictClass = 'color-warning';
           fillClass = 'bg-warning';
+          localizedVerdict = t.warning || 'WARNING';
         }
 
         setReport({
-          safetyIndex,
-          verdict,
+          riskScore,
+          category,
+          verdict: localizedVerdict,
           verdictClass,
           fillClass,
           reason,
-          scores: { url: urlScore, payment: paymentScore, urgency: urgencyScore }
+          recommendation
         });
       } else {
         alert("Failed to analyze message.");
@@ -107,44 +110,24 @@ export default function ScamShield({ lang }) {
             <div className="diagnostic-report w-full">
               <div className="safety-gauge-wrapper">
                 <span className="safety-title">Danger Level</span>
-                <div className={`safety-percent ${report.verdictClass}`}>{100 - report.safetyIndex}%</div>
+                <div className={`safety-percent ${report.verdictClass}`}>{report.riskScore}%</div>
                 <div className={`safety-verdict ${report.verdictClass}`}>{report.verdict}</div>
               </div>
 
               <div className="metric-bars">
                 <div className="metric-row-item">
-                  <div className="bar-header"><span>Domain Authority (NIC / GOV check)</span><span>{report.scores.url}%</span></div>
-                  <div className="bar-track">
-                    <div 
-                      className={`bar-fill ${report.scores.url < 50 ? 'bg-danger' : 'bg-success'}`} 
-                      style={{ width: `${report.scores.url}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="metric-row-item">
-                  <div className="bar-header"><span>No Payment / UPI Demands</span><span>{report.scores.payment}%</span></div>
-                  <div className="bar-track">
-                    <div 
-                      className={`bar-fill ${report.scores.payment < 50 ? 'bg-danger' : 'bg-success'}`} 
-                      style={{ width: `${report.scores.payment}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="metric-row-item">
-                  <div className="bar-header"><span>Linguistic Urgency Index</span><span>{report.scores.urgency}%</span></div>
-                  <div className="bar-track">
-                    <div 
-                      className={`bar-fill ${report.scores.urgency < 50 ? 'bg-danger' : 'bg-success'}`} 
-                      style={{ width: `${report.scores.urgency}%` }}
-                    />
-                  </div>
+                  <div className="bar-header"><span>Category</span><span style={{textTransform: 'capitalize'}}>{report.category}</span></div>
                 </div>
               </div>
 
               <div className="report-hints">
                 <h4>AI Threat Diagnostic:</h4>
-                <p className="text-xs text-secondary mt-1">
+                <p className="text-xs text-secondary mt-1 mb-3">
                   {report.reason}
+                </p>
+                <h4>Recommendation:</h4>
+                <p className="text-xs text-secondary mt-1">
+                  {report.recommendation}
                 </p>
               </div>
             </div>

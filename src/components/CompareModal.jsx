@@ -1,8 +1,10 @@
 import React from 'react';
-import { X, Sparkles, Scale } from 'lucide-react';
+import { X, CheckCircle, Scale, BrainCircuit, Sparkles } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import { SCHEMES_DB } from '../data/schemes';
 
 export default function CompareModal({ isOpen, onClose, compareList, onNavigateToPlanner }) {
+  const { t } = useLanguage();
   if (!isOpen) return null;
 
   const selectedSchemes = compareList.map(id => SCHEMES_DB.find(s => s.id === id)).filter(Boolean);

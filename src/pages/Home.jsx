@@ -1,11 +1,11 @@
 import React from 'react';
 import { ArrowRight, Sparkles, ChevronRight, Landmark, Brain, IdCard } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { translations } from '../data/translations';
 
-export default function Home({ lang, onNavigate, onTriggerAuth }) {
+import { useLanguage } from '../context/LanguageContext';
 
-  const t = translations[lang] || translations.en;
+export default function Home({ onNavigate, onTriggerAuth }) {
+  const { lang, t } = useLanguage();
 
   const milestones = [
     { id: 'child', icon: '👶', title: t.milestoneChild || 'Child Born', desc: t.milestoneChildDesc || 'Maternity relief, baby supplies, nutritional support.', cat: 'Women', color: 'bg-soft-blue' },

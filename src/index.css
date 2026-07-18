@@ -3002,6 +3002,7 @@ button, input, select, textarea {
   padding: 0 !important;
   background: radial-gradient(circle at top center, rgba(212,175,55,0.05) 0%, transparent 60%);
   height: calc(100vh - var(--nav-height));
+  margin-top: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -3127,7 +3128,7 @@ button, input, select, textarea {
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 2rem 2rem 4rem 2rem;
+  padding: 1.5rem 2rem 4rem 2rem;
   scroll-behavior: smooth;
   display: flex;
   flex-direction: column;

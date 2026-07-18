@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { X, Send, Fingerprint, Phone } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
+  const { t } = useLanguage();
   const API_URL = import.meta.env.VITE_API_URL || '';
   const [loginMethod, setLoginMethod] = useState('mobile'); // 'mobile' or 'saathi' or 'recovery'
   const [phone, setPhone] = useState('');

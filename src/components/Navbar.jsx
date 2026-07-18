@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Languages, MapPin, Bell, Menu, X, ChevronDown, ArrowRight, User, LogOut } from 'lucide-react';
-import { translations } from '../data/translations';
+
+import { useLanguage } from '../context/LanguageContext';
 import './Navbar.css';
 
 export default function Navbar({ 
   activeView, 
   onNavigate, 
-  lang, 
-  onChangeLang, 
   stateLocation, 
   onChangeState, 
   notifications, 
@@ -32,7 +31,7 @@ export default function Navbar({
   const filteredStates = states.filter(s => s.toLowerCase().includes(stateSearch.toLowerCase()));
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const t = translations[lang] || translations.en;
+  const { lang, setLang, t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -144,7 +143,7 @@ export default function Navbar({
                       <div 
                         key={code} 
                         className="lux-dropdown-item"
-                        onClick={() => { onChangeLang(code); setLangOpen(false); }}
+                        onClick={() => { setLang(code); setLangOpen(false); }}
                       >
                         {label}
                       </div>

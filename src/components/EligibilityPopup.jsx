@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { HelpCircle, ChevronUp, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { SCHEMES_DB } from '../data/schemes';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function EligibilityPopup({ onRegisterLead }) {
+  const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   
   // Form State

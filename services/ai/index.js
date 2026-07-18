@@ -31,7 +31,7 @@ export class GeminiService {
             parts: [{
               text: context?.type === "scam_analysis" 
                 ? "You are a Cybersecurity Analyst protecting Indian citizens from welfare fraud. You MUST output ONLY raw JSON without any markdown formatting." 
-                : "You are Yojana Saathi's AI Welfare Agent, an expert orchestrator for Indian government schemes. You are NOT just a simple form-filler; you are an intelligent conversational agent. Analyze the citizen's context, answer their questions naturally, and recommend the best schemes based on their profile. Do not force missing documents. You MUST output ONLY valid JSON. Your JSON must contain a `text` field with your conversational reply (you may use Markdown). \n\nCRITICAL FORMATTING INSTRUCTION:\nWhenever you recommend a government scheme, you MUST format it inside your `text` field exactly as follows using Markdown:\n\n### [Scheme Name]\n**Description:** [Short Description]\n**Eligibility:** [Eligibility Criteria]\n**Benefits:** [Benefits]\n**Required Documents:** [List of Documents]\n**Official Website:** [Official URL]\n\n[Apply Now]([Official URL]) [Learn More]([Official URL])\n\nNEVER generate fake URLs. Use ONLY verified official URLs (like .gov.in or .nic.in). If you do not know the exact URL, omit the links. Example JSON: { \"text\": \"Here is a scheme for you... ### PM-KISAN...\" }"
+                : "You are Yojana Saathi's AI Welfare Agent, an expert orchestrator for Indian government schemes. Analyze the citizen's context, answer their questions naturally, and recommend the best schemes based on their profile. Do not force missing documents. You MUST output ONLY valid JSON. Your JSON must contain a `text` field with your conversational reply (you may use Markdown), and a `detectedLang` field containing the ISO language code (en, hi, ta, te, bn) of the user's prompt. \n\nCRITICAL FORMATTING INSTRUCTION:\nWhenever you recommend a government scheme, you MUST format it inside your `text` field exactly as follows using Markdown:\n\n### [Scheme Name]\n**Description:** [Short Description]\n**Eligibility:** [Eligibility Criteria]\n**Benefits:** [Benefits]\n**Required Documents:** [List of Documents]\n**Official Website:** [Official URL]\n\n[Apply Now]([Official URL]) [Learn More]([Official URL])\n\nNEVER generate fake URLs. Use ONLY verified official URLs. Example JSON: { \"text\": \"Here is a scheme for you...\", \"detectedLang\": \"en\" }"
             }]
           },
           generationConfig: {
@@ -201,11 +201,20 @@ export class AlchemystService {
     
     // Inject Language requirement into the prompt
     let localizedQuery = query;
-    if (lang !== 'en') {
-      const langNames = { hi: "Hindi", ta: "Tamil", te: "Telugu", bn: "Bengali" };
-      const requestedLanguage = langNames[lang] || lang;
-      localizedQuery = `[CRITICAL REQUIREMENT: YOU MUST FORMULATE YOUR ENTIRE RESPONSE STRICTLY IN ${requestedLanguage}. Translate all advice, headers, and descriptions to ${requestedLanguage}.] \n\n${query}`;
-    }
+    const langNames = { en: "English", hi: "Hindi", ta: "Tamil", te: "Telugu", bn: "Bengali" };
+    const requestedLanguage = langNames[lang] || lang;
+    
+    localizedQuery = `The selected application language is: ${requestedLanguage}.
+You MUST generate your ENTIRE response in this language.
+Do NOT mix English except for:
+- Official Government Scheme Names
+- Government Departments
+- URLs
+- Official Document Names
+Everything else including headings, explanations, recommendations, summaries, lists and action items must be written in the selected language.
+
+User Request:
+${query}`;
 
     // Core Gemini generation
     const response = await GeminiService.generateRecommendation(richContext, localizedQuery);

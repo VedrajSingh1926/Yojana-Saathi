@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Sliders, Scale, Trash2, ArrowRight } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import { SCHEMES_DB } from '../data/schemes';
 import { motion, AnimatePresence } from 'framer-motion';
-import { translations } from '../data/translations';
+
 
 export default function Schemes({ 
-  lang,
   onNavigate, 
   compareList, 
   onToggleCompare, 
   initialCategory = 'all',
   onTriggerCompare
 }) {
+  const { lang, t } = useLanguage();
   const [search, setSearch] = useState('');
   const [types, setTypes] = useState(['Central', 'State']);
   const [category, setCategory] = useState(initialCategory);
   const [trendingTab, setTrendingTab] = useState('all-trending');
-
-  const t = translations[lang] || translations.en;
 
   // Keep state in sync with parent updates (e.g. milestone redirects)
   useEffect(() => {

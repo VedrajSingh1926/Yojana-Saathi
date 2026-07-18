@@ -25,7 +25,6 @@ export default function App() {
   const [catalogCategory, setCatalogCategory] = useState('all');
 
   // Global App States
-  const [lang, setLang] = useState('en');
   const [stateLocation, setStateLocation] = useState('Rajasthan');
   const [compareList, setCompareList] = useState([]);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -271,8 +270,6 @@ export default function App() {
       <Navbar 
         activeView={activeView}
         onNavigate={handleNavigate}
-        lang={lang}
-        onChangeLang={setLang}
         stateLocation={stateLocation}
         onChangeState={setStateLocation}
         notifications={notifications}
@@ -293,7 +290,6 @@ export default function App() {
       <main className="main-content">
         {activeView === 'home' && (
           <Home 
-            lang={lang}
             onNavigate={handleNavigate}
             onTriggerAuth={(isRegister) => {
               if (isRegister) handleNavigate('onboarding');
@@ -304,7 +300,6 @@ export default function App() {
         
         {activeView === 'schemes' && (
           <Schemes 
-            lang={lang}
             onNavigate={handleNavigate}
             compareList={compareList}
             onToggleCompare={handleToggleCompare}
@@ -319,7 +314,6 @@ export default function App() {
             onBack={() => handleNavigate('schemes')}
             onNavigate={handleNavigate}
             onSaveScheme={handleSaveScheme}
-            lang={lang}
           />
         )}
 
@@ -327,13 +321,11 @@ export default function App() {
           <AIPlanner 
             initialPrompt={plannerPrompt}
             user={user}
-            lang={lang}
           />
         )}
 
         {activeView === 'family' && (
           <Family 
-            lang={lang}
             user={user}
             onAddMember={handleAddMember}
             onUploadDoc={handleUploadDoc}
@@ -342,7 +334,7 @@ export default function App() {
         )}
 
         {activeView === 'scam-shield' && (
-          <ScamShield lang={lang} />
+          <ScamShield />
         )}
 
         {activeView === 'onboarding' && (
@@ -361,16 +353,15 @@ export default function App() {
           <GovFormAssistant 
             user={user}
             onBack={() => handleNavigate('schemes')}
-            lang={lang}
           />
         )}
 
         {activeView === 'partners' && (
-          <Partners lang={lang} />
+          <Partners />
         )}
 
         {activeView === 'outlier' && (
-          <OutlierDashboard lang={lang} />
+          <OutlierDashboard />
         )}
       </main>
 

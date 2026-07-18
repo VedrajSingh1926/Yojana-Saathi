@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Check, ChevronLeft, ShieldAlert, AlertTriangle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function GovFormAssistant({ onBack, user }) {
+  const { lang, t } = useLanguage();
   const [activeField, setActiveField] = useState(null);
   const [formState, setFormState] = useState({
     aadhar: '',

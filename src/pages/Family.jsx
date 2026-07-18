@@ -3,9 +3,10 @@ import { Users, User, Check, Network, IdCard, FolderOpen, Calendar, ShieldCheck,
 import QRCode from 'react-qr-code';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { translations } from '../data/translations';
+import { useLanguage } from '../context/LanguageContext';
 
-export default function Family({ lang, user, onAddMember, onUploadDoc, onTriggerAuth }) {
+export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }) {
+  const { t } = useLanguage();
   const [subtab, setSubtab] = useState('overview');
   
   // Member Form State
@@ -15,8 +16,6 @@ export default function Family({ lang, user, onAddMember, onUploadDoc, onTrigger
   const [memberAge, setMemberAge] = useState('');
   const [memberOccupation, setMemberOccupation] = useState('Student');
   const [memberIncome, setMemberIncome] = useState('');
-
-  const t = translations[lang] || translations.en;
 
   if (!user) {
     return (
