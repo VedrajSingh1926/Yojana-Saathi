@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Sparkles, Mic, Plus, MessageSquare, Bookmark, History, Users, Paperclip } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { convertWebmToWav } from '../utils/audioHelper';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { translations } from '../data/translations';
@@ -68,13 +69,18 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
       };
 
       mediaRecorder.current.onstop = async () => {
-        const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
-        const formData = new FormData();
-        formData.append('audio', audioBlob, 'audio.webm');
-        formData.append('language', lang);
-
-        setInput(t.transcribing || 'Transcribing via Gnani...');
+        setIsListening(false);
+        const webmBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
+        
         try {
+          setInput(t.transcribing || 'Transcribing via Gnani...');
+          // Convert WebM to true WAV so Gnani ffmpeg backend can decode it
+          const trueWavBlob = await convertWebmToWav(webmBlob);
+          
+          const formData = new FormData();
+          formData.append('audio', trueWavBlob, 'audio.wav');
+          formData.append('language', lang);
+
           const response = await fetch(`${API_URL}/api/ai/stt`, { method: 'POST', body: formData });
           const data = await response.json();
           if (data.success) {
