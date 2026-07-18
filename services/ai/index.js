@@ -173,7 +173,7 @@ export class OutlierService {
 
 // 4. Alchemyst AI Orchestrator
 export class AlchemystService {
-  static async orchestrate(userId, currentHousehold, userPrompt, lang = 'en') {
+  static async orchestrate(userId, currentHousehold, userPrompt, lang = 'en', state = 'All States') {
     logger.info('Alchemyst Starting orchestration', { userId, lang });
     
     const query = userPrompt;
@@ -195,8 +195,8 @@ export class AlchemystService {
     
     const richContext = {
       household,
-      history: longTermContext || 'No previous history.',
-      documents: docsContext
+      documents: docsContext,
+      stateContext: `The user's selected state is: ${state}. Focus recommendations on Central Government schemes and specifically ${state} State Government schemes.`
     };
     
     // Inject Language requirement into the prompt

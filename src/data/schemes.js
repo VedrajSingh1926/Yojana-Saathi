@@ -124,6 +124,7 @@ export const SCHEMES_DB = [
     emoji: "🏠",
     benefit: "₹1.0L–2.0L Assistance",
     type: "State",
+    state: "Rajasthan",
     category: "Housing",
     description: "State-funded affordable housing scheme matching central housing efforts.",
     purpose: "To support economically weaker sections within the state who are left out of central housing lists.",
@@ -311,6 +312,7 @@ export const SCHEMES_DB = [
     emoji: "👩",
     benefit: "₹1,250/month Cash",
     type: "State",
+    state: "Madhya Pradesh",
     category: "Women",
     description: "Financial empowerment program for women residents of the state.",
     purpose: "To improve the health, nutrition, and financial independence of women in rural and urban households.",
@@ -341,6 +343,130 @@ export const SCHEMES_DB = [
       hi: "राज्य की महिलाओं के आर्थिक सशक्तिकरण की योजना। इसके तहत प्रति माह ₹1,250 सीधे बैंक खाते में भेजे जाते हैं। विवाहित, विधवा, तलाकशुदा सभी महिलाएं पात्र हैं।",
       ta: "பெண்களின் பொருளாதார சுதந்திரத்திற்காக மாதம் ₹1,250 வழங்கும் மாநில அரசின் திட்டமாகும். வறுமைக்கோட்டிற்கு கீழ் உள்ள பெண்கள் இதற்கு தகுதியானவர்கள்."
     },
+    official_url: "#"
+  },
+  {
+    id: "maha-arogya",
+    name: "Mahatma Jyotiba Phule Jan Arogya",
+    emoji: "🏥",
+    benefit: "Up to ₹1.5L Cover",
+    type: "State",
+    state: "Maharashtra",
+    category: "Senior Citizen",
+    description: "State health insurance scheme for low income families.",
+    purpose: "Provides end-to-end cashless services for identified diseases through a network of service providers.",
+    benefits_detail: "Cashless medical insurance up to ₹1.5 Lakhs per family per year for major surgeries and treatments.",
+    who_can_apply: "Families holding Yellow, Orange, or Antyodaya ration cards in Maharashtra.",
+    timeline: ["Hospitalization", "Pre-authorization", "Surgery/Treatment", "Discharge"],
+    ai_score: "99% Match",
+    eligibility: [
+      { name: "Valid Ration Card (Yellow/Orange/AAY)", match: true },
+      { name: "Resident of Maharashtra", match: true }
+    ],
+    docs: [
+      { name: "Ration Card", desc: "For eligibility verification." },
+      { name: "Aadhaar Card", desc: "For identity verification." }
+    ],
+    faqs: [],
+    ai_summaries: {
+      en: "A state health insurance scheme covering major surgeries and hospitalization up to ₹1.5 Lakhs.",
+      hi: "एक राज्य स्वास्थ्य बीमा योजना जो बड़ी सर्जरी और अस्पताल में भर्ती होने के लिए ₹1.5 लाख तक कवर करती है।"
+    },
+    official_url: "https://www.jeevandayee.gov.in"
+  },
+  {
+    id: "maha-kanya",
+    name: "Majhi Kanya Bhagyashree",
+    emoji: "👧",
+    benefit: "₹50,000 Grant",
+    type: "State",
+    state: "Maharashtra",
+    category: "Women",
+    description: "Financial incentive for families to retain the girl child and educate her.",
+    purpose: "To improve the sex ratio and promote girls' education.",
+    benefits_detail: "Up to ₹50,000 kept in fixed deposit which can be withdrawn when the girl turns 18.",
+    who_can_apply: "Parents who undergo family planning after the birth of one or two daughters.",
+    timeline: ["Birth of girl child", "Family planning certificate", "Fund deposit"],
+    ai_score: "85% Match",
+    eligibility: [
+      { name: "Family Planning Certificate", match: true },
+      { name: "Resident of Maharashtra", match: true }
+    ],
+    docs: [
+      { name: "Birth Certificate", desc: "Of the girl child." },
+      { name: "Family Planning Certificate", desc: "From authorized medical officer." }
+    ],
+    faqs: [],
+    ai_summaries: { en: "A financial grant for families with a girl child, provided after family planning." },
+    official_url: "#"
+  },
+  {
+    id: "kar-gruha",
+    name: "Gruha Lakshmi",
+    emoji: "💰",
+    benefit: "₹2,000/month Cash",
+    type: "State",
+    state: "Karnataka",
+    category: "Women",
+    description: "Monthly financial assistance to the female head of the family.",
+    purpose: "To support women heads of households with direct cash transfer.",
+    benefits_detail: "₹2,000 transferred every month to the bank account of the woman head of the family.",
+    who_can_apply: "Women identified as head of the family in APL/BPL/Antyodaya ration cards.",
+    timeline: ["Online registration", "Verification", "Monthly transfer"],
+    ai_score: "95% Match",
+    eligibility: [
+      { name: "Woman head of family in Ration Card", match: true },
+      { name: "Should not be a taxpayer", match: true }
+    ],
+    docs: [
+      { name: "Ration Card", desc: "Must show applicant as head." },
+      { name: "Aadhaar Card", desc: "Must be linked to bank." }
+    ],
+    faqs: [],
+    ai_summaries: { en: "₹2,000 monthly cash transfer for the woman head of the household in Karnataka." },
+    official_url: "#"
+  },
+  {
+    id: "kar-anna",
+    name: "Anna Bhagya",
+    emoji: "🍚",
+    benefit: "Free Rice/Cash",
+    type: "State",
+    state: "Karnataka",
+    category: "Housing",
+    description: "Free rice and equivalent cash transfer for BPL card holders.",
+    purpose: "Food security for BPL and Antyodaya card holders.",
+    benefits_detail: "10kg of rice per person per month, or equivalent cash transfer.",
+    who_can_apply: "BPL and Antyodaya ration card holders in Karnataka.",
+    timeline: ["Monthly distribution/transfer"],
+    ai_score: "90% Match",
+    eligibility: [{ name: "BPL/Antyodaya Card", match: true }],
+    docs: [{ name: "Ration Card", desc: "Valid BPL card." }],
+    faqs: [],
+    ai_summaries: { en: "Provides free rice or equivalent cash for low income families." },
+    official_url: "#"
+  },
+  {
+    id: "tn-women",
+    name: "Kalaignar Magalir Urimai Thittam",
+    emoji: "💸",
+    benefit: "₹1,000/month",
+    type: "State",
+    state: "Tamil Nadu",
+    category: "Women",
+    description: "Monthly rights grant for eligible women heads of families.",
+    purpose: "Economic empowerment of women.",
+    benefits_detail: "₹1,000 credited monthly directly to the bank account.",
+    who_can_apply: "Women heads of families meeting income criteria in Tamil Nadu.",
+    timeline: ["Camp registration", "Field verification", "Direct transfer"],
+    ai_score: "94% Match",
+    eligibility: [
+      { name: "Income < ₹2.5 Lakhs", match: true },
+      { name: "Resident of Tamil Nadu", match: true }
+    ],
+    docs: [{ name: "Ration Card", desc: "Showing head of family." }],
+    faqs: [],
+    ai_summaries: { en: "Monthly cash assistance for eligible women heads of families in Tamil Nadu." },
     official_url: "#"
   }
 ];

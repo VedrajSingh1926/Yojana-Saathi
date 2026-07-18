@@ -15,8 +15,10 @@ export default function Schemes({
   const { lang, t } = useLanguage();
   const [search, setSearch] = useState('');
   const [types, setTypes] = useState(['Central', 'State']);
+  const [selectedState, setSelectedState] = useState('All States');
   const [category, setCategory] = useState(initialCategory);
   const [trendingTab, setTrendingTab] = useState('all-trending');
+
 
   // Keep state in sync with parent updates (e.g. milestone redirects)
   useEffect(() => {
@@ -48,6 +50,7 @@ export default function Schemes({
   const handleReset = () => {
     setSearch('');
     setTypes(['Central', 'State']);
+    setSelectedState('All States');
     setCategory('all');
     setTrendingTab('all-trending');
   };
@@ -111,6 +114,79 @@ export default function Schemes({
     ta: "வடிகட்டிகளை மீட்டமைக்க அல்லது தேடலை மாற்ற முயற்சிக்கவும்.",
     te: "ఫిల్టర్లను రీసెట్ చేయడానికి లేదా మీ శోధనను మార్చడానికి ప్రయత్నించండి.",
     bn: "অনুগ্রহ করে ফিল্টার রিসেট করুন অথবা অন্য কিছু লিখে সার্চ করুন।"
+  };
+
+  const centralSchemes = filtered.filter(s => s.type === 'Central');
+  const stateSchemes = filtered.filter(s => s.type === 'State' && (selectedState === 'All States' || s.state === selectedState));
+
+  const renderSchemeCard = (s) => {
+    const isCompared = compareList.includes(s.id);
+    return (
+      <motion.div 
+        layout
+        key={s.id}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.3 }}
+        className="scheme-card glass-card"
+      >
+        <div className="scheme-card-header">
+          <div className="scheme-emoji">{s.emoji}</div>
+          <div className="scheme-badges">
+            <span className={`badge ${s.type === 'Central' ? 'badge-type-central' : 'badge-type-state'}`}>
+              {s.type === 'Central' ? '🟢 Central Government' : `🟠 ${s.state || 'State'} Government`}
+            </span>
+            <span className="badge badge-tag">{localizedCategories[lang]?.[s.category] || s.category}</span>
+          </div>
+        </div>
+        <h3>{s.name}</h3>
+        <p className="scheme-desc">{s.description}</p>
+        
+        <div className="scheme-stats">
+          <div className="stat-box">
+            <span className="stat-label">{t.estimatedBenefit || "Benefit"}</span>
+            <span className="stat-val text-gold">{s.benefit}</span>
+          </div>
+          <div className="stat-box">
+            <span className="stat-label">{verificationTimeText[lang] || verificationTimeText.en}</span>
+            <span className="stat-val">2-4 Weeks</span>
+          </div>
+        </div>
+
+        <div className="scheme-card-actions">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <button 
+              className="btn btn-primary btn-sm" 
+              style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+              onClick={() => onNavigate('form-assistant')}
+            >
+              <Sparkles size={12} /> Fill with AI
+            </button>
+            <a 
+              href={`https://www.google.com/search?q=${encodeURIComponent(s.name + ' CSC near me')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline btn-sm" 
+              style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              📍 Find Nearby CSC
+            </a>
+            <a href="#" className="card-learn-more" onClick={(e) => { e.preventDefault(); onNavigate('detail', { schemeId: s.id }); }} style={{ display: 'flex', alignItems: 'center' }}>
+              {learnMoreText[lang] || learnMoreText.en} <ArrowRight size={14} />
+            </a>
+          </div>
+          <label className="compare-checkbox-label">
+            <input 
+              type="checkbox"
+              checked={isCompared}
+              onChange={() => onToggleCompare(s.id)}
+            />
+            <span>{t.compare || "Compare"}</span>
+          </label>
+        </div>
+      </motion.div>
+    );
   };
 
   return (
@@ -179,6 +255,25 @@ export default function Schemes({
               </label>
             </div>
           </div>
+
+          {types.includes('State') && (
+            <div className="filter-group">
+              <h4>State Selection</h4>
+              <select 
+                className="input-field w-full"
+                value={selectedState}
+                onChange={(e) => setSelectedState(e.target.value)}
+                style={{ padding: '0.5rem', marginTop: '0.5rem' }}
+              >
+                <option value="All States">All States</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Maharashtra">Maharashtra</option>
+              </select>
+            </div>
+          )}
+
 
           {/* Category Filters */}
           <div className="filter-group">
@@ -269,69 +364,33 @@ export default function Schemes({
           </div>
 
           {/* Cards Grid */}
-          <div className="schemes-cards-grid">
-            <AnimatePresence>
-              {filtered.map(s => {
-                const isCompared = compareList.includes(s.id);
-                return (
-                  <motion.div 
-                    layout
-                    key={s.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3 }}
-                    className="scheme-card glass-card"
-                  >
-                    <div className="scheme-card-header">
-                      <div className="scheme-emoji">{s.emoji}</div>
-                      <div className="scheme-badges">
-                        <span className={`badge ${s.type === 'Central' ? 'badge-type-central' : 'badge-type-state'}`}>
-                          {s.type}
-                        </span>
-                        <span className="badge badge-tag">{localizedCategories[lang]?.[s.category] || s.category}</span>
-                      </div>
-                    </div>
-                    <h3>{s.name}</h3>
-                    <p className="scheme-desc">{s.description}</p>
-                    
-                    <div className="scheme-stats">
-                      <div className="stat-box">
-                        <span className="stat-label">{t.estimatedBenefit}</span>
-                        <span className="stat-val text-gold">{s.benefit}</span>
-                      </div>
-                      <div className="stat-box">
-                        <span className="stat-label">{verificationTimeText[lang] || verificationTimeText.en}</span>
-                        <span className="stat-val">2-4 Weeks</span>
-                      </div>
-                    </div>
+          <div className="schemes-cards-section">
+            
+            {centralSchemes.length > 0 && (
+              <div style={{ marginBottom: '3rem' }}>
+                <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)', borderBottom: '2px solid var(--primary-glow)', paddingBottom: '0.5rem', fontSize: '1.4rem' }}>
+                  Central Government Schemes
+                </h3>
+                <div className="schemes-cards-grid">
+                  <AnimatePresence>
+                    {centralSchemes.map(s => renderSchemeCard(s))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
 
-                    <div className="scheme-card-actions">
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <button 
-                          className="btn btn-primary btn-sm" 
-                          style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
-                          onClick={() => onNavigate('form-assistant')}
-                        >
-                          <Sparkles size={12} /> Fill with AI
-                        </button>
-                        <a href="#" className="card-learn-more" onClick={(e) => { e.preventDefault(); onNavigate('detail', { schemeId: s.id }); }} style={{ display: 'flex', alignItems: 'center' }}>
-                          Learn More <ArrowRight size={14} />
-                        </a>
-                      </div>
-                      <label className="compare-checkbox-label">
-                        <input 
-                          type="checkbox"
-                          checked={isCompared}
-                          onChange={() => onToggleCompare(s.id)}
-                        />
-                        <span>{t.compare}</span>
-                      </label>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
+            {stateSchemes.length > 0 && (
+              <div style={{ marginBottom: '3rem' }}>
+                <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)', borderBottom: '2px solid var(--secondary-glow)', paddingBottom: '0.5rem', fontSize: '1.4rem' }}>
+                  State-Specific Schemes
+                </h3>
+                <div className="schemes-cards-grid">
+                  <AnimatePresence>
+                    {stateSchemes.map(s => renderSchemeCard(s))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
 
             {filtered.length === 0 && (
               <div className="text-center p-5 w-full col-span-2 glass-card">

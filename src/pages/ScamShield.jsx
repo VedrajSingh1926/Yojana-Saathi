@@ -264,12 +264,27 @@ export default function ScamShield() {
             </div>
           ) : (
             <div className="diagnostic-report w-full">
-              <div className="safety-gauge-wrapper">
-                <span className="safety-title">Danger Level</span>
-                <div className={`safety-percent ${report.verdictClass}`}>{report.riskScore}%</div>
-                <div className={`safety-verdict ${report.verdictClass}`}>{report.verdict}</div>
+              <div className="safety-gauge-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                  <span className="safety-title">Danger Level</span>
+                  <div className={`safety-verdict ${report.verdictClass}`}>{report.verdict}</div>
+                </div>
+                <div style={{ 
+                  width: '100%', 
+                  height: '12px', 
+                  background: 'rgba(255,255,255,0.1)', 
+                  borderRadius: '6px',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{ 
+                    width: `${report.riskScore}%`, 
+                    height: '100%', 
+                    background: report.verdictClass === 'danger' ? 'var(--danger)' : report.verdictClass === 'warning' ? 'var(--warning)' : 'var(--success)',
+                    transition: 'width 1s ease-out'
+                  }}></div>
+                </div>
+                <div className={`safety-percent ${report.verdictClass}`} style={{ textAlign: 'right', fontSize: '0.85rem' }}>{report.riskScore}% Risk</div>
               </div>
-
               <div className="metric-bars">
                 <div className="metric-row-item">
                   <div className="bar-header"><span>Category</span><span style={{textTransform: 'capitalize'}}>{report.category}</span></div>

@@ -1,97 +1,90 @@
 import React from 'react';
-import { Globe, Link, Video, Camera } from 'lucide-react';
+import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-
-const brandDescMap = {
-  en: "Empowering 1.4 billion Indians with AI-driven welfare access.",
-  hi: "1.4 अरब भारतीयों को एआई-संचालित कल्याण तक पहुंच के साथ सशक्त बनाना।"
-};
-
-const ecosystemItems = {
-  gp: { en: "Gram Panchayat Login", hi: "ग्राम पंचायत लॉगिन" },
-  csc: { en: "CSC VLE Portal", hi: "सीएससी वीएलई पोर्टल" }
-};
-
-const partnerIntegrationsMap = {
-  en: "Partner Integrations",
-  hi: "पार्टनर इंटीग्रेशन"
-};
-
-const getStartedBtnText = {
-  en: "Create Free Profile",
-  hi: "मुफ्त प्रोफाइल बनाएं"
-};
 
 export default function Footer({ user, onNavigate, onTriggerAuth }) {
   const { t, lang } = useLanguage();
   return (
     <footer className="glass-footer">
-      <div className="footer-container">
+      <div className="footer-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', padding: '3rem 0' }}>
         
-        {/* Brand Info */}
+        {/* Column 1: Brand */}
         <div className="footer-brand">
           <a href="#" className="logo-container mb-3" onClick={(e) => { e.preventDefault(); onNavigate('home'); }}>
             <div className="logo-icon" style={{ display: 'flex', alignItems: 'center' }}>
               <img src="/Logo.png" alt="Yojana Saathi Logo" style={{ height: '60px', width: 'auto', maxWidth: '180px', objectFit: 'contain' }} />
             </div>
           </a>
-          <p className="brand-desc text-muted">
-            {brandDescMap[lang] || brandDescMap.en}
+          <p className="brand-desc text-muted mb-4" style={{ fontSize: '0.95rem' }}>
+            {t.brandDesc || "India's AI Welfare Operating System"}
           </p>
-          <div className="social-links">
-            <a href="#" className="social-icon"><Globe size={16} /></a>
-            <a href="#" className="social-icon"><Link size={16} /></a>
-            <a href="#" className="social-icon"><Video size={16} /></a>
-            <a href="#" className="social-icon"><Camera size={16} /></a>
+          <div className="social-links" style={{ display: 'flex', gap: '1rem' }}>
+            <a href="#" className="social-icon" style={{ color: 'var(--text-muted)' }}><Github size={18} /></a>
+            <a href="#" className="social-icon" style={{ color: 'var(--text-muted)' }}><Linkedin size={18} /></a>
+            <a href="#" className="social-icon" style={{ color: 'var(--text-muted)' }}><Twitter size={18} /></a>
+            <a href="#" className="social-icon" style={{ color: 'var(--text-muted)' }}><Mail size={18} /></a>
           </div>
         </div>
 
-
-        {/* Column 1 */}
+        {/* Column 2: Product */}
         <div className="footer-nav-col">
-          <h3>{t.quickLinks}</h3>
-          <span className="footer-link" onClick={() => onNavigate('home')}>{t.home}</span>
-          {lang === 'en' && <span className="footer-link" onClick={() => onNavigate('planner')}>{t.planner}</span>}
-          <span className="footer-link" onClick={() => onNavigate('schemes')}>{t.schemes}</span>
-          <span className="footer-link" onClick={() => onNavigate('family')}>{t.family}</span>
-          <span className="footer-link" onClick={() => onNavigate('scam-shield')}>{t.scamShield}</span>
-          <div style={{ marginTop: '1rem' }}>
-            <h4 style={{ color: 'var(--lux-text)', marginBottom: '0.75rem', fontSize: '1rem' }}>{t.ecosystem}</h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <li><a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{ecosystemItems.gp[lang] || ecosystemItems.gp.en}</a></li>
-              <li><a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{ecosystemItems.csc[lang] || ecosystemItems.csc.en}</a></li>
-              <li><a href="#partners" onClick={(e) => { e.preventDefault(); onNavigate('partners'); }} className="footer-link">{partnerIntegrationsMap[lang] || partnerIntegrationsMap.en} <span className="pill-badge" style={{ fontSize: '10px', padding: '2px 6px' }}>Live</span></a></li>
-            </ul>
-          </div>
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>{t.product || 'Product'}</h3>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('home')}>{t.home || 'Home'}</span></li>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('planner')}>{t.planner || 'Planner'}</span></li>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('schemes')}>{t.schemes || 'Schemes'}</span></li>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('family')}>{t.family || 'Family'}</span></li>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('scam-shield')}>{t.scamShield || 'Scam Shield'}</span></li>
+          </ul>
         </div>
 
-        {/* Column 2 */}
+        {/* Column 3: Resources */}
         <div className="footer-nav-col">
-          <h3>{t.resources}</h3>
-          <span className="footer-link" onClick={() => onNavigate('schemes')}>{t.schemes}</span>
-          <a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{t.helpCenter}</a>
-          <a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{t.welfareGuides}</a>
-          <a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{t.blogNews}</a>
-          <a href="#" className="footer-link" onClick={(e) => e.preventDefault()}>{t.privacyPolicy}</a>
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>{t.resources || 'Resources'}</h3>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('home')}>{t.about || 'About'}</span></li>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('home')}>{t.privacy || 'Privacy'}</span></li>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('home')}>{t.terms || 'Terms'}</span></li>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('home')}>{t.contact || 'Contact'}</span></li>
+          </ul>
         </div>
 
-        {/* CTA Column */}
+        {/* Column 4: Community */}
+        <div className="footer-nav-col">
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>{t.community || 'Community'}</h3>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('home')}>{t.github || 'GitHub'}</span></li>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('home')}>{t.reportIssue || 'Report Issue'}</span></li>
+            <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('home')}>{t.linkedin || 'LinkedIn'}</span></li>
+          </ul>
+        </div>
+
+        {/* Right Side CTA */}
         {!user && (
-          <div className="footer-brand-action">
-            <div className="footer-cta-card">
-              <h3>{t.readyToGetStarted}</h3>
-              <p className="text-sm text-muted mb-3">{t.getStartedDesc}</p>
-              <button className="btn btn-primary w-full" onClick={() => onTriggerAuth(true)}>
-                {getStartedBtnText[lang] || getStartedBtnText.en}
+          <div className="footer-cta-col" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="premium-glass-cta" style={{ background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', textAlign: 'center' }}>
+              <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)', fontSize: '1.05rem' }}>{t.ctaReady || 'Ready to discover your eligible schemes?'}</h4>
+              <button 
+                className="btn btn-primary" 
+                onClick={() => onTriggerAuth(true)}
+                style={{ width: '100%', marginBottom: '0.5rem', background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))', border: 'none' }}
+              >
+                {t.ctaCreateProfile || 'Create Free Profile'}
               </button>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t.ctaMinutes || 'It only takes 2 minutes.'}</p>
             </div>
           </div>
         )}
 
       </div>
 
-      <div className="footer-bottom text-center">
-        <p>&copy; 2026 Yojana Saathi. {t.allRightsReserved}</p>
+      <div className="footer-bottom" style={{ borderTop: '1px solid var(--border-color)', padding: '1.5rem 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>&copy; 2026 Yojana Saathi</p>
+        <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+          <span className="cursor-pointer hover:text-primary transition-colors">{t.privacy || 'Privacy'}</span>
+          <span className="cursor-pointer hover:text-primary transition-colors">{t.terms || 'Terms'}</span>
+        </div>
+        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t.madeWithLove || 'Made with ❤️ for India'}</p>
       </div>
     </footer>
   );

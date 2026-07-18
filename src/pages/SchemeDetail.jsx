@@ -19,25 +19,31 @@ export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveSchem
   };
 
   const handleDownload = () => {
-    const content = `
-WELFARE PASSPORT CHECKLIST
---------------------------
-Scheme: ${scheme.name}
-Department: ${scheme.department}
-Fund Amount: ${scheme.amount}
+    import('jspdf').then(({ jsPDF }) => {
+      const pdf = new jsPDF();
+      pdf.setFontSize(16);
+      pdf.text('WELFARE PASSPORT CHECKLIST', 20, 20);
+      pdf.setFontSize(12);
+      pdf.text(`Scheme: ${scheme.name}`, 20, 30);
+      pdf.text(`Category: ${scheme.category}`, 20, 40);
+      pdf.text(`Fund Amount: ${scheme.benefit}`, 20, 50);
+      
+      pdf.text('REQUIRED DOCUMENTS:', 20, 70);
+      let y = 80;
+      scheme.docs.forEach(doc => {
+        pdf.text(`[ ] ${doc.name}`, 20, y);
+        y += 10;
+      });
 
-REQUIRED DOCUMENTS:
-${scheme.docs.map(doc => `- [ ] ${doc}`).join('\n')}
-
-ELIGIBILITY CRITERIA:
-${scheme.eligibility.map(crit => `- [ ] ${crit}`).join('\n')}
-
-Next Steps:
-1. Gather all required documents.
-2. Visit the nearest Common Service Centre (CSC) or apply online.
-3. Keep this checklist handy for tracking your application progress.
-    `.trim();
-    triggerLocalDownload(`${scheme.name.replace(/\s+/g, '_')}_Checklist.txt`, content);
+      pdf.text('ELIGIBILITY CRITERIA:', 20, y + 10);
+      y += 20;
+      scheme.eligibility.forEach(crit => {
+        pdf.text(`[ ] ${crit.name}`, 20, y);
+        y += 10;
+      });
+      
+      pdf.save(`${scheme.name.replace(/\s+/g, '_')}_Checklist.pdf`);
+    });
   };
 
   return (
@@ -52,8 +58,8 @@ Next Steps:
         {/* Top Hero block */}
         <div className="detail-hero">
           <div className="detail-title-block">
-            <div className="pill-badge">
-              <span className="badge-dot"></span> {scheme.type} Government Scheme
+            <div className={`pill-badge ${scheme.type === 'Central' ? 'badge-central' : 'badge-state'}`}>
+              <span className="badge-dot"></span> {scheme.type === 'Central' ? 'Central' : scheme.state} Government Scheme
             </div>
             <h1>{scheme.name}</h1>
             <div className="detail-meta-row">
@@ -173,6 +179,27 @@ Next Steps:
               <button className="btn btn-primary w-full" onClick={handleDownload}>
                 <Download size={16} /> Download Checklist
               </button>
+              <a 
+                href={`https://www.google.com/search?q=${encodeURIComponent(scheme.name + ' CSC service provider near me')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline w-full" 
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+              >
+                📍 Find Nearby CSC
+              </a>
+              <div style={{ textAlign: 'center', marginTop: '1rem', marginBottom: '0.5rem' }}>
+                <span className="text-xs text-muted" style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>Need Legal Help?</span>
+              </div>
+              <a 
+                href={`https://www.google.com/search?q=${encodeURIComponent(scheme.name + ' consultant near me')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline w-full" 
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+              >
+                ⚖️ Find Service Provider
+              </a>
             </div>
           </aside>
         </div>

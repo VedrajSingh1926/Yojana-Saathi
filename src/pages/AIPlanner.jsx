@@ -8,7 +8,27 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useLanguage } from '../context/LanguageContext';
 
-export default function AIPlanner({ initialPrompt, user }) {
+function TypewriterMarkdown({ content, speed = 10, ...props }) {
+  const [displayed, setDisplayed] = useState('');
+  useEffect(() => {
+    let i = 0;
+    setDisplayed('');
+    if (!content) return;
+    const timer = setInterval(() => {
+      setDisplayed((prev) => {
+        const nextChar = content.charAt(i);
+        i++;
+        if (i >= content.length) clearInterval(timer);
+        return prev + nextChar;
+      });
+    }, speed);
+    return () => clearInterval(timer);
+  }, [content, speed]);
+  
+  return <ReactMarkdown {...props}>{displayed}</ReactMarkdown>;
+}
+
+export default function AIPlanner({ initialPrompt, user, stateLocation }) {
   const { lang, setLang, t, gnaniLang } = useLanguage();
   const [chat, setChat] = useState(() => {
     try {
@@ -211,7 +231,7 @@ export default function AIPlanner({ initialPrompt, user }) {
     setInput('');
     setTyping(true);
 
-    const requestBody = { prompt: promptText, user, lang };
+    const requestBody = { prompt: promptText, user, lang, state: stateLocation || 'All States' };
 
     try {
       const res = await fetch(`${API_URL}/api/ai/planner`, {
@@ -366,20 +386,20 @@ export default function AIPlanner({ initialPrompt, user }) {
                   <div className={`message-bubble ${msg.sender} animate-slide-up`}>
                     {msg.sender === 'system' ? (
                       <div className="markdown-body">
-                        <ReactMarkdown 
+                        <TypewriterMarkdown
+                          content={msg.text}
+                          speed={5}
                           remarkPlugins={[remarkGfm]}
                           components={{
                             a: ({node, ...props}) => {
-                              const text = props.children?.[0];
-                              const isApply = text === 'Apply Now';
-                              const isLearn = text === 'Learn More';
-                              if (isApply || isLearn) {
+                              const isApply = props.children && String(props.children).toLowerCase().includes('apply');
+                              if (isApply) {
                                 return (
                                   <a 
                                     {...props} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className={`btn ${isApply ? 'btn-primary' : 'btn-outline'} btn-sm`}
+                                    className={`btn btn-primary btn-sm`}
                                     style={{ display: 'inline-flex', margin: '8px 8px 8px 0', textDecoration: 'none' }}
                                   >
                                     {props.children}
@@ -389,9 +409,7 @@ export default function AIPlanner({ initialPrompt, user }) {
                               return <a {...props} target="_blank" rel="noopener noreferrer" />;
                             }
                           }}
-                        >
-                          {msg.text}
-                        </ReactMarkdown>
+                        />
                       </div>
                     ) : (
                       <p style={{ margin: 0, whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>{msg.text}</p>
@@ -414,14 +432,25 @@ export default function AIPlanner({ initialPrompt, user }) {
                         <button 
                           className="btn-action-small" 
                           onClick={() => {
-                            const fileName = `ai_roadmap_step_${index}.txt`;
-                            const blob = new Blob([msg.text], { type: 'text/plain;charset=utf-8' });
-                            const link = document.createElement('a');
-                            link.href = URL.createObjectURL(blob);
-                            link.download = fileName;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
+                            import('jspdf').then(({ jsPDF }) => {
+                              const pdf = new jsPDF();
+                              pdf.setFontSize(14);
+                              pdf.text('AI Welfare Planner Roadmap', 10, 10);
+                              pdf.setFontSize(10);
+                              
+                              const splitText = pdf.splitTextToSize(msg.text.replace(/[*#]/g, ''), 190);
+                              let y = 20;
+                              splitText.forEach(line => {
+                                if (y > 280) {
+                                  pdf.addPage();
+                                  y = 10;
+                                }
+                                pdf.text(line, 10, y);
+                                y += 6;
+                              });
+                              
+                              pdf.save(`ai_roadmap_step_${index}.pdf`);
+                            });
                           }}
                           style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', transition: 'color 0.2s' }}
                           onMouseEnter={(e) => e.target.style.color = 'var(--text-primary)'}

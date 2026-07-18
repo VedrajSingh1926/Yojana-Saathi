@@ -93,11 +93,9 @@ export default function Home({ onNavigate, onTriggerAuth }) {
             <button className="btn btn-primary btn-lg" onClick={() => onTriggerAuth(true)}>
               {t.getStarted || "Get Started"} <ArrowRight size={18} />
             </button>
-            {lang === 'en' && (
-              <button className="btn btn-outline btn-outline-light btn-lg" onClick={() => onNavigate('planner')}>
-                <Sparkles size={18} className="text-gold" /> {t.tryPlanner || "Try AI Planner"}
-              </button>
-            )}
+            <button className="btn btn-outline btn-outline-light btn-lg" onClick={() => onNavigate('planner')}>
+              <Sparkles size={18} className="text-gold" /> {t.tryPlanner || "Try AI Planner"}
+            </button>
             <button className="btn btn-text btn-text-light btn-lg" onClick={() => onNavigate('schemes')}>
               {t.exploreSchemes || "Explore Schemes"} <ChevronRight size={18} />
             </button>
