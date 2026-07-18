@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, ShieldAlert, Key, Calendar, Loader } from 'lucide-react';
-import { API_URL } from '../config';
-
 export default function VerifyCard({ cardId, onLogin }) {
+  const API_URL = import.meta.env.VITE_API_URL || '';
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
