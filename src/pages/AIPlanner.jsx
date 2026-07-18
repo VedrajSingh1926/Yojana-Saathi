@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Sparkles, Mic, Plus, MessageSquare, Bookmark, History, Users, Paperclip } from 'lucide-react';
+import { Send, Sparkles, Mic, Plus, MessageSquare, Download, History, Users, Paperclip } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { convertWebmToWav } from '../utils/audioHelper';
 import ReactMarkdown from 'react-markdown';
@@ -238,7 +238,11 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
           <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>History</span>
             {history.length === 0 ? (
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', paddingLeft: '0.5rem' }}>No history yet.</span>
+              <div style={{ padding: '1.5rem 1rem', textAlign: 'center', background: 'rgba(0,0,0,0.02)', borderRadius: '12px', border: '1px dashed var(--border-color)', margin: '0.5rem 0' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>📂</div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>No conversations yet</div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Start your first AI planning session.</div>
+              </div>
             ) : (
               history.map(h => (
                 <button 
@@ -255,9 +259,12 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
             )}
           </div>
 
-          <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>Assets</span>
-            <button className="gpt-sidebar-btn" onClick={handleDownloadPDF}><Bookmark size={16} /> Download Roadmap PDF</button>
+            <button className="action-btn-vertical" onClick={handleDownloadPDF}>
+              <Download size={24} /> 
+              <span>Download Roadmap PDF</span>
+            </button>
             <button className="gpt-sidebar-btn" onClick={() => window.location.hash = 'family'}><History size={16} /> Welfare History</button>
             <button className="gpt-sidebar-btn" onClick={() => window.location.hash = 'family'}><Users size={16} /> Family Profiles</button>
           </div>
@@ -265,7 +272,7 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
 
         {/* Main Chat Area */}
         <div className="gpt-main-chat glass-card" style={{ padding: 0 }}>
-          <div className="chat-messages" style={{ flex: 1, padding: '2rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="chat-messages">
             <AnimatePresence>
               {chat.map((msg, index) => (
                 <motion.div 
@@ -340,33 +347,35 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
             <div ref={messagesEndRef} style={{ height: '1px' }} />
           </div>
 
-          <div className="chat-input-bar" style={{ padding: '1.25rem 2rem', borderTop: '1px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', gap: '12px', alignItems: 'center', flexShrink: 0 }}>
-            <button 
-              className={`btn btn-outline`} 
-              onClick={() => alert("Attachment functionality coming soon")}
-              style={{ width: '56px', height: '56px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}
-            >
-              <Paperclip size={20} />
-            </button>
-            <input 
-              type="text" 
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder={isListening ? "🔴 Recording... Click mic to stop" : isTranscribing ? "⏳ Transcribing audio..." : (t.askPlaceholder || "Ask AI: e.g. 'I want to open a small shop...'")}
-              disabled={isListening || isTranscribing}
-              style={{ flex: 1, padding: '0 1.5rem', borderRadius: '30px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)', fontSize: '1.05rem', outline: 'none', color: 'var(--text-primary)' }}
-            />
-            <button 
-              className={`btn ${isListening ? 'btn-primary' : 'btn-outline'}`} 
-              onClick={handleVoiceInput}
-              style={{ width: '56px', height: '56px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, animation: isListening ? 'pulse 1.5s infinite' : 'none' }}
-            >
-              <Mic size={22} />
-            </button>
-            <button className="btn btn-primary" onClick={() => handleSendPrompt(input)} style={{ width: '56px', height: '56px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>
-              <Send size={20} style={{ marginLeft: '2px' }} />
-            </button>
+          <div className="chat-input-bar">
+            <div className="chat-input-bar-inner">
+              <button 
+                className={`btn btn-outline`} 
+                onClick={() => alert("Attachment functionality coming soon")}
+                style={{ width: '50px', height: '50px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}
+              >
+                <Paperclip size={20} />
+              </button>
+              <input 
+                type="text" 
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder={isListening ? "🔴 Recording... Click mic to stop" : isTranscribing ? "⏳ Transcribing audio..." : (t.askPlaceholder || "Ask AI: e.g. 'I want to open a small shop...'")}
+                disabled={isListening || isTranscribing}
+                style={{ flex: 1, padding: '0 1.5rem', borderRadius: '28px', border: '1px solid var(--border-color)', background: 'var(--bg-darkest)', fontSize: '1.05rem', outline: 'none', color: 'var(--text-primary)' }}
+              />
+              <button 
+                className={`btn ${isListening ? 'btn-primary' : 'btn-outline'}`} 
+                onClick={handleVoiceInput}
+                style={{ width: '50px', height: '50px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0, animation: isListening ? 'pulse 1.5s infinite' : 'none' }}
+              >
+                <Mic size={22} />
+              </button>
+              <button className="btn btn-primary" onClick={() => handleSendPrompt(input)} style={{ width: '50px', height: '50px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 }}>
+                <Send size={20} style={{ marginLeft: '2px' }} />
+              </button>
+            </div>
           </div>
           
           <style>{`

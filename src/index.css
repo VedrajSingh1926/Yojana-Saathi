@@ -2997,22 +2997,34 @@ button, input, select, textarea {
 .gpt-main-chat { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 @media (max-width: 1024px) { .gpt-sidebar { display: none; } }
 /* ==================== PREMIUM AI PLANNER UI ==================== */
+/* ==================== PREMIUM AI PLANNER UI ==================== */
 .planner-view-section {
-  padding: 1.5rem 2rem 0 !important;
+  padding: 0 !important;
   background: radial-gradient(circle at top center, rgba(212,175,55,0.05) 0%, transparent 60%);
+  height: calc(100vh - var(--nav-height));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
+
 .planner-hero {
-  margin-bottom: 1.5rem !important;
+  padding: 1.5rem 2rem 0.5rem;
+  margin-bottom: 0 !important;
+  flex-shrink: 0;
 }
 
 .gpt-layout-container {
   display: flex;
   gap: 1.5rem;
-  height: calc(100vh - var(--nav-height) - 160px);
-  max-width: 1400px;
+  flex: 1;
+  max-width: 1500px;
+  width: 100%;
   margin: 0 auto;
   position: relative;
+  overflow: hidden;
+  padding: 0 1.5rem 1.5rem;
 }
+
 .gpt-layout-container::before {
   content: '';
   position: absolute;
@@ -3037,6 +3049,7 @@ button, input, select, textarea {
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+  height: 100%;
 }
 .gpt-sidebar::-webkit-scrollbar {
   width: 4px;
@@ -3073,6 +3086,29 @@ button, input, select, textarea {
   font-weight: 600;
 }
 
+.action-btn-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, rgba(217, 119, 54, 0.8) 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(217, 119, 54, 0.2);
+  text-align: center;
+  width: 100%;
+}
+.action-btn-vertical:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(217, 119, 54, 0.3);
+}
+
 /* Main Chat Box */
 .gpt-main-chat {
   flex: 1;
@@ -3085,13 +3121,22 @@ button, input, select, textarea {
   box-shadow: 0 8px 32px rgba(0,0,0,0.05);
   overflow: hidden;
   position: relative;
+  height: 100%;
 }
 
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 2rem;
+  padding: 2rem 2rem 4rem 2rem;
   scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.chat-messages > * {
+  width: 100%;
+  max-width: 800px;
 }
 .chat-messages::-webkit-scrollbar {
   width: 6px;
@@ -3104,17 +3149,28 @@ button, input, select, textarea {
 /* Chat Input Bar */
 .chat-input-bar {
   flex-shrink: 0;
-  padding: 1.5rem 2rem;
-  background: linear-gradient(to top, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
-  position: relative;
+  padding: 1rem 1.5rem;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,0.4);
+  display: flex;
+  justify-content: center;
+}
+.chat-input-bar-inner {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  max-width: 800px;
+  width: 100%;
 }
 .chat-input-bar input {
-  height: 60px;
-  border-radius: 30px;
+  height: 56px;
+  flex: 1;
+  border-radius: 28px;
   padding-left: 1.5rem;
   font-size: 1.05rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  border: 2px solid rgba(255,255,255,0.5);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.1);
   transition: all 0.3s ease;
   background: white;
 }
@@ -3131,6 +3187,7 @@ button, input, select, textarea {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  flex-shrink: 0;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 .chat-input-bar .btn:hover {
@@ -3146,6 +3203,8 @@ button, input, select, textarea {
   font-family: inherit;
   color: var(--text-primary);
   line-height: 1.6;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 .markdown-body p { margin-bottom: 1rem; }
 .markdown-body p:last-child { margin-bottom: 0; }
@@ -3176,7 +3235,7 @@ button, input, select, textarea {
 .markdown-body th { background: rgba(0,0,0,0.03); font-weight: 600; }
 .markdown-body pre { overflow-x: auto; max-width: 100%; background: #1e1e1e; color: #fff; padding: 1rem; border-radius: 8px; }
 
-.message-bubble .markdown-body { max-width: 850px; }
+.message-bubble .markdown-body { max-width: 100%; }
 
 /* Message bubbles layout */
 .message-bubble {
@@ -3218,28 +3277,34 @@ button, input, select, textarea {
 /* Mobile Responsiveness for AI Planner */
 @media (max-width: 1024px) {
   .gpt-layout-container {
-    height: calc(100vh - var(--nav-height) - 100px);
-    margin-top: 0.5rem;
+    padding: 0 0.5rem 0.5rem;
+    flex-direction: column;
   }
   .gpt-sidebar {
-    display: none; /* Hide sidebar on mobile */
+    display: none;
   }
   .planner-view-section {
-    padding: 1rem 0.5rem 0 !important;
+    padding: 0 !important;
+  }
+  .planner-hero {
+    padding: 1rem 1rem 0.5rem;
   }
   .chat-messages {
-    padding: 1rem;
+    padding: 1rem 1rem 2rem 1rem;
   }
   .chat-input-bar {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
+  }
+  .chat-input-bar-inner {
+    max-width: 100%;
   }
   .chat-input-bar input {
     height: 50px;
     font-size: 1rem;
+    padding-left: 1rem;
   }
   .chat-input-bar .btn {
     width: 45px;
     height: 45px;
   }
 }
-
