@@ -109,9 +109,11 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1);
 });
 
-app.listen(port, () => {
-  logger.info(`Server is running on port: ${port}`);
-});
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(port, () => {
+    logger.info(`Server is running on port: ${port}`);
+  });
+}
 
 export default app;
 

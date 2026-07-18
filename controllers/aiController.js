@@ -89,13 +89,13 @@ export const tts = async (req, res, next) => {
 
 export const planner = async (req, res, next) => {
   try {
-    const { prompt, user } = req.body;
+    const { prompt, user, lang } = req.body;
     
     const userId = user?.saathiId || 'anonymous';
     const household = user?.family || 'Unknown household structure';
     
-    logger.info('Planner request received', { userId, promptLength: prompt.length });
-    const aiResponse = await AlchemystService.orchestrate(userId, household, prompt);
+    logger.info('Planner request received', { userId, promptLength: prompt.length, lang });
+    const aiResponse = await AlchemystService.orchestrate(userId, household, prompt, lang);
     
     return res.status(200).json({ success: true, reply: aiResponse });
   } catch (error) {

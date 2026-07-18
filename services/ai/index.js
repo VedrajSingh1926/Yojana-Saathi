@@ -128,12 +128,20 @@ export class Mem0Service {
 
     try {
       // Use search to retrieve relevant context
-      const results = await client.search("What is the user's context and history?", { user_id: userId });
+      const results = await client.search(userId, { user_id: userId, limit: 5 });
       
-      if (results && Array.isArray(results)) {
-        return results.map(m => m.memory).join('\n');
-      } else if (results && results.data) {
-        return results.data.map(m => m.memory).join('\n');
+      let memories = [];
+      // Handle various response shapes from Mem0
+      if (Array.isArray(results)) {
+        memories = results;
+      } else if (results && Array.isArray(results.data)) {
+        memories = results.data;
+      } else if (results && Array.isArray(results.results)) {
+        memories = results.results;
+      }
+      
+      if (memories.length > 0) {
+        return memories.map(m => m.memory).join('\n');
       }
       return null;
     } catch (error) {
@@ -159,8 +167,8 @@ export class OutlierService {
 
 // 4. Alchemyst AI Orchestrator
 export class AlchemystService {
-  static async orchestrate(userId, currentHousehold, userPrompt) {
-    logger.info('Alchemyst Starting orchestration', { userId });
+  static async orchestrate(userId, currentHousehold, userPrompt, lang = 'en') {
+    logger.info('Alchemyst Starting orchestration', { userId, lang });
     
     const query = userPrompt;
     const household = currentHousehold;
@@ -185,8 +193,16 @@ export class AlchemystService {
       documents: docsContext
     };
     
+    // Inject Language requirement into the prompt
+    let localizedQuery = query;
+    if (lang !== 'en') {
+      const langNames = { hi: "Hindi", ta: "Tamil", te: "Telugu", bn: "Bengali" };
+      const requestedLanguage = langNames[lang] || lang;
+      localizedQuery = `[CRITICAL REQUIREMENT: YOU MUST FORMULATE YOUR ENTIRE RESPONSE STRICTLY IN ${requestedLanguage}. Translate all advice, headers, and descriptions to ${requestedLanguage}.] \n\n${query}`;
+    }
+
     // Core Gemini generation
-    const response = await GeminiService.generateRecommendation(richContext, query);
+    const response = await GeminiService.generateRecommendation(richContext, localizedQuery);
     
     OutlierService.evaluateResponse(query, response);
     
