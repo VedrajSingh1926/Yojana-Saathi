@@ -123,7 +123,8 @@ export const register = async (req, res, next) => {
       state: personal.state,
       district: personal.district,
       household: {
-        headName: household?.isHead === 'Yes' ? personal.name : '',
+        isHead: household?.isHead === 'Yes',
+        headName: household?.isHead === 'Yes' ? personal.name : household?.headName,
         totalMembers: (household?.members?.length || 0) + 1,
         annualIncome: Number(personal.income) || 0,
         members: household?.members || []
@@ -243,6 +244,55 @@ export const login = async (req, res, next) => {
     }
 
     return res.status(200).json({ success: true, message: 'Logged in successfully', user, saathiId: user.saathiId });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyCard = async (req, res, next) => {
+  try {
+    const { saathiId } = req.params;
+    if (!saathiId) return res.status(400).json({ success: false, message: 'Saathi ID is required' });
+
+    const user = await User.findOne({ saathiId: saathiId.toUpperCase() });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Card not found' });
+    }
+
+    // Determine the Household Head Name
+    let headName = '';
+    if (user.household?.isHead) {
+      headName = user.fullName;
+    } else if (user.household?.headName) {
+      headName = user.household.headName;
+    } else {
+      headName = user.fullName; // fallback
+    }
+
+    // Mask the Household Head Name
+    let maskedHeadName = headName;
+    if (headName.length > 3) {
+      const parts = headName.split(' ');
+      maskedHeadName = parts.map(part => {
+        if (part.length <= 2) return part;
+        return part[0] + '*'.repeat(part.length - 2) + part[part.length - 1];
+      }).join(' ');
+    }
+
+    // Mask the Saathi ID (e.g. YS-*******281)
+    const maskedSaathiId = 'YS-*******' + saathiId.slice(-3);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        verificationStatus: 'Verified',
+        maskedHeadName,
+        maskedSaathiId,
+        cardStatus: 'Active',
+        issueDate: user.createdAtIST ? user.createdAtIST.split(',')[0] : new Date(user.createdAt).toLocaleDateString('en-GB'),
+        lastUpdated: user.updatedAt ? new Date(user.updatedAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
+      }
+    });
   } catch (error) {
     next(error);
   }

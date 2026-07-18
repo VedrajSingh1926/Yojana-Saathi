@@ -17,7 +17,10 @@ export const stt = async (req, res, next) => {
     const formData = new FormData();
     const audioBlob = new Blob([req.file.buffer], { type: req.file.mimetype || 'audio/webm' });
     formData.append('audio_file', audioBlob, req.file.originalname || 'audio.webm');
-    formData.append('language_code', req.body.language || 'en-IN');
+    
+    let langCode = req.body.language || 'en';
+    if (langCode.length === 2) langCode += '-IN';
+    formData.append('language_code', langCode);
 
     logger.info('Calling Gnani STT API');
     const response = await fetchWithTimeoutAndRetry('https://api.vachana.ai/stt/v3', {

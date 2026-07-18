@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   state: { type: String },
   district: { type: String },
   household: {
+    isHead: { type: Boolean },
     headName: { type: String },
     totalMembers: { type: Number },
     annualIncome: { type: Number },

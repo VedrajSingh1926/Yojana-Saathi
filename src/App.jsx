@@ -16,6 +16,7 @@ import Onboarding from './pages/Onboarding';
 import GovFormAssistant from './pages/GovFormAssistant';
 import Partners from './pages/Partners';
 import OutlierDashboard from './pages/OutlierDashboard';
+import VerifyCard from './pages/VerifyCard';
 
 export default function App() {
   const [activeView, setActiveView] = useState('home');
@@ -42,6 +43,10 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
+      if (hash.startsWith('verify/')) {
+        setActiveView('verify');
+        return;
+      }
       if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant', 'partners', 'outlier'].includes(hash)) {
         setActiveView(hash);
       }
@@ -91,17 +96,36 @@ export default function App() {
       const userIncome = isFromDB ? (registeredData.household?.annualIncome || 0) : (parseInt(registeredData.personal?.income) || 0);
       const userPhone = isFromDB ? registeredData.mobileNumber : (registeredData.personal?.phone || '9999999999');
 
+      let userRelation = "Head";
+      let headName = userName;
+
+      if (!isFromDB && registeredData.household?.isHead === 'No') {
+        userRelation = "Applicant";
+        headName = registeredData.household?.headName || "Head";
+      } else if (isFromDB && !registeredData.household?.isHead) {
+        userRelation = "Applicant";
+        headName = registeredData.household?.headName || "Head";
+      }
+
       // Create dynamic user profile from registration data
-      const familyMembers = [
-        { 
-          name: userName, 
+      const familyMembers = [];
+      
+      if (userRelation === "Applicant") {
+        familyMembers.push({ 
+          name: headName, 
           relation: "Head", 
-          age: userAge, 
-          occupation: userOccupation, 
-          income: userIncome, 
-          status: "Verified" 
-        }
-      ];
+          age: 0, occupation: 'N/A', income: 0, status: "Pending" 
+        });
+      }
+
+      familyMembers.push({ 
+        name: userName, 
+        relation: userRelation, 
+        age: userAge, 
+        occupation: userOccupation, 
+        income: userIncome, 
+        status: "Verified" 
+      });
 
       if (registeredData.household && registeredData.household.members) {
         registeredData.household.members.forEach(m => {
@@ -225,6 +249,15 @@ export default function App() {
   const handleMarkNotiRead = (id) => {
     setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
   };
+
+  // If verify view, render only verify card
+  if (activeView === 'verify') {
+    const cardId = window.location.hash.split('/')[1] || '';
+    return <VerifyCard cardId={cardId} onLogin={() => {
+      handleNavigate('home');
+      setTimeout(() => setIsAuthOpen(true), 100);
+    }} />;
+  }
 
   return (
     <div className="app-shell">

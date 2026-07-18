@@ -6,7 +6,8 @@ import {
   saathiLookup, 
   checkNumber, 
   recover, 
-  login 
+  login,
+  verifyCard
 } from '../controllers/authController.js';
 
 const router = express.Router();
@@ -18,5 +19,6 @@ router.post('/saathi-lookup', saathiLookup);
 router.post('/check-number', checkNumber);
 router.post('/recover', recover);
 router.post('/login', login);
+router.get('/verify/:saathiId', verifyCard);
 
 export default router;
