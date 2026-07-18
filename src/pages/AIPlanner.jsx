@@ -274,11 +274,11 @@ export default function AIPlanner({ initialPrompt, user, lang }) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, ease: "easeOut" }}
                   className={`message ${msg.sender === 'user' ? 'user-message' : 'system-message'}`} 
-                  style={{ marginBottom: 0, maxWidth: '100%' }}
+                  style={{ marginBottom: 0, maxWidth: '100%', display: 'flex', gap: '1rem', flexDirection: msg.sender === 'user' ? 'row-reverse' : 'row' }}
                 >
-                  {msg.sender === 'system' && <div className="bot-avatar"><Sparkles size={16} /></div>}
+                  {msg.sender === 'system' && <div className="bot-avatar" style={{ marginTop: '0.5rem', width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--gold) 0%, var(--primary) 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Sparkles size={16} /></div>}
                   
-                  <div className="message-bubble" style={{ maxWidth: msg.sender === 'system' ? '100%' : '85%', overflow: 'hidden' }}>
+                  <div className={`message-bubble ${msg.sender}`} style={{ maxWidth: msg.sender === 'system' ? '100%' : '85%', overflow: 'hidden' }}>
                     {msg.sender === 'system' ? (
                       <div className="markdown-body" style={{ margin: 0, whiteSpace: 'normal', lineHeight: '1.6', fontSize: '1rem', color: 'var(--text-primary)' }}>
                         <ReactMarkdown 

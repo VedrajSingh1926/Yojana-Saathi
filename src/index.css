@@ -3214,3 +3214,32 @@ button, input, select, textarea {
   box-shadow: 0 8px 24px rgba(0,0,0,0.06);
   border-color: rgba(212,175,55,0.4);
 }
+
+/* Mobile Responsiveness for AI Planner */
+@media (max-width: 1024px) {
+  .gpt-layout-container {
+    height: calc(100vh - var(--nav-height) - 100px);
+    margin-top: 0.5rem;
+  }
+  .gpt-sidebar {
+    display: none; /* Hide sidebar on mobile */
+  }
+  .planner-view-section {
+    padding: 1rem 0.5rem 0 !important;
+  }
+  .chat-messages {
+    padding: 1rem;
+  }
+  .chat-input-bar {
+    padding: 1rem;
+  }
+  .chat-input-bar input {
+    height: 50px;
+    font-size: 1rem;
+  }
+  .chat-input-bar .btn {
+    width: 45px;
+    height: 45px;
+  }
+}
+
