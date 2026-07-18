@@ -76,12 +76,15 @@ const __dirname = path.dirname(__filename);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'dist')));
-  app.get('*', (req, res) => {
+  app.use((req, res, next) => {
     // Exclude /api routes from being caught by the static server routing
     if (req.originalUrl.startsWith('/api')) {
       return res.status(404).json({ success: false, message: 'API Route Not Found' });
     }
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    if (req.method === 'GET') {
+      return res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    }
+    next();
   });
 }
 

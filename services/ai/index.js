@@ -6,7 +6,10 @@ import { fetchWithTimeoutAndRetry } from '../../utils/http.js';
 export class GeminiService {
   static async generateRecommendation(context, prompt) {
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
+    if (!apiKey) {
+      logger.warn('GEMINI_API_KEY is not set. Returning fallback response.');
+      return { text: "AI is currently unavailable because the API key is missing. Please contact support.", roadmap: null };
+    }
 
     try {
       // Check if it's a bearer token (Google OAuth tokens usually start with ya29)
@@ -90,7 +93,10 @@ export class GeminiService {
 export class Mem0Service {
   static async storeContext(userId, contextData) {
     const apiKey = process.env.MEM0_API_KEY;
-    if (!apiKey) throw new Error('MEM0_API_KEY is not set');
+    if (!apiKey) {
+      logger.warn('MEM0_API_KEY is not set. Skipping context storage.');
+      return false;
+    }
 
     try {
       let memoryContent = typeof contextData === 'string' ? contextData : JSON.stringify(contextData);
@@ -112,7 +118,10 @@ export class Mem0Service {
 
   static async retrieveContext(userId) {
     const apiKey = process.env.MEM0_API_KEY;
-    if (!apiKey) throw new Error('MEM0_API_KEY is not set');
+    if (!apiKey) {
+      logger.warn('MEM0_API_KEY is not set. Skipping context retrieval.');
+      return null;
+    }
 
     try {
       const res = await fetchWithTimeoutAndRetry(`https://api.mem0.ai/v1/memories?user_id=${userId}`, {
