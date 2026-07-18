@@ -154,8 +154,7 @@ export default {
   outlierTitle: "ব্যতিক্রম ড্যাশবোর্ড",
   
   // Partners
-  partnersTitle: "অংশীদার নেটওয়ার্ক"
-
+  partnersTitle: "অংশীদার নেটওয়ার্ক",
   // Added dynamically
   findNearbyCsc: "নিকটবর্তী সিএসসি খুঁজুন",
   clear: "মুছুন",

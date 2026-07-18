@@ -171,8 +171,7 @@ export default {
   outlierTitle: "विसंगति का पता लगाने वाला डैशबोर्ड",
   
   // Partners
-  partnersTitle: "पार्टनर नेटवर्क"
-
+  partnersTitle: "पार्टनर नेटवर्क",
   // Added dynamically
   findNearbyCsc: "निकटतम सीएससी खोजें",
   clear: "साफ़ करें",

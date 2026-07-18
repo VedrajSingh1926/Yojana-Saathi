@@ -154,8 +154,7 @@ export default {
   outlierTitle: "అసాధారణ తనిఖీ డాష్‌బోర్డ్",
   
   // Partners
-  partnersTitle: "భాగస్వామ్య నెట్‌వర్క్"
-
+  partnersTitle: "భాగస్వామ్య నెట్‌వర్క్",
   // Added dynamically
   findNearbyCsc: "సమీప CSC కనుగొనండి",
   clear: "క్లియర్",

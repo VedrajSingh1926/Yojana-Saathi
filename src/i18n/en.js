@@ -173,8 +173,7 @@ export default {
   step4Title: "Apply Smarter",
   step4Desc: "Detailed document checklists and instructions show you how to apply.",
   step5Title: "Receive Benefits",
-  step5Desc: "Track steps from validation to final direct bank transfer."
-
+  step5Desc: "Track steps from validation to final direct bank transfer.",
   // Added dynamically
   findNearbyCsc: "Find Nearby CSC",
   clear: "Clear",

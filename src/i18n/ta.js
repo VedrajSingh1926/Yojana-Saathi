@@ -154,8 +154,7 @@ export default {
   outlierTitle: "முரண்பாடு கண்டறிதல் டாஷ்போர்டு",
   
   // Partners
-  partnersTitle: "பங்குதாரர் நெட்வொர்க்"
-
+  partnersTitle: "பங்குதாரர் நெட்வொர்க்",
   // Added dynamically
   findNearbyCsc: "அருகிலுள்ள சிஎஸ்சி-யைக் கண்டறிக",
   clear: "அழி",
