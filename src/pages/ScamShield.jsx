@@ -14,56 +14,52 @@ export default function ScamShield({ lang }) {
     setText(sampleScam);
   };
 
-  const handleScan = () => {
+  const handleScan = async () => {
     if (!text.trim()) {
       alert("Please paste a suspicious message first.");
       return;
     }
 
-    let urlScore = 100;
-    let paymentScore = 100;
-    let urgencyScore = 100;
+    setReport({ loading: true });
 
-    const lowerText = text.toLowerCase();
+    try {
+      const response = await fetch(import.meta.env.VITE_API_URL + '/api/ai/scam-scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        const { safetyIndex, urlScore, paymentScore, urgencyScore, verdict, reason } = data.data;
+        
+        let verdictClass = 'color-success';
+        let fillClass = 'bg-success';
+        if (safetyIndex < 40) {
+          verdictClass = 'color-danger';
+          fillClass = 'bg-danger';
+        } else if (safetyIndex < 80) {
+          verdictClass = 'color-warning';
+          fillClass = 'bg-warning';
+        }
 
-    // Heuristics checks
-    if (lowerText.includes("http") || lowerText.includes(".in/") || lowerText.includes(".net")) {
-      if (!lowerText.includes("gov.in") && !lowerText.includes("nic.in")) {
-        urlScore = 10;
+        setReport({
+          safetyIndex,
+          verdict,
+          verdictClass,
+          fillClass,
+          reason,
+          scores: { url: urlScore, payment: paymentScore, urgency: urgencyScore }
+        });
+      } else {
+        alert("Failed to analyze message.");
+        setReport(null);
       }
+    } catch (err) {
+      console.error(err);
+      alert("Error connecting to Scam Shield API.");
+      setReport(null);
     }
-
-    if (lowerText.includes("deposit") || lowerText.includes("pay") || lowerText.includes("fee") || lowerText.includes("transfer") || lowerText.includes("rs.") || lowerText.includes("₹") || lowerText.includes("upi")) {
-      paymentScore = 15;
-    }
-
-    if (lowerText.includes("immediately") || lowerText.includes("urgent") || lowerText.includes("right now") || lowerText.includes("action required") || lowerText.includes("expire")) {
-      urgencyScore = 20;
-    }
-
-    const safetyIndex = Math.round((urlScore + paymentScore + urgencyScore) / 3);
-
-    let verdict = 'SAFE';
-    let verdictClass = 'color-success';
-    let fillClass = 'bg-success';
-
-    if (safetyIndex < 40) {
-      verdict = 'DANGER: PHISHING FRAUD DETECTED';
-      verdictClass = 'color-danger';
-      fillClass = 'bg-danger';
-    } else if (safetyIndex < 80) {
-      verdict = 'WARNING: SUSPICIOUS CONTENT';
-      verdictClass = 'color-warning';
-      fillClass = 'bg-warning';
-    }
-
-    setReport({
-      safetyIndex,
-      verdict,
-      verdictClass,
-      fillClass,
-      scores: { url: urlScore, payment: paymentScore, urgency: urgencyScore }
-    });
   };
 
   return (
@@ -99,6 +95,12 @@ export default function ScamShield({ lang }) {
               <ShieldCheck className="text-cyan large-shield" size={48} style={{ margin: '0 auto 1rem' }} />
               <h3>Scam Shield Ready</h3>
               <p className="text-muted text-sm">Enter content on the left to run safety scanning. We run vocabulary heuristics, domain checking, and government API lookups.</p>
+            </div>
+          ) : report.loading ? (
+            <div className="scam-result-placeholder">
+              <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
+              <h3>Analyzing Threat...</h3>
+              <p className="text-muted text-sm">Gemini is inspecting the message for fraud indicators.</p>
             </div>
           ) : (
             <div className="diagnostic-report w-full">
@@ -141,10 +143,7 @@ export default function ScamShield({ lang }) {
               <div className="report-hints">
                 <h4>AI Threat Diagnostic:</h4>
                 <p className="text-xs text-secondary mt-1">
-                  {report.safetyIndex < 50 ? 
-                    "This message fails multiple government safety checks. Government welfare funds NEVER demand processing deposits or security transfers via UPI. Furthermore, the URL links lead to an unofficial server domain." : 
-                    "No critical threat indicators matched. However, always ensure you only submit details to official websites ending in '.gov.in' or '.nic.in'."
-                  }
+                  {report.reason}
                 </p>
               </div>
             </div>
@@ -156,7 +155,7 @@ export default function ScamShield({ lang }) {
       <section className="section-container">
         <div className="section-header text-center">
           <span className="section-tagline text-orange">RECENT THREAT ALERTS</span>
-          <h2 class="section-title">Active Fraud Alerts</h2>
+          <h2 className="section-title">Active Fraud Alerts</h2>
         </div>
         <div className="scam-threats-grid">
           <div className="threat-card card-danger">
@@ -169,14 +168,14 @@ export default function ScamShield({ lang }) {
           </div>
           <div className="threat-card card-warning">
             <div className="threat-header">
-              <span class="threat-badge badge-warning">HIGH</span>
+              <span className="threat-badge badge-warning">HIGH</span>
               <span className="threat-date">June 2026</span>
             </div>
             <h4>Phishing Site: 'pm-awas-subsidy.in'</h4>
             <p>A replica portal asking applicants to transfer a "security verification deposit" of ₹2,500 via UPI. <strong>Government housing allocation is free.</strong></p>
           </div>
           <div className="threat-card card-warning">
-            <div class="threat-header">
+            <div className="threat-header">
               <span className="threat-badge badge-warning">HIGH</span>
               <span className="threat-date">June 2026</span>
             </div>

@@ -1,4 +1,4 @@
-import { AlchemystService } from '../services/ai/index.js';
+import { AlchemystService, GeminiService } from '../services/ai/index.js';
 import { logger } from '../utils/logger.js';
 import { fetchWithTimeoutAndRetry } from '../utils/http.js';
 

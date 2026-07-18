@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ChevronRight, User, Home, Upload, Target, Sparkles, Loader2, Plus, X, Users, Fingerprint } from 'lucide-react';
+import { triggerLocalDownload } from '../utils/downloadHelper';
 
 export default function Onboarding({ stateLocation, onChangeState, onComplete, onTriggerAuth }) {
   const [step, setStep] = useState(1);
@@ -632,7 +633,19 @@ export default function Onboarding({ stateLocation, onChangeState, onComplete, o
                 <button 
                   className="btn btn-primary" 
                   style={{ flex: 1 }}
-                  onClick={() => alert("Downloading ID Card (Demo)...")}
+                  onClick={() => {
+                    const content = `
+YOJANA SAATHI DIGITAL ID
+------------------------
+Saathi ID: ${saathiId}
+Name: ${formData.personal.name}
+State: ${formData.personal.state}
+Date Issued: ${new Date().toLocaleDateString('en-GB')}
+
+Keep this ID safe. It is your single access point to track all government welfare schemes and disbursements.
+                    `.trim();
+                    triggerLocalDownload(`Saathi_Card_${saathiId}.txt`, content);
+                  }}
                 >
                   Download Card
                 </button>

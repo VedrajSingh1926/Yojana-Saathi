@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Landmark, Info, Banknote, ListChecks, FileText, Compass, HelpCircle, Globe, Download, Bookmark, Sparkles } from 'lucide-react';
+import { triggerLocalDownload } from '../utils/downloadHelper';
 import { SCHEMES_DB } from '../data/schemes';
 
 export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveScheme }) {
@@ -17,7 +18,25 @@ export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveSchem
   };
 
   const handleDownload = () => {
-    alert(`Checklist download triggered for: ${scheme.name}\nWe have packed: PDF Eligibility rules, local office locations, and blank copies of required self-declaration forms.`);
+    const content = `
+WELFARE PASSPORT CHECKLIST
+--------------------------
+Scheme: ${scheme.name}
+Department: ${scheme.department}
+Fund Amount: ${scheme.amount}
+
+REQUIRED DOCUMENTS:
+${scheme.docs.map(doc => `- [ ] ${doc}`).join('\n')}
+
+ELIGIBILITY CRITERIA:
+${scheme.eligibility.map(crit => `- [ ] ${crit}`).join('\n')}
+
+Next Steps:
+1. Gather all required documents.
+2. Visit the nearest Common Service Centre (CSC) or apply online.
+3. Keep this checklist handy for tracking your application progress.
+    `.trim();
+    triggerLocalDownload(`${scheme.name.replace(/\s+/g, '_')}_Checklist.txt`, content);
   };
 
   return (
