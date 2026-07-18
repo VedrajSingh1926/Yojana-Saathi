@@ -141,7 +141,7 @@ export default function Home({ onNavigate, onTriggerAuth }) {
       <section className="section-container bg-dark-gradient">
         <div className="section-header text-center">
           <span className="section-tagline">{t.howItWorks || "HOW YOJANA SAATHI WORKS"}</span>
-          <h2 className="section-title">{t.howItWorksTitle || "Simple Steps. Maximum Benefits."}</h2>
+          <h2 className="section-title">{t.simpleSteps || "Simple Steps. Maximum Benefits."}</h2>
         </div>
         
         <div className="steps-grid">

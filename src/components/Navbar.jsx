@@ -43,7 +43,7 @@ export default function Navbar({
 
   const navLinks = [
     { id: 'home', label: t.home || 'Home' },
-    ...(lang === 'en' ? [{ id: 'planner', label: t.planner || 'Planner' }] : []),
+    { id: 'planner', label: t.planner || 'Planner' },
     { id: 'schemes', label: t.schemes || 'Schemes' },
     { id: 'family', label: t.family || 'Family' },
     { id: 'scam-shield', label: t.scamShield || 'Scam Shield' }

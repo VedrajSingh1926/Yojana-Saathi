@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 export default function ScamShield() {
   const { lang, t } = useLanguage();
   const [text, setText] = useState('');
+  const [report, setReport] = useState(null);
 
   const localizedScam = {
     en: {

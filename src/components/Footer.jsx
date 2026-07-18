@@ -2,8 +2,28 @@ import React from 'react';
 import { Globe, Link, Video, Camera } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
+const brandDescMap = {
+  en: "Empowering 1.4 billion Indians with AI-driven welfare access.",
+  hi: "1.4 अरब भारतीयों को एआई-संचालित कल्याण तक पहुंच के साथ सशक्त बनाना।"
+};
+
+const ecosystemItems = {
+  gp: { en: "Gram Panchayat Login", hi: "ग्राम पंचायत लॉगिन" },
+  csc: { en: "CSC VLE Portal", hi: "सीएससी वीएलई पोर्टल" }
+};
+
+const partnerIntegrationsMap = {
+  en: "Partner Integrations",
+  hi: "पार्टनर इंटीग्रेशन"
+};
+
+const getStartedBtnText = {
+  en: "Create Free Profile",
+  hi: "मुफ्त प्रोफाइल बनाएं"
+};
+
 export default function Footer({ user, onNavigate, onTriggerAuth }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   return (
     <footer className="glass-footer">
       <div className="footer-container">

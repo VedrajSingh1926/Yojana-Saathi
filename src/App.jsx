@@ -4,7 +4,7 @@ import Footer from './components/Footer';
 import AuthModal from './components/AuthModal';
 import CompareModal from './components/CompareModal';
 import EligibilityPopup from './components/EligibilityPopup';
-
+import { useLanguage } from './context/LanguageContext';
 // Pages
 import Home from './pages/Home';
 import Schemes from './pages/Schemes';
@@ -19,6 +19,7 @@ import OutlierDashboard from './pages/OutlierDashboard';
 import VerifyCard from './pages/VerifyCard';
 
 export default function App() {
+  const { lang, t } = useLanguage();
   const [activeView, setActiveView] = useState('home');
   const [detailSchemeId, setDetailSchemeId] = useState(null);
   const [plannerPrompt, setPlannerPrompt] = useState('');
@@ -47,11 +48,7 @@ export default function App() {
         return;
       }
       if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant', 'partners', 'outlier'].includes(hash)) {
-        if (hash === 'planner' && lang !== 'en') {
-          handleNavigate('home');
-        } else {
-          setActiveView(hash);
-        }
+        setActiveView(hash);
       }
     };
     window.addEventListener('hashchange', handleHashChange);

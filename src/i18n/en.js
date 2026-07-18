@@ -153,6 +153,19 @@ export default {
   // Outlier
   outlierTitle: "Anomaly Detection Dashboard",
   
-  // Partners
-  partnersTitle: "Partner Network"
+  partnersTitle: "Partner Network",
+  
+  // How it works
+  howItWorks: "HOW YOJANA SAATHI WORKS",
+  simpleSteps: "Simple Steps. Maximum Benefits.",
+  step1Title: "Create Profile",
+  step1Desc: "Tell us about your family size, income, land status, and needs.",
+  step2Title: "AI Understands",
+  step2Desc: "Our engine matches your background to hundreds of government rules.",
+  step3Title: "Find Schemes",
+  step3Desc: "Instantly discover central and state schemes you qualify for.",
+  step4Title: "Apply Smarter",
+  step4Desc: "Detailed document checklists and instructions show you how to apply.",
+  step5Title: "Receive Benefits",
+  step5Desc: "Track steps from validation to final direct bank transfer."
 };
