@@ -1,5 +1,5 @@
 import React from 'react';
-import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
+import { Globe, Mail } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Footer({ user, onNavigate, onTriggerAuth }) {
@@ -19,9 +19,9 @@ export default function Footer({ user, onNavigate, onTriggerAuth }) {
             {t.brandDesc || "India's AI Welfare Operating System"}
           </p>
           <div className="social-links" style={{ display: 'flex', gap: '1rem' }}>
-            <a href="#" className="social-icon" style={{ color: 'var(--text-muted)' }}><Github size={18} /></a>
-            <a href="#" className="social-icon" style={{ color: 'var(--text-muted)' }}><Linkedin size={18} /></a>
-            <a href="#" className="social-icon" style={{ color: 'var(--text-muted)' }}><Twitter size={18} /></a>
+            <a href="#" className="social-icon" style={{ color: 'var(--text-muted)' }}><Globe size={18} /></a>
+            <a href="#" className="social-icon" style={{ color: 'var(--text-muted)' }}><Globe size={18} /></a>
+            <a href="#" className="social-icon" style={{ color: 'var(--text-muted)' }}><Globe size={18} /></a>
             <a href="#" className="social-icon" style={{ color: 'var(--text-muted)' }}><Mail size={18} /></a>
           </div>
         </div>
