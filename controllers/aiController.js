@@ -72,7 +72,8 @@ export const tts = async (req, res, next) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`TTS API Failed: ${response.status} ${errorText}`);
+      logger.warn(`TTS API Failed: ${response.status} ${errorText}`);
+      return res.status(502).json({ success: false, message: 'TTS provider API failed', error: errorText });
     }
 
     // Assuming it returns an audio stream
@@ -83,7 +84,7 @@ export const tts = async (req, res, next) => {
     return res.send(buffer);
   } catch (error) {
     logger.error('Gnani TTS Error', error);
-    next(error);
+    return res.status(500).json({ success: false, message: 'TTS fetch error', error: error.message });
   }
 };
 
