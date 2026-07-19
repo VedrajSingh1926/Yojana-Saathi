@@ -73,15 +73,15 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         {/* Left Side: Image */}
         <div className="modal-split-image" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1590403328249-14a9a08eec13?auto=format&fit=crop&q=80&w=1000)' }}>
           <div className="modal-split-image-overlay">
-            <h3 className="text-white">Your Family's Digital Welfare Passport</h3>
-            <p className="text-white-alpha mt-2">Unlock personalized schemes, track applications, and store your important documents securely in one place.</p>
+            <h3 className="text-white">{t.authTitle || "Your Family's Digital Welfare Passport"}</h3>
+            <p className="text-white-alpha mt-2">{t.authDesc || "Unlock personalized schemes, track applications, and store your important documents securely in one place."}</p>
           </div>
         </div>
 
         {/* Right Side: Form */}
         <div className="modal-split-content">
           <div className="modal-header border-0 pb-0">
-            <h2>Sign In to Yojana Saathi</h2>
+            <h2>{t.signInTitle || "Sign In to Yojana Saathi"}</h2>
             <button className="close-modal" onClick={onClose}><X size={20} /></button>
           </div>
           
@@ -93,20 +93,20 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                     style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: loginMethod === 'mobile' ? 'white' : 'transparent', boxShadow: loginMethod === 'mobile' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', fontWeight: loginMethod === 'mobile' ? 600 : 500, color: loginMethod === 'mobile' ? 'var(--lux-text)' : 'var(--lux-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', cursor: 'pointer' }}
                     onClick={() => { setLoginMethod('mobile'); setPhone(''); setPassword(''); }}
                   >
-                    <Phone size={16} /> Mobile
+                    <Phone size={16} /> {t.mobile || "Mobile"}
                   </button>
                   <button 
                     style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: loginMethod === 'saathi' ? 'white' : 'transparent', boxShadow: loginMethod === 'saathi' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none', fontWeight: loginMethod === 'saathi' ? 600 : 500, color: loginMethod === 'saathi' ? 'var(--lux-text)' : 'var(--lux-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', cursor: 'pointer' }}
                     onClick={() => { setLoginMethod('saathi'); setSaathiId(''); setPassword(''); }}
                   >
-                    <Fingerprint size={16} /> Saathi ID
+                    <Fingerprint size={16} /> {t.saathiId || "Saathi ID"}
                   </button>
                 </div>
 
                 {loginMethod === 'mobile' ? (
                   <form onSubmit={(e) => handleLogin(e, 'mobile')}>
                     <div className="form-group">
-                      <label>Mobile Number</label>
+                      <label>{t.mobileNumber || "Mobile Number"}</label>
                       <div className="phone-input-wrapper" style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-darkest)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.25rem', marginBottom: '1rem' }}>
                         <span style={{ padding: '0.5rem 0.75rem', color: 'var(--text-muted)', fontWeight: '500', borderRight: '1px solid var(--border-color)' }}>+91</span>
                         <input 
@@ -122,26 +122,26 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                       </div>
                     </div>
                     <div className="form-group">
-                      <label>Password</label>
+                      <label>{t.password || "Password"}</label>
                       <input 
                         type="password" 
                         required 
-                        placeholder="Enter your password" 
+                        placeholder={t.enterPassword || "Enter your password"} 
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
                     </div>
                     <button type="submit" className="btn btn-primary w-full mt-3">
-                      Login <Send size={14} />
+                      {t.login || "Login"} <Send size={14} />
                     </button>
                     <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                      <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('recovery'); setRecoveredData(null); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Mobile No.?</a>
+                      <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('recovery'); setRecoveredData(null); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{t.forgotMobile || "Forgot Mobile No.?"}</a>
                     </div>
                   </form>
                 ) : loginMethod === 'saathi' ? (
                   <form onSubmit={(e) => handleLogin(e, 'saathi')}>
                     <div className="form-group" style={{ marginBottom: '1rem' }}>
-                      <label>Saathi ID</label>
+                      <label>{t.saathiIdLabel || "Saathi ID"}</label>
                       <input 
                         type="text" 
                         required 
@@ -151,52 +151,52 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                       />
                     </div>
                     <div className="form-group">
-                      <label>Password</label>
+                      <label>{t.password || "Password"}</label>
                       <input 
                         type="password" 
                         required 
-                        placeholder="Enter your password" 
+                        placeholder={t.enterPassword || "Enter your password"} 
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
                     </div>
                     <button type="submit" className="btn btn-primary w-full mt-3">
-                      Login <Send size={14} />
+                      {t.login || "Login"} <Send size={14} />
                     </button>
                     <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                      <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('recovery'); setRecoveredData(null); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Forgot Saathi ID?</a>
+                      <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('recovery'); setRecoveredData(null); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{t.forgotSaathiId || "Forgot Saathi ID?"}</a>
                     </div>
                   </form>
                 ) : (
                   <form onSubmit={handleRecovery}>
                     {recoveredData ? (
                       <div style={{ background: 'var(--bg-darkest)', padding: '1.5rem', borderRadius: '12px', border: '1px dashed var(--gold)', textAlign: 'center' }}>
-                        <h4 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>Account Recovered</h4>
-                        <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Your Saathi ID:</p>
-                        <strong style={{ fontSize: '1.2rem', color: 'var(--text-primary)', display: 'block', marginBottom: '1rem' }}>{recoveredData.saathiId}</strong>
-                        <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Linked Mobile:</p>
-                        <strong style={{ fontSize: '1.2rem', color: 'var(--text-primary)', display: 'block' }}>{recoveredData.maskedMobile}</strong>
-                        <button type="button" className="btn btn-primary w-full mt-4" onClick={() => { setLoginMethod('mobile'); }}>
-                          Back to Login
+                        <div style={{ padding: '16px', background: 'rgba(52, 211, 153, 0.1)', color: '#059669', borderRadius: '8px', marginBottom: '20px', fontSize: '0.9rem' }}>
+                          <strong>{t.accountFound || "Account Found!"}</strong><br/>
+                          {t.yourSaathiIdIs || "Your Saathi ID is:"} <span style={{ fontSize: '1.2rem', display: 'block', margin: '8px 0', letterSpacing: '2px' }}>{recoveredData.saathiId}</span>
+                          {t.otpSentTo || "An OTP has been sent to:"} {recoveredData.maskedMobile}
+                        </div>
+                        <button type="button" className="btn btn-primary w-100" onClick={() => { setLoginMethod('mobile'); }} style={{ marginTop: '10px' }}>
+                          {t.backToLogin || "Back to Login"}
                         </button>
                       </div>
                     ) : (
                       <>
                         <div className="form-group">
-                          <label>Enter Registered Email or Mobile</label>
+                          <label>{t.recoverLabel || "Enter Mobile Number or Aadhar"}</label>
                           <input 
                             type="text" 
                             required 
-                            placeholder="Email or Phone Number" 
+                            placeholder={t.emailOrPhone || "Email or Phone Number"} 
                             value={recoveryInput}
                             onChange={(e) => setRecoveryInput(e.target.value)}
                           />
                         </div>
                         <button type="submit" className="btn btn-primary w-full mt-3">
-                          Recover Details
+                          {t.recoverDetails || "Recover Details"}
                         </button>
                         <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                          <a href="#" onClick={(e) => { e.preventDefault(); setLoginMethod('mobile'); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Back to Login</a>
+                          <a href="#" className="lux-link" onClick={(e) => { e.preventDefault(); setLoginMethod('mobile'); }} style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{t.backToLogin || "Back to Login"}</a>
                         </div>
                       </>
                     )}

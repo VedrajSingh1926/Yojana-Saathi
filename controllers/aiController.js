@@ -188,7 +188,7 @@ Analyze the following message. You MUST output ONLY valid JSON in exactly this f
 Message to analyze:
 "${message}"`;
 
-    const response = await GeminiService.generateRecommendation({ type: "scam_analysis" }, systemPrompt);
+    const response = await GeminiService.generateRecommendation({ type: "scam_analysis" }, systemPrompt, lang);
     
     // Fallback if the AI fails to return the exact format
     const result = {

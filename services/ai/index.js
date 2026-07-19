@@ -5,7 +5,7 @@ import { MemoryClient } from 'mem0ai';
 
 // 1. Google Gemini Service
 export class GeminiService {
-  static async generateRecommendation(context, prompt) {
+  static async generateRecommendation(context, prompt, lang = 'en') {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       logger.warn('GEMINI_API_KEY is not set. Returning fallback response.');
@@ -22,16 +22,26 @@ export class GeminiService {
         headers['Authorization'] = `Bearer ${apiKey}`;
       }
 
-      logger.info('Gemini Generating Recommendation', { promptLength: prompt.length });
+      logger.info('Gemini Generating Recommendation', { promptLength: prompt.length, lang });
+      
+      const langNames = { en: "English", hi: "Hindi", ta: "Tamil", te: "Telugu", bn: "Bengali" };
+      const requestedLanguage = langNames[lang] || lang;
+      
+      const langInstruction = `\n\nCRITICAL LANGUAGE INSTRUCTION: Respond ONLY in the currently selected language (${requestedLanguage}). Never mix languages. Never answer in English unless English is selected. Translate EVERYTHING including headings, lists, reasons, and recommendations.`;
+
+      let baseSystemPrompt = context?.type === "scam_analysis" 
+        ? "You are a Cybersecurity Analyst protecting Indian citizens from welfare fraud. You MUST output ONLY raw JSON without any markdown formatting. The JSON MUST perfectly match this schema: { \"riskScore\": Number (0-100), \"category\": \"String (e.g. Phishing/Safe/Malware/Fraud)\", \"reason\": \"String explaining the analysis in detail\", \"recommendation\": \"String telling the user what action to take\" }" 
+        : "You are Yojana Saathi's AI Welfare Agent, an expert orchestrator for Indian government schemes. Analyze the citizen's context, answer their questions, and recommend the best schemes based on their profile. Do not force missing documents. You MUST output ONLY valid JSON. Your JSON must contain a `text` field with your reply, and a `detectedLang` field containing the ISO language code (en, hi, ta, te, bn). \n\nCRITICAL FORMATTING INSTRUCTION:\nYou MUST use beautiful, structured Markdown in the `text` field. Never use flat boring paragraphs! Use bullet points, bold text for emphasis, and numbered lists to create a step-by-step roadmap. Whenever you recommend a scheme, format it exactly as:\n\n### [Scheme Name]\n**Description:** [Short]\n**Eligibility:** [Criteria]\n**Benefits:** [Benefits]\n**Required Documents:** [Docs]\n**Official Website:** [URL]\n\n[Apply Now]([URL]) [Learn More]([URL])\n\nExample JSON: { \"text\": \"Here is your step-by-step roadmap:\\n1. **Step 1**...\", \"detectedLang\": \"en\" }";
+
+      baseSystemPrompt += langInstruction;
+
       const response = await fetchWithTimeoutAndRetry(url, {
         method: 'POST',
         headers,
         body: JSON.stringify({
           system_instruction: {
             parts: [{
-              text: context?.type === "scam_analysis" 
-                ? "You are a Cybersecurity Analyst protecting Indian citizens from welfare fraud. You MUST output ONLY raw JSON without any markdown formatting. The JSON MUST perfectly match this schema: { \"riskScore\": Number (0-100), \"category\": \"String (e.g. Phishing/Safe/Malware/Fraud)\", \"reason\": \"String explaining the analysis in detail\", \"recommendation\": \"String telling the user what action to take\" }" 
-                : "You are Yojana Saathi's AI Welfare Agent, an expert orchestrator for Indian government schemes. Analyze the citizen's context, answer their questions, and recommend the best schemes based on their profile. Do not force missing documents. You MUST output ONLY valid JSON. Your JSON must contain a `text` field with your reply, and a `detectedLang` field containing the ISO language code (en, hi, ta, te, bn). \n\nCRITICAL FORMATTING INSTRUCTION:\nYou MUST use beautiful, structured Markdown in the `text` field. Never use flat boring paragraphs! Use bullet points, bold text for emphasis, and numbered lists to create a step-by-step roadmap. Whenever you recommend a scheme, format it exactly as:\n\n### [Scheme Name]\n**Description:** [Short]\n**Eligibility:** [Criteria]\n**Benefits:** [Benefits]\n**Required Documents:** [Docs]\n**Official Website:** [URL]\n\n[Apply Now]([URL]) [Learn More]([URL])\n\nExample JSON: { \"text\": \"Here is your step-by-step roadmap:\\n1. **Step 1**...\", \"detectedLang\": \"en\" }"
+              text: baseSystemPrompt
             }]
           },
           generationConfig: {
@@ -223,7 +233,7 @@ User Request:
 ${query}`;
 
     // Core Gemini generation
-    const response = await GeminiService.generateRecommendation(richContext, localizedQuery);
+    const response = await GeminiService.generateRecommendation(richContext, localizedQuery, lang);
     
     OutlierService.evaluateResponse(query, response);
     

@@ -67,9 +67,9 @@ export default function Navbar({
     { id: 'planner', label: t.planner || 'Planner' },
     { id: 'schemes', label: t.schemes || 'Schemes' },
     { id: 'family', label: t.family || 'Family' },
-    { id: 'family', label: 'Household', sub: true },
-    { id: 'family', label: 'Documents', sub: true },
-    { id: 'family', label: 'QR Card', sub: true },
+    { id: 'family', label: t.household || 'Household', sub: true },
+    { id: 'family', label: t.documents || 'Documents', sub: true },
+    { id: 'family', label: t.qrCard || 'QR Card', sub: true },
     { id: 'family', label: t.achievements || 'Achievements', sub: true },
     { id: 'scam-shield', label: t.scamShield || 'Scam Shield' }
   ].filter(Boolean);
@@ -201,7 +201,7 @@ export default function Navbar({
                     <input 
                       type="text" 
                       className="lux-search-input" 
-                      placeholder="Search state..." 
+                      placeholder={t.searchState || "Search state..."} 
                       value={stateSearch}
                       onChange={e => setStateSearch(e.target.value)}
                       autoFocus
@@ -243,12 +243,12 @@ export default function Navbar({
                     exit="exit"
                   >
                     <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--lux-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 600, fontSize: '15px' }}>Welfare Alerts</span>
-                      <span style={{ fontSize: '13px', color: 'var(--lux-accent)', cursor: 'pointer', fontWeight: 500 }} onClick={onClearNoti}>Clear All</span>
+                      <span style={{ fontWeight: 600, fontSize: '15px' }}>{t.welfareAlerts || "Welfare Alerts"}</span>
+                      <span style={{ fontSize: '13px', color: 'var(--lux-accent)', cursor: 'pointer', fontWeight: 500 }} onClick={onClearNoti}>{t.clearAll || "Clear All"}</span>
                     </div>
                     <div style={{ maxHeight: '350px', overflowY: 'auto', padding: '8px 0' }}>
                       {notifications.length === 0 ? (
-                        <div style={{ padding: '24px', textAlign: 'center', color: 'var(--lux-muted)', fontSize: '14px' }}>No new alerts.</div>
+                        <div style={{ padding: '24px', textAlign: 'center', color: 'var(--lux-muted)', fontSize: '14px' }}>{t.noNewAlerts || "No new alerts."}</div>
                       ) : (
                         notifications.map(n => (
                           <div 

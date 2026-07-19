@@ -49,7 +49,7 @@ export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveSchem
     <div className="view-section animate-fade-in">
       <div className="detail-back-bar">
         <button className="btn btn-text" onClick={onBack}>
-          <ArrowLeft size={16} /> Back to Schemes
+          <ArrowLeft size={16} /> {t.backToSchemes || "Back to Schemes"}
         </button>
       </div>
 
@@ -62,19 +62,19 @@ export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveSchem
             </div>
             <h1>{schemeT.name || scheme.name}</h1>
             <div className="detail-meta-row">
-              <span className="score-badge">✓ AI Verified Domicile</span>
-              <span className="text-muted"><Landmark size={14} style={{ display: 'inline', marginRight: '4px' }} /> {scheme.category} Category</span>
+              <span className="score-badge">✓ {t.aiVerifiedDomicile || "AI Verified Domicile"}</span>
+              <span className="text-muted"><Landmark size={14} style={{ display: 'inline', marginRight: '4px' }} /> {scheme.category} {t.categoryWord || "Category"}</span>
             </div>
           </div>
           <div className="detail-actions-panel">
             <button className="btn btn-outline" onClick={() => onSaveScheme(scheme)}>
-              <Bookmark size={16} /> Save
+              <Bookmark size={16} /> {t.saveScheme || "Save"}
             </button>
             <button className="btn btn-primary" onClick={() => onNavigate('form-assistant')}>
-              Apply with AI Assistant <Sparkles size={16} />
+              {t.applyWithAI || "Apply with AI Assistant"} <Sparkles size={16} />
             </button>
             <button className="btn btn-outline" onClick={() => window.open(scheme.official_url, '_blank')}>
-              Official Web <Globe size={16} />
+              {t.officialWeb || "Official Web"} <Globe size={16} />
             </button>
           </div>
         </div>
