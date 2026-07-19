@@ -59,8 +59,19 @@ export default function Navbar({
     { id: 'planner', label: t.planner || 'Planner' },
     { id: 'schemes', label: t.schemes || 'Schemes' },
     { id: 'family', label: t.family || 'Family' },
-    { id: 'scam-shield', label: t.scamShield || 'Scam Shield' },
-    { id: 'achievements', label: t.achievements || 'Achievements' }
+    { id: 'scam-shield', label: t.scamShield || 'Scam Shield' }
+  ].filter(Boolean);
+
+  const mobileLinks = [
+    { id: 'home', label: t.home || 'Home' },
+    { id: 'planner', label: t.planner || 'Planner' },
+    { id: 'schemes', label: t.schemes || 'Schemes' },
+    { id: 'family', label: t.family || 'Family' },
+    { id: 'family', label: 'Household', sub: true },
+    { id: 'family', label: 'Documents', sub: true },
+    { id: 'family', label: 'QR Card', sub: true },
+    { id: 'family', label: t.achievements || 'Achievements', sub: true },
+    { id: 'scam-shield', label: t.scamShield || 'Scam Shield' }
   ].filter(Boolean);
 
   const dropdownVariants = {
@@ -346,22 +357,29 @@ export default function Navbar({
                 </button>
               </div>
 
-            <div className="lux-drawer-links" style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--lux-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '16px' }}>Primary Navigation</div>
-              {navLinks.map((link, i) => (
-                <motion.a
-                  key={link.id}
-                  href={`#${link.id}`}
-                  className={`lux-drawer-link ${activeView === link.id ? 'active' : ''}`}
-                  style={{ display: 'block', marginBottom: '24px' }}
-                  onClick={(e) => { e.preventDefault(); onNavigate(link.id); setMobileOpen(false); }}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + (i * 0.05) }}
-                >
-                  {link.label}
-                </motion.a>
-              ))}
+              <div className="lux-drawer-links" style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--lux-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '16px' }}>Primary Navigation</div>
+                {mobileLinks.map((link, i) => (
+                  <motion.a
+                    key={link.label}
+                    href={`#${link.id}`}
+                    className={`lux-drawer-link ${activeView === link.id && !link.sub ? 'active' : ''}`}
+                    style={{ 
+                      display: 'block', 
+                      marginBottom: link.sub ? '16px' : '24px',
+                      fontSize: link.sub ? '20px' : '32px',
+                      paddingLeft: link.sub ? '20px' : '0',
+                      color: link.sub ? 'var(--lux-muted)' : 'var(--lux-text)',
+                      fontWeight: link.sub ? '500' : '700'
+                    }}
+                    onClick={(e) => { e.preventDefault(); onNavigate(link.id); setMobileOpen(false); }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + (i * 0.05) }}
+                  >
+                    {link.label}
+                  </motion.a>
+                ))}
 
               <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--lux-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '24px', marginBottom: '16px' }}>Quick Links</div>
               <motion.a href="#" style={{ display: 'block', marginBottom: '20px', color: 'var(--lux-text)', textDecoration: 'none', fontWeight: 500 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>Gram Panchayat Login</motion.a>
