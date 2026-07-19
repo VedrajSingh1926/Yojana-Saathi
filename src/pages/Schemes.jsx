@@ -60,9 +60,9 @@ export default function Schemes({
 
   // Filter schemes
   let filtered = SCHEMES_DB.filter(scheme => {
-    const locName = scheme.translations?.[lang]?.name || scheme.name;
-    const locDesc = scheme.translations?.[lang]?.description || scheme.description;
-    const locCat = scheme.translations?.[lang]?.category || scheme.category;
+    const locName = scheme.name[lang] || scheme.name.en || "";
+    const locDesc = scheme.description[lang] || scheme.description.en || "";
+    const locCat = scheme.category[lang] || scheme.category.en || "";
 
     const matchesSearch = locName.toLowerCase().includes(search.toLowerCase()) ||
                           locDesc.toLowerCase().includes(search.toLowerCase()) ||
@@ -70,6 +70,7 @@ export default function Schemes({
     const matchesType = types.length === 0 ? true : types.includes(scheme.type);
     
     let matchesCategory = false;
+    const baseCategory = scheme.category.en || scheme.category;
     if (category === 'all') {
       matchesCategory = true;
     } else if (category === 'recommended') {
@@ -79,12 +80,12 @@ export default function Schemes({
         const familyOccupations = user.family ? user.family.map(m => m.occupation) : [user.occupation];
         const hasSenior = user.family ? user.family.some(m => m.age >= 60) : user.age >= 60;
         
-        matchesCategory = familyOccupations.includes(scheme.category) || 
-                          (hasSenior && scheme.category === 'Senior Citizen') ||
-                          ['Housing', 'Health'].includes(scheme.category);
+        matchesCategory = familyOccupations.includes(baseCategory) || 
+                          (hasSenior && baseCategory === 'Senior Citizen') ||
+                          ['Housing', 'Health'].includes(baseCategory);
       }
     } else {
-      matchesCategory = scheme.category === category;
+      matchesCategory = baseCategory === category;
     }
     
     return matchesSearch && matchesType && matchesCategory;
@@ -200,7 +201,7 @@ export default function Schemes({
             <span className={`badge ${s.type === 'Central' ? 'badge-type-central' : 'badge-type-state'}`}>
               {s.type === 'Central' ? (t.centralBadge || '🟢 Central Government') : `🟠 ${s.state || 'State'} ${(t.stateBadgeSuffix || 'Government')}`}
             </span>
-            <span className="badge badge-tag">{localizedCategories[lang]?.[s.category] || s.category}</span>
+            <span className="badge badge-tag">{localizedCategories[lang]?.[(s.category && s.category.en) || s.category] || s.category[lang] || s.category.en}</span>
           </div>
         </div>
         <h3 className="break-words">{s.name[lang] || s.name.en}</h3>
