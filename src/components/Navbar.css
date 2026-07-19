@@ -19,16 +19,16 @@
   display: flex;
   align-items: center;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  background: var(--lux-bg);
-  border-bottom: 1px solid transparent;
+  background: var(--lux-bg) !important;
+  border-bottom: 1px solid var(--lux-border);
 }
 
 .luxury-navbar.scrolled {
-  background: rgba(250, 250, 248, 0.82);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: var(--lux-bg) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border-bottom: 1px solid var(--lux-border);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
 }
 
 .lux-container {

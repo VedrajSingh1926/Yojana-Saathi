@@ -243,9 +243,9 @@ button, input, select, textarea {
 
 /* ==================== LAYOUT COMPONENTS ==================== */
 .main-content {
-  margin-top: var(--nav-height);
+  margin-top: 110px;
   padding-bottom: 5rem;
-  min-height: calc(100vh - var(--nav-height) - 300px);
+  min-height: calc(100vh - 110px - 300px);
 }
 
 .main-content-planner {
@@ -1273,7 +1273,7 @@ button, input, select, textarea {
 
 .schemes-cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, minmax(360px, 1fr));
   gap: 1.5rem;
   width: 100%;
   max-width: 100%;
@@ -1374,6 +1374,7 @@ button, input, select, textarea {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex-wrap: nowrap;
 }
 .main-actions-group .main-btn {
   flex: 1;
@@ -1383,6 +1384,7 @@ button, input, select, textarea {
   padding: 0.6rem 0.5rem;
   text-align: center;
   white-space: nowrap;
+  font-size: 0.85rem;
 }
 .secondary-actions-group {
   display: flex;
@@ -3774,10 +3776,13 @@ button,
   display: none;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1279px) {
   .schemes-cards-grid {
-    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
   }
+}
+
+@media (max-width: 1024px) {
   .mobile-filter-fab {
     display: flex;
     position: fixed;
