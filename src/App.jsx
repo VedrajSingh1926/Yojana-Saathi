@@ -196,6 +196,7 @@ function MainApp() {
         { id: Date.now(), title: "Welfare Passport Activated", text: `Welcome ${userName}! Your Saathi ID is ${saathiId}.`, time: "Just now", read: false },
         ...prev
       ]);
+      setCatalogCategory('recommended');
     } else {
       // Load default Ramesh Kumar demo profile matching standard specs
       setUser({
@@ -232,6 +233,7 @@ function MainApp() {
         { id: Date.now(), title: "Welfare Passport Activated", text: "Welcome Ramesh Kumar! Your household details have been verified.", time: "Just now", read: false },
         ...prev
       ]);
+      setCatalogCategory('recommended');
     }
   };
 
@@ -344,6 +346,7 @@ function MainApp() {
             onToggleCompare={handleToggleCompare}
             initialCategory={catalogCategory}
             onTriggerCompare={() => setIsCompareOpen(true)}
+            user={user}
           />
         )}
 

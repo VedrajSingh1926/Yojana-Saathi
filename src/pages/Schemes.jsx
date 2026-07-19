@@ -11,7 +11,8 @@ export default function Schemes({
   compareList, 
   onToggleCompare, 
   initialCategory = 'all',
-  onTriggerCompare
+  onTriggerCompare,
+  user
 }) {
   const { lang, t } = useLanguage();
   const { stateLocation, setStateLocation } = useLocationContext();
@@ -30,15 +31,15 @@ export default function Schemes({
   }, [initialCategory]);
 
   const categories = [
-    'all', 'Women', 'Student', 'Farmer', 'Business', 'Housing', 'Health', 'Employment', 'Education', 'Senior Citizen', 'Disabled', 'Minority'
+    'all', 'recommended', 'Women', 'Student', 'Farmer', 'Business', 'Housing', 'Health', 'Employment', 'Education', 'Senior Citizen', 'Disabled', 'Minority'
   ];
 
   const localizedCategories = {
-    en: { all: "All Schemes", Women: "Women", Student: "Student", Farmer: "Farmer", Business: "Business", Housing: "Housing", Health: "Health", Employment: "Employment", Education: "Education", 'Senior Citizen': "Senior Citizen", Disabled: "Disabled", Minority: "Minority" },
-    hi: { all: "सभी योजनाएं", Women: "महिला", Student: "छात्र", Farmer: "किसान", Business: "व्यवसाय", Housing: "आवास", Health: "स्वास्थ्य", Employment: "रोजगार", Education: "शिक्षा", 'Senior Citizen': "वरिष्ठ नागरिक", Disabled: "दिव्यांग", Minority: "अल्पसंख्यक" },
-    ta: { all: "அனைத்து திட்டங்கள்", Women: "பெண்கள்", Student: "மாணவர்", Farmer: "விவசாயி", Business: "வணிகம்", Housing: "வீட்டுவசதி", Health: "சுகாதாரம்", Employment: "வேலைவாய்ப்பு", Education: "கல்வி", 'Senior Citizen': "முதியோர்", Disabled: "மாற்றுத்திறனாளி", Minority: "சிறுபான்மையினர்" },
-    te: { all: "అన్ని పథకాలు", Women: "మహిళలు", Student: "విద్యార్థి", Farmer: "రైతు", Business: "వ్యాపారం", Housing: "గృహనిర్మాణం", Health: "ఆరోగ్యం", Employment: "ఉపాధి", Education: "విద్య", 'Senior Citizen': "సీనియర్ సిటిజన్", Disabled: "వికలాంగులు", Minority: "మైనారిటీలు" },
-    bn: { all: "সমস্ত স্কিম", Women: "মহিলা", Student: "ছাত্র", Farmer: "কৃষক", Business: "ব্যবসা", Housing: "আবাসন", Health: "স্বাস্থ্য", Employment: "কর্মসংস্থান", Education: "শিক্ষা", 'Senior Citizen': "প্রবীণ নাগরিক", Disabled: "প্রতিবন্ধী", Minority: "সংখ্যালঘু" }
+    en: { all: "All Schemes", recommended: "✨ For You", Women: "Women", Student: "Student", Farmer: "Farmer", Business: "Business", Housing: "Housing", Health: "Health", Employment: "Employment", Education: "Education", 'Senior Citizen': "Senior Citizen", Disabled: "Disabled", Minority: "Minority" },
+    hi: { all: "सभी योजनाएं", recommended: "✨ आपके लिए", Women: "महिला", Student: "छात्र", Farmer: "किसान", Business: "व्यवसाय", Housing: "आवास", Health: "स्वास्थ्य", Employment: "रोजगार", Education: "शिक्षा", 'Senior Citizen': "वरिष्ठ नागरिक", Disabled: "दिव्यांग", Minority: "अल्पसंख्यक" },
+    ta: { all: "அனைத்து திட்டங்கள்", recommended: "✨ உங்களுக்கானவை", Women: "பெண்கள்", Student: "மாணவர்", Farmer: "விவசாயி", Business: "வணிகம்", Housing: "வீட்டுவசதி", Health: "சுகாதாரம்", Employment: "வேலைவாய்ப்பு", Education: "கல்வி", 'Senior Citizen': "முதியோர்", Disabled: "மாற்றுத்திறனாளி", Minority: "சிறுபான்மையினர்" },
+    te: { all: "అన్ని పథకాలు", recommended: "✨ మీ కోసం", Women: "మహిళలు", Student: "విద్యార్థి", Farmer: "రైతు", Business: "వ్యాపారం", Housing: "గృహనిర్మాణం", Health: "ఆరోగ్యం", Employment: "ఉపాధి", Education: "విద్య", 'Senior Citizen': "సీనియర్ సిటిజన్", Disabled: "వికలాంగులు", Minority: "మైనారిటీలు" },
+    bn: { all: "সমস্ত স্কিম", recommended: "✨ আপনার জন্য", Women: "মহিলা", Student: "ছাত্র", Farmer: "কৃষক", Business: "ব্যবসা", Housing: "আবাসন", Health: "স্বাস্থ্য", Employment: "কর্মসংস্থান", Education: "শিক্ষা", 'Senior Citizen': "প্রবীণ নাগরিক", Disabled: "প্রতিবন্ধী", Minority: "সংখ্যালঘু" }
   };
 
   const handleTypeChange = (typeVal) => {
@@ -67,7 +68,25 @@ export default function Schemes({
                           locDesc.toLowerCase().includes(search.toLowerCase()) ||
                           locCat.toLowerCase().includes(search.toLowerCase());
     const matchesType = types.length === 0 ? true : types.includes(scheme.type);
-    const matchesCategory = category === 'all' || scheme.category === category;
+    
+    let matchesCategory = false;
+    if (category === 'all') {
+      matchesCategory = true;
+    } else if (category === 'recommended') {
+      if (!user) {
+        matchesCategory = true;
+      } else {
+        const familyOccupations = user.family ? user.family.map(m => m.occupation) : [user.occupation];
+        const hasSenior = user.family ? user.family.some(m => m.age >= 60) : user.age >= 60;
+        
+        matchesCategory = familyOccupations.includes(scheme.category) || 
+                          (hasSenior && scheme.category === 'Senior Citizen') ||
+                          ['Housing', 'Health'].includes(scheme.category);
+      }
+    } else {
+      matchesCategory = scheme.category === category;
+    }
+    
     return matchesSearch && matchesType && matchesCategory;
   });
 

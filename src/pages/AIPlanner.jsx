@@ -67,11 +67,13 @@ export default function AIPlanner({ initialPrompt, user }) {
     // Translate the initial welcome message when language changes
     setChat(prev => {
       if (prev.length === 1 && prev[0].sender === 'system' && prev[0].id === 1) {
-        return [{ id: 1, sender: 'system', text: lang === 'hi' ? "नमस्ते! मैं योजना साथी का एआई कल्याण योजनाकार हूं। आपके परिवार को किस चीज़ की आवश्यकता है, इसका वर्णन करें या नीचे दिए गए कार्डों में से एक चुनें, और मैं आपके लिए एक रोडमैप तैयार करूँगा।" : "Hello! I am Yojana Saathi's AI Welfare Planner. Describe what your household needs or plans, or select one of the cards below, and I will generate a step-by-step Welfare Roadmap for you." }];
+        const baseMsgEn = user ? `Welcome ${user.name}! I have analyzed your profile and family structure. Describe what your household needs or plans, and I will generate a highly personalized Welfare Roadmap for you.` : "Hello! I am Yojana Saathi's AI Welfare Planner. Describe what your household needs or plans, or select one of the cards below, and I will generate a step-by-step Welfare Roadmap for you.";
+        const baseMsgHi = user ? `नमस्ते ${user.name}! मैंने आपकी प्रोफाइल और परिवार की संरचना का विश्लेषण किया है। अपनी आवश्यकताएं बताएं, और मैं आपके लिए एक व्यक्तिगत रोडमैप तैयार करूँगा।` : "नमस्ते! मैं योजना साथी का एआई कल्याण योजनाकार हूं। आपके परिवार को किस चीज़ की आवश्यकता है, इसका वर्णन करें या नीचे दिए गए कार्डों में से एक चुनें, और मैं आपके लिए एक रोडमैप तैयार करूँगा।";
+        return [{ id: 1, sender: 'system', text: lang === 'hi' ? baseMsgHi : baseMsgEn }];
       }
       return prev;
     });
-  }, [lang]);
+  }, [lang, user]);
 
   useEffect(() => {
     if (initialPrompt) {
