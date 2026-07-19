@@ -3,7 +3,7 @@ import { X, CheckCircle, Scale, BrainCircuit, Sparkles } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { SCHEMES_DB } from '../data/schemes';
 
-export default function CompareModal({ isOpen, onClose, compareList, onNavigateToPlanner }) {
+export default function CompareModal({ isOpen, onClose, compareList, onNavigateToPlanner, lang }) {
   const { t } = useLanguage();
   if (!isOpen) return null;
 
@@ -64,7 +64,7 @@ export default function CompareModal({ isOpen, onClose, compareList, onNavigateT
     : (localizedAdviceMap[lang]?.defaultRec || recommendation);
 
   const handleOpenInPlanner = () => {
-    const names = selectedSchemes.map(s => s.name);
+    const names = selectedSchemes.map(s => s.name.en || s.name);
     onNavigateToPlanner(`Compare ${names.join(" vs ")} for my family. Which one should I claim first?`);
     onClose();
   };
@@ -106,7 +106,7 @@ export default function CompareModal({ isOpen, onClose, compareList, onNavigateT
             {selectedSchemes.map(s => (
               <div key={s.id} className={`comparison-column ${s.type === 'Central' ? 'head-column' : ''}`}>
                 <div className="comp-scheme-header">
-                  <h3>{s.emoji} {s.name}</h3>
+                  <h3>{s.emoji} {s.name[lang] || s.name.en || s.name}</h3>
                   <span className={`badge ${s.type === 'Central' ? 'badge-type-central' : 'badge-type-state'}`}>
                     {s.type} Gov
                   </span>
@@ -114,12 +114,12 @@ export default function CompareModal({ isOpen, onClose, compareList, onNavigateT
 
                 <div className="comp-row">
                   <span className="comp-label">{headersMap.benefit[lang] || headersMap.benefit.en}</span>
-                  <strong className="comp-value text-gold">{s.benefit}</strong>
+                  <strong className="comp-value text-gold">{s.benefit[lang] || s.benefit.en || s.benefit}</strong>
                 </div>
 
                 <div className="comp-row">
                   <span className="comp-label">{headersMap.focus[lang] || headersMap.focus.en}</span>
-                  <span className="comp-value">{s.category} Assistance</span>
+                  <span className="comp-value">{s.category[lang] || s.category.en || s.category} Assistance</span>
                 </div>
 
                 <div className="comp-row">
@@ -134,12 +134,12 @@ export default function CompareModal({ isOpen, onClose, compareList, onNavigateT
 
                 <div className="comp-row">
                   <span className="comp-label">{headersMap.documents[lang] || headersMap.documents.en}</span>
-                  <span className="comp-value">{s.docs.map(d => d.name).join(', ')}</span>
+                  <span className="comp-value">{(s.docs[lang] || s.docs.en || s.docs || []).map(d => d.name).join(', ')}</span>
                 </div>
 
                 <div className="comp-row">
                   <span className="comp-label">{headersMap.score[lang] || headersMap.score.en}</span>
-                  <span className="comp-value text-cyan">{s.ai_score}</span>
+                  <span className="comp-value text-cyan">{s.ai_score[lang] || s.ai_score.en || s.ai_score}</span>
                 </div>
               </div>
             ))}

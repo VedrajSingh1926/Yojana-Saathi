@@ -93,13 +93,13 @@ export default function Schemes({
 
   // Tab filters
   if (trendingTab === 'recently-updated') {
-    filtered = filtered.filter(s => ['pm-kisan', 'ladli-behna', 'mukhya-awas'].includes(s.id));
+    filtered = [...filtered].sort((a, b) => b.id.localeCompare(a.id)).slice(0, 4);
   } else if (trendingTab === 'most-applied') {
-    filtered = filtered.filter(s => ['pm-awas', 'pm-kisan', 'ayushman-bharat'].includes(s.id));
+    filtered = [...filtered].sort((a, b) => a.id.localeCompare(b.id)).slice(0, 4);
   } else if (trendingTab === 'deadline-soon') {
-    filtered = filtered.filter(s => ['scholarship'].includes(s.id));
+    filtered = [...filtered].sort((a, b) => (a.category.en || a.category).localeCompare(b.category.en || b.category)).slice(0, 4);
   } else if (trendingTab === 'new-launch') {
-    filtered = filtered.filter(s => ['ladli-behna'].includes(s.id));
+    filtered = [...filtered].filter(s => s.type === 'State').slice(0, 4);
   }
 
   // Localized UI Texts
@@ -362,9 +362,10 @@ export default function Schemes({
               ) : (
                 compareList.map(id => {
                   const s = SCHEMES_DB.find(sch => sch.id === id);
+                  const schemeName = s?.name?.[lang] || s?.name?.en || s?.name || "";
                   return (
                     <div key={id} className="tray-item">
-                      <span>{s?.emoji} {s?.name.split('(')[0]}</span>
+                      <span>{s?.emoji} {typeof schemeName === 'string' ? schemeName.split('(')[0] : schemeName}</span>
                       <button className="tray-item-remove" onClick={() => onToggleCompare(id)}>
                         <Trash2 size={14} />
                       </button>
