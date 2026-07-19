@@ -5,7 +5,7 @@ import { SCHEMES_DB } from '../data/schemes';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveScheme }) {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const scheme = SCHEMES_DB.find(s => s.id === schemeId) || SCHEMES_DB[0];
   const [activeFaq, setActiveFaq] = useState(null);
 
