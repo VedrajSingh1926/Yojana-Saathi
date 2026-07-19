@@ -37,8 +37,21 @@ export default function Navbar({
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        setMobileOpen(false);
+        setProfileOpen(false);
+        setLangOpen(false);
+        setStateOpen(false);
+        setNotiOpen(false);
+      }
+    };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('keydown', handleEsc);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('keydown', handleEsc);
+    };
   }, []);
 
   const navLinks = [
@@ -294,37 +307,43 @@ export default function Navbar({
               </div>
             )}
 
-            {/* Mobile Toggle */}
-            <button className="lux-mobile-toggle" onClick={() => setMobileOpen(true)}>
-              <Menu size={28} />
-            </button>
-
           </motion.div>
+
+          {/* Mobile Toggle */}
+          <button className="lux-mobile-toggle" onClick={() => setMobileOpen(true)}>
+            <Menu size={28} />
+          </button>
         </div>
       </motion.header>
 
       {/* Mobile Drawer */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div 
-            className="lux-mobile-drawer"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          >
-            <div className="lux-drawer-header">
-              <div className="lux-brand">
-                <img src="/Logo.png" alt="Logo" className="lux-logo-img" style={{ height: '40px' }} />
-                <div className="lux-brand-text">
-                  <span className="lux-brand-title">Yojana Saathi</span>
-                  <span className="lux-brand-sub">India's AI Welfare OS</span>
+          <>
+            <motion.div 
+              className="lux-drawer-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileOpen(false)}
+            />
+            <motion.div 
+              className="lux-mobile-drawer"
+              initial={{ opacity: 0, x: '100%' }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            >
+              <div className="lux-drawer-header">
+                <div className="lux-brand">
+                  <div className="lux-brand-text">
+                    <span className="lux-brand-title">Menu</span>
+                  </div>
                 </div>
+                <button className="lux-icon-btn" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }} onClick={() => setMobileOpen(false)}>
+                  <X size={28} />
+                </button>
               </div>
-              <button className="lux-icon-btn" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }} onClick={() => setMobileOpen(false)}>
-                <X size={28} />
-              </button>
-            </div>
 
             <div className="lux-drawer-links">
               {navLinks.map((link, i) => (
@@ -382,6 +401,7 @@ export default function Navbar({
               )}
             </div>
           </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
