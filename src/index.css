@@ -1068,6 +1068,9 @@ button, input, select, textarea {
   gap: 2.5rem;
   align-items: start;
 }
+.schemes-grid-content {
+  min-width: 0;
+}
 
 @media (max-width: 1024px) {
   .schemes-layout-container {
@@ -1273,7 +1276,7 @@ button, input, select, textarea {
 
 .schemes-cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(360px, 1fr));
+  grid-template-columns: repeat(2, minmax(420px, 1fr));
   gap: 1.5rem;
   width: 100%;
   max-width: 100%;
@@ -3856,11 +3859,6 @@ button,
 }
 
 /* Specific Grid Fixes (To be used anywhere inline grids were used) */
-.schemes-cards-grid {
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: repeat(3, 1fr);
-}
 .overview-grid,
 .grid-responsive {
   display: grid;
@@ -3869,9 +3867,6 @@ button,
 }
 
 @media (max-width: 1024px) {
-  .schemes-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .overview-grid,
   .grid-responsive {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -3879,7 +3874,6 @@ button,
 }
 
 @media (max-width: 767px) {
-  .schemes-cards-grid,
   .overview-grid,
   .grid-responsive {
     grid-template-columns: 1fr;
