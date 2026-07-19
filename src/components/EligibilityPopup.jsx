@@ -4,7 +4,7 @@ import { SCHEMES_DB } from '../data/schemes';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function EligibilityPopup({ onRegisterLead }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   
   // Form State
