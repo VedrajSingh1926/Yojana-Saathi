@@ -3,13 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Languages, MapPin, Bell, Menu, X, ChevronDown, ArrowRight, User, LogOut } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
+import { useLocationContext } from '../context/LocationContext';
 import './Navbar.css';
 
 export default function Navbar({ 
   activeView, 
   onNavigate, 
-  stateLocation, 
-  onChangeState, 
   notifications, 
   onClearNoti, 
   onMarkNotiRead,
@@ -26,12 +25,13 @@ export default function Navbar({
   const [stateSearch, setStateSearch] = useState('');
 
   const langMap = { en: "English", hi: "हिन्दी", ta: "தமிழ்", te: "తెలుగు", bn: "বাংলা" };
-  const states = ["Rajasthan", "Maharashtra", "Uttar Pradesh", "Delhi", "Karnataka", "Tamil Nadu", "Gujarat", "Bihar"];
+  const states = ["All States", "Madhya Pradesh", "Rajasthan", "Maharashtra", "Uttar Pradesh", "Delhi", "Karnataka", "Tamil Nadu", "Gujarat", "Bihar"];
 
   const filteredStates = states.filter(s => s.toLowerCase().includes(stateSearch.toLowerCase()));
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const { lang, setLang, t } = useLanguage();
+  const { stateLocation, setStateLocation } = useLocationContext();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -186,7 +186,7 @@ export default function Navbar({
                         <div 
                           key={st} 
                           className="lux-dropdown-item"
-                          onClick={() => { onChangeState(st); setStateOpen(false); setStateSearch(''); }}
+                          onClick={() => { setStateLocation(st); setStateOpen(false); setStateSearch(''); }}
                         >
                           {st}
                         </div>
@@ -343,9 +343,32 @@ export default function Navbar({
             </div>
 
             <div className="lux-drawer-footer">
+              {/* Mobile Drawer State and Language */}
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
+                <select 
+                  style={{ flex: 1, padding: '12px', borderRadius: '12px', border: '1px solid var(--lux-border)', background: 'var(--lux-bg)', color: 'var(--lux-text)', outline: 'none' }}
+                  value={lang}
+                  onChange={(e) => setLang(e.target.value)}
+                >
+                  {Object.entries(langMap).map(([code, label]) => (
+                    <option key={code} value={code}>{label}</option>
+                  ))}
+                </select>
+
+                <select 
+                  style={{ flex: 1, padding: '12px', borderRadius: '12px', border: '1px solid var(--lux-border)', background: 'var(--lux-bg)', color: 'var(--lux-text)', outline: 'none' }}
+                  value={stateLocation}
+                  onChange={(e) => { setStateLocation(e.target.value); }}
+                >
+                  {states.map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
               {!user ? (
                 <>
-                  <button className="lux-login-btn" style={{ background: 'rgba(15,23,42,0.04)', borderRadius: '26px', padding: '18px', width: '100%' }} onClick={() => { setMobileOpen(false); onTriggerAuth(false); }}>
+                  <button className="lux-login-btn" style={{ background: 'rgba(15,23,42,0.04)', borderRadius: '26px', padding: '18px', width: '100%', marginBottom: '10px' }} onClick={() => { setMobileOpen(false); onTriggerAuth(false); }}>
                     {t.login || 'Login'}
                   </button>
                   <button className="lux-cta-btn" style={{ width: '100%', justifyContent: 'center' }} onClick={() => { setMobileOpen(false); onTriggerAuth(true); }}>

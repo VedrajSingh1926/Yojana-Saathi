@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useLanguage } from '../context/LanguageContext';
+import { useLocationContext } from '../context/LocationContext';
 
 function TypewriterMarkdown({ content, speed = 10, ...props }) {
   const [displayed, setDisplayed] = useState('');
@@ -15,12 +16,9 @@ function TypewriterMarkdown({ content, speed = 10, ...props }) {
     setDisplayed('');
     if (!content) return;
     const timer = setInterval(() => {
-      setDisplayed((prev) => {
-        const nextChar = content.charAt(i);
-        i++;
-        if (i >= content.length) clearInterval(timer);
-        return prev + nextChar;
-      });
+      i++;
+      setDisplayed(content.slice(0, i));
+      if (i >= content.length) clearInterval(timer);
     }, speed);
     return () => clearInterval(timer);
   }, [content, speed]);
@@ -28,8 +26,9 @@ function TypewriterMarkdown({ content, speed = 10, ...props }) {
   return <ReactMarkdown {...props}>{displayed}</ReactMarkdown>;
 }
 
-export default function AIPlanner({ initialPrompt, user, stateLocation }) {
+export default function AIPlanner({ initialPrompt, user }) {
   const { lang, setLang, t, gnaniLang } = useLanguage();
+  const { stateLocation } = useLocationContext();
   const [chat, setChat] = useState(() => {
     try {
       const saved = localStorage.getItem('planner_history');
@@ -387,19 +386,34 @@ export default function AIPlanner({ initialPrompt, user, stateLocation }) {
                     {msg.sender === 'system' ? (
                       <div className="markdown-body">
                         <TypewriterMarkdown
-                          content={msg.text}
+                          content={msg.text.replace(/\n/g, '  \n')}
                           speed={5}
                           remarkPlugins={[remarkGfm]}
                           components={{
                             a: ({node, ...props}) => {
                               const isApply = props.children && String(props.children).toLowerCase().includes('apply');
+                              const isLearn = props.children && String(props.children).toLowerCase().includes('learn');
+                              
                               if (isApply) {
                                 return (
                                   <a 
                                     {...props} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className={`btn btn-primary btn-sm`}
+                                    className="btn btn-primary btn-sm"
+                                    style={{ display: 'inline-flex', margin: '8px 8px 8px 0', textDecoration: 'none', color: '#ffffff' }}
+                                  >
+                                    {props.children}
+                                  </a>
+                                );
+                              }
+                              if (isLearn) {
+                                return (
+                                  <a 
+                                    {...props} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="btn btn-outline btn-sm"
                                     style={{ display: 'inline-flex', margin: '8px 8px 8px 0', textDecoration: 'none' }}
                                   >
                                     {props.children}

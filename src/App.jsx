@@ -5,6 +5,7 @@ import AuthModal from './components/AuthModal';
 import CompareModal from './components/CompareModal';
 import EligibilityPopup from './components/EligibilityPopup';
 import { useLanguage } from './context/LanguageContext';
+import { LocationProvider } from './context/LocationContext';
 // Pages
 import Home from './pages/Home';
 import Schemes from './pages/Schemes';
@@ -18,16 +19,19 @@ import Partners from './pages/Partners';
 import OutlierDashboard from './pages/OutlierDashboard';
 import VerifyCard from './pages/VerifyCard';
 import SplashLoader from './components/SplashLoader';
+import Achievements from './pages/Achievements';
+import VerifyBadge from './pages/VerifyBadge';
 
-export default function App() {
+function MainApp() {
   const { lang, t } = useLanguage();
   const [showSplash, setShowSplash] = useState(true);
   const [activeView, setActiveView] = useState(() => {
     if (typeof window === 'undefined') return 'home';
 
     const hash = window.location.hash.replace('#', '');
+    if (hash.startsWith('verify-badge/')) return 'verify-badge';
     if (hash.startsWith('verify/')) return 'verify';
-    if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant', 'partners', 'outlier'].includes(hash)) {
+    if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant', 'partners', 'outlier', 'achievements'].includes(hash)) {
       return hash;
     }
     return 'home';
@@ -37,7 +41,6 @@ export default function App() {
   const [catalogCategory, setCatalogCategory] = useState('all');
 
   // Global App States
-  const [stateLocation, setStateLocation] = useState('Rajasthan');
   const [compareList, setCompareList] = useState([]);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
@@ -50,15 +53,34 @@ export default function App() {
 
   const [user, setUser] = useState(null);
 
+  const [userBadges, setUserBadges] = useState(() => {
+    try {
+      const stored = localStorage.getItem('yojana_badges');
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const handleEarnBadge = (badgeData) => {
+    const newBadges = [badgeData, ...userBadges];
+    setUserBadges(newBadges);
+    localStorage.setItem('yojana_badges', JSON.stringify(newBadges));
+  };
+
   // Auto-route on hash change
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
+      if (hash.startsWith('verify-badge/')) {
+        setActiveView('verify-badge');
+        return;
+      }
       if (hash.startsWith('verify/')) {
         setActiveView('verify');
         return;
       }
-      if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant', 'partners', 'outlier'].includes(hash)) {
+      if (['home', 'planner', 'schemes', 'family', 'scam-shield', 'onboarding', 'form-assistant', 'partners', 'outlier', 'achievements'].includes(hash)) {
         setActiveView(hash);
       }
     };
@@ -263,6 +285,8 @@ export default function App() {
     setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
   };
 
+  const isPublicPage = activeView.startsWith('verify');
+
   // If verify view, render only verify card
   if (activeView === 'verify') {
     const cardId = window.location.hash.split('/')[1] || '';
@@ -282,24 +306,24 @@ export default function App() {
       <div className="glowing-orb orb-tertiary"></div>
 
       {/* Floating Navbar */}
-      <Navbar 
-        activeView={activeView}
-        onNavigate={handleNavigate}
-        stateLocation={stateLocation}
-        onChangeState={setStateLocation}
-        notifications={notifications}
-        onClearNoti={handleClearNoti}
-        onMarkNotiRead={handleMarkNotiRead}
-        user={user}
-        onLogout={handleLogout}
-        onTriggerAuth={(isRegister) => {
-          if (isRegister) {
-            handleNavigate('onboarding');
-          } else {
-            setIsAuthOpen(true);
-          }
-        }}
-      />
+      {!isPublicPage && (
+        <Navbar 
+          activeView={activeView}
+          onNavigate={handleNavigate}
+          notifications={notifications}
+          onClearNoti={handleClearNoti}
+          onMarkNotiRead={handleMarkNotiRead}
+          user={user}
+          onLogout={handleLogout}
+          onTriggerAuth={(isRegister) => {
+            if (isRegister) {
+              handleNavigate('onboarding');
+            } else {
+              setIsAuthOpen(true);
+            }
+          }}
+        />
+      )}
 
       {/* Main Container */}
       <main className={`main-content ${activeView === 'planner' ? 'main-content-planner' : ''}`}>
@@ -336,13 +360,13 @@ export default function App() {
           <AIPlanner 
             initialPrompt={plannerPrompt}
             user={user}
-            stateLocation={stateLocation}
           />
         )}
 
         {activeView === 'family' && (
           <Family 
             user={user}
+            userBadges={userBadges}
             onAddMember={handleAddMember}
             onUploadDoc={handleUploadDoc}
             onTriggerAuth={() => setIsAuthOpen(true)}
@@ -355,8 +379,6 @@ export default function App() {
 
         {activeView === 'onboarding' && (
           <Onboarding 
-            stateLocation={stateLocation}
-            onChangeState={setStateLocation}
             onTriggerAuth={() => setIsAuthOpen(true)}
             onComplete={(data, saathiId) => {
               handleLoginSuccess(data, saathiId);
@@ -368,7 +390,15 @@ export default function App() {
         {activeView === 'form-assistant' && (
           <GovFormAssistant 
             user={user}
+            onEarnBadge={handleEarnBadge}
             onBack={() => handleNavigate('schemes')}
+          />
+        )}
+
+        {activeView === 'achievements' && (
+          <Achievements 
+            user={user}
+            userBadges={userBadges}
           />
         )}
 
@@ -379,10 +409,12 @@ export default function App() {
         {activeView === 'outlier' && (
           <OutlierDashboard />
         )}
+
+        {activeView === 'verify-badge' && <VerifyBadge />}
       </main>
 
       {/* Bottom Sticky Footer */}
-      {activeView !== 'planner' && (
+      {activeView !== 'planner' && !isPublicPage && (
         <Footer 
           user={user}
           onNavigate={handleNavigate}
@@ -409,11 +441,19 @@ export default function App() {
         lang={lang}
       />
 
-      {activeView !== 'planner' && (
+      {activeView !== 'planner' && !isPublicPage && (
         <EligibilityPopup 
           onRegisterLead={() => setIsAuthOpen(true)}
         />
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LocationProvider>
+      <MainApp />
+    </LocationProvider>
   );
 }

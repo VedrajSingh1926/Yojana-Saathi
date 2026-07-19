@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Users, User, Check, Network, IdCard, FolderOpen, Calendar, ShieldCheck, Plus, Download } from 'lucide-react';
+import { Users, User, Check, Network, IdCard, FolderOpen, Calendar, ShieldCheck, Plus, Download, Award } from 'lucide-react';
 import QRCode from 'react-qr-code';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useLanguage } from '../context/LanguageContext';
+import Achievements from './Achievements';
 
-export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }) {
+export default function Family({ user, userBadges, onAddMember, onUploadDoc, onTriggerAuth }) {
   const { t, lang } = useLanguage();
   
   // Define fallback labels (f) to prevent crashes on undefined properties
@@ -146,6 +147,9 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
           <button className={`family-tab-btn ${subtab === 'events' ? 'active' : ''}`} onClick={() => setSubtab('events')}>
             <Calendar size={16} /> {t.tabEvents || "Life Events Log"}
           </button>
+          <button className={`family-tab-btn ${subtab === 'achievements' ? 'active' : ''}`} onClick={() => setSubtab('achievements')}>
+            <Award size={16} /> {t.achievements || "Achievements"}
+          </button>
         </div>
 
         {/* Tab Content Panes */}
@@ -228,7 +232,7 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
                       <label>{t.incomeLabel}</label>
                       <input type="number" required value={memberIncome} onChange={(e) => setMemberIncome(e.target.value)} placeholder="e.g. 0" />
                     </div>
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                    <div className="action-buttons-group" style={{ marginTop: '1rem' }}>
                       <button type="submit" className="btn btn-primary btn-sm">{f.addMember}</button>
                       <button type="button" className="btn btn-text btn-sm" onClick={() => setShowMemberForm(false)}>{f.cancel}</button>
                     </div>
@@ -540,6 +544,13 @@ export default function Family({ user, onAddMember, onUploadDoc, onTriggerAuth }
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* SUBTAB 6: Achievements */}
+          {subtab === 'achievements' && (
+            <div className="animate-fade-in">
+              <Achievements user={user} userBadges={userBadges} isEmbedded={true} />
             </div>
           )}
 

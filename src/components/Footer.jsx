@@ -27,7 +27,7 @@ export default function Footer({ user, onNavigate, onTriggerAuth }) {
         </div>
 
         {/* Column 2: Product */}
-        <div className="footer-nav-col">
+        <div className="footer-nav-col desktop-only-nav">
           <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>{t.product || 'Product'}</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <li><span className="footer-link cursor-pointer hover:text-primary transition-colors" onClick={() => onNavigate('home')}>{t.home || 'Home'}</span></li>

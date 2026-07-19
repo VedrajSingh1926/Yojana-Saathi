@@ -3862,5 +3862,106 @@ export const SCHEMES_DB = [
         "faqs": []
       }
     }
+  },
+  {
+    "id": "mp-ladli-behna",
+    "name": "Ladli Behna Yojana",
+    "emoji": "👩",
+    "benefit": "₹1,250/month",
+    "type": "State",
+    "state": "Madhya Pradesh",
+    "category": "Women",
+    "description": "Financial assistance for women to enhance their health and nutrition.",
+    "purpose": "To promote economic independence and improve health of women and dependent children.",
+    "benefits_detail": "₹1,250 per month directly credited to the Aadhar linked DBT enabled bank account.",
+    "who_can_apply": "Married women (including widows, divorced) aged 21-60 years residing in MP. Annual family income less than ₹2.5 Lakhs.",
+    "timeline": ["Online/Camp Registration", "Verification by local officials", "Monthly DBT"],
+    "eligibility": [
+      { "name": "Resident of Madhya Pradesh", "match": true },
+      { "name": "Woman aged 21-60 years", "match": true },
+      { "name": "Family Income < ₹2.5 Lakhs", "match": true }
+    ],
+    "docs": [
+      { "name": "Samagra ID", "desc": "Family ID document." },
+      { "name": "Aadhaar Card", "desc": "Identity proof linked to bank." }
+    ],
+    "faqs": [],
+    "ai_summaries": { "en": "Ladli Behna provides ₹1250 monthly to eligible women in MP to support household and health expenses." },
+    "official_url": "https://cmladlibahna.mp.gov.in"
+  },
+  {
+    "id": "mp-kisan-kalyan",
+    "name": "Mukhyamantri Kisan Kalyan Yojana",
+    "emoji": "🌾",
+    "benefit": "₹6,000/year",
+    "type": "State",
+    "state": "Madhya Pradesh",
+    "category": "Farmer",
+    "description": "Additional financial support to farmers in MP, aligned with PM Kisan.",
+    "purpose": "To increase farmers' income and support agricultural expenses.",
+    "benefits_detail": "₹6,000 per year transferred in equal installments.",
+    "who_can_apply": "Farmers who are beneficiaries of PM Kisan Samman Nidhi.",
+    "timeline": ["Automatic mapping with PM-Kisan", "DBT disbursement"],
+    "eligibility": [
+      { "name": "Beneficiary of PM Kisan", "match": true },
+      { "name": "Resident of MP", "match": true }
+    ],
+    "docs": [
+      { "name": "Khasra/Khatauni", "desc": "Land records." },
+      { "name": "Aadhaar", "desc": "DBT linkage." }
+    ],
+    "faqs": [],
+    "ai_summaries": { "en": "State top-up for PM-Kisan providing an extra ₹6000 annually to MP farmers." },
+    "official_url": "https://saara.mp.gov.in"
+  },
+  {
+    "id": "mp-sambal",
+    "name": "Sambal Yojana",
+    "emoji": "🛡️",
+    "benefit": "Insurance & Assistance",
+    "type": "State",
+    "state": "Madhya Pradesh",
+    "category": "Employment",
+    "description": "Social security for unorganized sector workers.",
+    "purpose": "Provides maternal assistance, education incentives, accident insurance, and funeral assistance.",
+    "benefits_detail": "Varies by event: ₹4 Lacs for accidental death, maternity benefits up to ₹16,000.",
+    "who_can_apply": "Unorganized workers aged 18-60 with a BPL status or low income.",
+    "timeline": ["Registration at Gram Panchayat/Zone", "Verification", "Card issuance"],
+    "eligibility": [
+      { "name": "Unorganized worker", "match": true },
+      { "name": "Age 18-60", "match": true }
+    ],
+    "docs": [
+      { "name": "Aadhaar", "desc": "Identity." },
+      { "name": "Labor Card / Self Declaration", "desc": "Proof of unorganized labor." }
+    ],
+    "faqs": [],
+    "ai_summaries": { "en": "Comprehensive social security net for unorganized workers in MP." },
+    "official_url": "https://sambal.mp.gov.in"
+  },
+  {
+    "id": "mp-udyam-kranti",
+    "name": "Mukhyamantri Udyam Kranti Yojana",
+    "emoji": "🏭",
+    "benefit": "₹1L - 50L Loan",
+    "type": "State",
+    "state": "Madhya Pradesh",
+    "category": "Business",
+    "description": "Self-employment generation through subsidized bank loans.",
+    "purpose": "To encourage youth to set up their own manufacturing or service enterprises.",
+    "benefits_detail": "Loans up to ₹50 Lakhs for manufacturing and ₹25 Lakhs for service/retail. 3% interest subsidy.",
+    "who_can_apply": "Youth aged 18-40, minimum 8th pass, family income below ₹12 Lakhs.",
+    "timeline": ["Online Application", "Bank Sanction", "Subsidy Disbursement"],
+    "eligibility": [
+      { "name": "Age 18-40 years", "match": true },
+      { "name": "8th Pass", "match": true }
+    ],
+    "docs": [
+      { "name": "Project Report", "desc": "Business plan." },
+      { "name": "Education Certificate", "desc": "Minimum 8th pass proof." }
+    ],
+    "faqs": [],
+    "ai_summaries": { "en": "Subsidized loans for MP youth to start new businesses." },
+    "official_url": "https://samast.mponline.gov.in"
   }
 ];

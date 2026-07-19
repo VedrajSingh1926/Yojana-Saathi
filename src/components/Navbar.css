@@ -452,6 +452,7 @@
   }
   .lux-mobile-toggle {
     display: block;
+    margin-left: 12px;
   }
 }
 
@@ -460,9 +461,9 @@
     height: 72px;
   }
   .lux-container {
-    padding: 0 32px;
+    padding: 0 24px;
   }
-  .lux-login-btn {
+  .lux-login-btn, .lux-cta-btn, .lux-actions .lux-icon-btn {
     display: none;
   }
 }
@@ -472,9 +473,9 @@
     height: 64px;
   }
   .lux-container {
-    padding: 0 24px;
+    padding: 0 16px;
   }
-  .lux-pill, .lux-icon-btn, .lux-cta-btn {
+  .lux-actions {
     display: none;
   }
   .lux-brand-sub {

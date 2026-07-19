@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Sliders, Scale, Trash2, ArrowRight, Sparkles } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { SCHEMES_DB } from '../data/schemes';
+import { useLocationContext } from '../context/LocationContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 
@@ -13,9 +14,9 @@ export default function Schemes({
   onTriggerCompare
 }) {
   const { lang, t } = useLanguage();
+  const { stateLocation, setStateLocation } = useLocationContext();
   const [search, setSearch] = useState('');
   const [types, setTypes] = useState(['Central', 'State']);
-  const [selectedState, setSelectedState] = useState('All States');
   const [category, setCategory] = useState(initialCategory);
   const [trendingTab, setTrendingTab] = useState('all-trending');
 
@@ -50,7 +51,7 @@ export default function Schemes({
   const handleReset = () => {
     setSearch('');
     setTypes(['Central', 'State']);
-    setSelectedState('All States');
+    setStateLocation('All States');
     setCategory('all');
     setTrendingTab('all-trending');
   };
@@ -135,7 +136,7 @@ export default function Schemes({
     const stateStr = state === 'All States' ? 'State' : state;
     const stateLoc = {
       hi: { "State": "राज्य", "Rajasthan": "राजस्थान", "Madhya Pradesh": "मध्य प्रदेश", "Tamil Nadu": "तमिलनाडु", "Maharashtra": "महाराष्ट्र" },
-      ta: { "State": "மாநில", "Rajasthan": "ராஜஸ்தான்", "Madhya Pradesh": "மத்தியப் பிரதேசம்", "Tamil Nadu": "தமிழ்நாடு", "Maharashtra": "மகாராஷ்டிரா" },
+      ta: { "State": "மாநில", "Rajasthan": "ராஜஸ்தான்", "Madhya Pradesh": "மத்தியப் பிரதேசம்", "Tamil Nadu": "தமிழ்நாடு", "Maharashtra": "மகாராட்டிரம்" },
       te: { "State": "రాష్ట్ర", "Rajasthan": "రాజస్థాన్", "Madhya Pradesh": "మధ్యప్రదేశ్", "Tamil Nadu": "తమిళనాడు", "Maharashtra": "మహారాష్ట్ర" },
       bn: { "State": "রাজ্য", "Rajasthan": "রাজস্থান", "Madhya Pradesh": "মধ্যপ্রদেশ", "Tamil Nadu": "তামিলনাড়ু", "Maharashtra": "মহারাষ্ট্র" }
     };
@@ -153,13 +154,13 @@ export default function Schemes({
 
   const localizedStates = {
     hi: { "All States": "सभी राज्य", "Rajasthan": "राजस्थान", "Madhya Pradesh": "मध्य प्रदेश", "Tamil Nadu": "तमिलनाडु", "Maharashtra": "महाराष्ट्र" },
-    ta: { "All States": "அனைத்து மாநிலங்கள்", "Rajasthan": "ராஜஸ்தான்", "Madhya Pradesh": "மத்தியப் பிரதேசம்", "Tamil Nadu": "தமிழ்நாடு", "Maharashtra": "மகாராஷ்டிரா" },
+    ta: { "All States": "அனைத்து மாநிலங்கள்", "Rajasthan": "ராஜஸ்தான்", "Madhya Pradesh": "மத்தியப் பிரதேசம்", "Tamil Nadu": "தமிழ்நாடு", "Maharashtra": "மகாராட்டிரம்" },
     te: { "All States": "అన్ని రాష్ట్రాలు", "Rajasthan": "రాజస్థాన్", "Madhya Pradesh": "మధ్యప్రదేశ్", "Tamil Nadu": "తమిళనాడు", "Maharashtra": "మహారాష్ట్ర" },
     bn: { "All States": "সমস্ত রাজ্য", "Rajasthan": "রাজস্থান", "Madhya Pradesh": "মধ্যপ্রদেশ", "Tamil Nadu": "তামিলনাড়ু", "Maharashtra": "মহারাষ্ট্র" }
   };
 
   const centralSchemes = filtered.filter(s => s.type === 'Central');
-  const stateSchemes = filtered.filter(s => s.type === 'State' && (selectedState === 'All States' || s.state === selectedState));
+  const stateSchemes = filtered.filter(s => s.type === 'State' && (stateLocation === 'All States' || s.state === stateLocation));
 
   const renderSchemeCard = (s) => {
     const isCompared = compareList.includes(s.id);
@@ -182,8 +183,8 @@ export default function Schemes({
             <span className="badge badge-tag">{localizedCategories[lang]?.[s.category] || s.category}</span>
           </div>
         </div>
-        <h3>{s.translations?.[lang]?.name || s.name}</h3>
-        <p className="scheme-desc">{s.translations?.[lang]?.description || s.description}</p>
+        <h3 className="break-words">{s.translations?.[lang]?.name || s.name}</h3>
+        <p className="scheme-desc break-words">{s.translations?.[lang]?.description || s.description}</p>
         
         <div className="scheme-stats">
           <div className="stat-box">
@@ -197,7 +198,7 @@ export default function Schemes({
         </div>
 
         <div className="scheme-card-actions">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div className="action-buttons-group">
             <button 
               className="btn btn-primary btn-sm" 
               style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
@@ -302,8 +303,8 @@ export default function Schemes({
               <h4>{t.stateSelection || "State Selection"}</h4>
               <select 
                 className="input-field w-full"
-                value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value)}
+                value={stateLocation}
+                onChange={(e) => setStateLocation(e.target.value)}
                 style={{ padding: '0.5rem', marginTop: '0.5rem' }}
               >
                 <option value="All States">{localizedStates[lang]?.["All States"] || "All States"}</option>
@@ -422,8 +423,13 @@ export default function Schemes({
             {stateSchemes.length > 0 && (
               <div style={{ marginBottom: '3rem' }}>
                 <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)', borderBottom: '2px solid var(--secondary-glow)', paddingBottom: '0.5rem', fontSize: '1.4rem' }}>
-                  {getStateHeading(selectedState, lang)}
+                  {getStateHeading(stateLocation, lang)}
                 </h3>
+                <div className="section-title-wrap">
+                  <div className="title-icon bg-gold"></div>
+                  <h2>{t.stateGovSchemes || "State Government Schemes"}</h2>
+                  {getStateHeading(stateLocation, lang)}
+                </div>
                 <div className="schemes-cards-grid">
                   <AnimatePresence>
                     {stateSchemes.map(s => renderSchemeCard(s))}

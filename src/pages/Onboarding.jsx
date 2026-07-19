@@ -3,24 +3,26 @@ import { motion } from 'framer-motion';
 import { Check, ChevronRight, User, Home, Upload, Target, Sparkles, Loader2, Plus, X, Users, Fingerprint } from 'lucide-react';
 import { triggerLocalDownload } from '../utils/downloadHelper';
 import { useLanguage } from '../context/LanguageContext';
+import { useLocationContext } from '../context/LocationContext';
 
-export default function Onboarding({ stateLocation, onChangeState, onComplete, onTriggerAuth }) {
+export default function Onboarding({ onComplete, onTriggerAuth }) {
   const { t } = useLanguage();
+  const { stateLocation, setStateLocation } = useLocationContext();
   const [step, setStep] = useState(1);
   const [otpSent, setOtpSent] = useState(false);
   const [mobileOtp, setMobileOtp] = useState(['', '', '', '', '', '']);
   const [generatedSaathiId, setGeneratedSaathiId] = useState(null);
 
   const [formData, setFormData] = useState({
-    personal: { name: '', age: '', gender: 'Male', occupation: '', income: '', phone: '', email: '', password: '', state: stateLocation || '', district: '' },
+    personal: { name: '', age: '', gender: 'Male', occupation: '', income: '', phone: '', email: '', password: '', state: stateLocation || 'All States', district: '' },
     household: { isHead: 'Yes', headName: '', members: [] },
     details: { houseType: 'Own', area: 'Urban', category: 'General', farmer: 'No', bpl: 'No', bank: 'Yes', land: 'None' },
     goals: []
   });
 
   useEffect(() => {
-    if (formData.personal.state && onChangeState && formData.personal.state !== stateLocation) {
-      onChangeState(formData.personal.state);
+    if (formData.personal.state && formData.personal.state !== stateLocation) {
+      setStateLocation(formData.personal.state);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.personal.state]);

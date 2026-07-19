@@ -3,15 +3,35 @@ import { motion } from 'framer-motion';
 import { Sparkles, Check, ChevronLeft, ShieldAlert, AlertTriangle, Info } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
-export default function GovFormAssistant({ onBack, user }) {
+export default function GovFormAssistant({ onBack, user, onEarnBadge, onNavigate }) {
   const { lang, t } = useLanguage();
   const [activeField, setActiveField] = useState(null);
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [earnedBadge, setEarnedBadge] = useState(null);
   const [formState, setFormState] = useState({
     aadhar: '',
     pan: '',
     income: '',
     account: ''
   });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Generate Badge
+    const badgeId = `YJ-${Math.random().toString(36).substr(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+    const newBadge = {
+      id: badgeId,
+      schemeName: 'Pradhan Mantri Awas Yojana', // Using a default for the prototype
+      status: 'Completed',
+      date: new Date().toLocaleDateString(),
+      icon: '🏠'
+    };
+    if (onEarnBadge) {
+      onEarnBadge(newBadge);
+    }
+    setEarnedBadge(newBadge);
+    setShowBadgeModal(true);
+  };
 
   // Mocking the AI Assistant's guidance based on the active field
   const getAiGuidance = () => {
@@ -74,7 +94,7 @@ export default function GovFormAssistant({ onBack, user }) {
             <span>{t.warningFalseInfo || "Warning: Providing false information is a punishable offense under the IT Act. Please ensure all details match your official documents."}</span>
           </div>
 
-          <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 600, color: '#333' }}>{t.aadhaarNum || "1. Aadhaar Number (UID)"} <span style={{ color: 'red' }}>*</span></label>
               <input 
@@ -124,8 +144,8 @@ export default function GovFormAssistant({ onBack, user }) {
             </div>
 
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-              <button style={{ padding: '0.75rem 2rem', background: '#ccc', color: '#333', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>{t.resetForm || "Reset"}</button>
-              <button style={{ padding: '0.75rem 2rem', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>{t.submitApp || "Submit Application"}</button>
+              <button type="button" onClick={() => setFormState({ aadhar: '', pan: '', income: '', account: '' })} style={{ padding: '0.75rem 2rem', background: '#ccc', color: '#333', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>{t.resetForm || "Reset"}</button>
+              <button type="submit" style={{ padding: '0.75rem 2rem', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>{t.submitApp || "Submit Application"}</button>
             </div>
           </form>
         </div>
@@ -193,6 +213,36 @@ export default function GovFormAssistant({ onBack, user }) {
           </div>
         </div>
       </motion.div>
+
+      {/* SUCCESS MODAL */}
+      {showBadgeModal && earnedBadge && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.8)', padding: '2rem' }}>
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-card" style={{ maxWidth: '500px', width: '100%', textAlign: 'center', padding: '3rem', position: 'relative', overflow: 'hidden' }}>
+            <div className="glowing-orb orb-primary" style={{ top: '-20%', left: '-20%' }}></div>
+            
+            <div style={{ background: 'rgba(255,255,255,0.1)', width: '80px', height: '80px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto', fontSize: '2.5rem' }}>
+              {earnedBadge.icon}
+            </div>
+            
+            <h2 style={{ margin: '0 0 1rem 0', color: 'var(--text-primary)' }}>Achievement Unlocked!</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>You have successfully completed the application for <strong>{earnedBadge.schemeName}</strong>.</p>
+            
+            <div style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.1), rgba(26,115,232,0.05))', border: '1px solid var(--gold)', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem' }}>
+              <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--gold)', letterSpacing: '2px', marginBottom: '8px' }}>Badge ID: {earnedBadge.id}</div>
+              <h4 style={{ margin: 0, color: 'var(--text-primary)' }}>Application Verified</h4>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <button className="btn btn-primary w-full" onClick={() => onNavigate('achievements')}>
+                View in Achievements
+              </button>
+              <button className="btn btn-outline w-full" onClick={onBack}>
+                Return to Schemes
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
