@@ -277,12 +277,12 @@ export default function Family({ user, userBadges, onAddMember, onUploadDoc, onT
                         };
                         return (
                           <tr key={idx}>
-                            <td><strong>{m.name}</strong></td>
-                            <td>{relationTextMap[m.relation] || m.relation}</td>
-                            <td>{m.age}</td>
-                            <td>{occupationTextMap[m.occupation] || m.occupation}</td>
-                            <td>₹{m.income.toLocaleString()}/yr</td>
-                            <td><span className="member-tag">{statusTextMap[m.status] || m.status}</span></td>
+                            <td data-label={f.nameCol}><strong>{m.name}</strong></td>
+                            <td data-label={f.relationCol}>{relationTextMap[m.relation] || m.relation}</td>
+                            <td data-label={f.ageCol}>{m.age}</td>
+                            <td data-label={f.occupationCol}>{occupationTextMap[m.occupation] || m.occupation}</td>
+                            <td data-label={f.incomeCol}>₹{m.income.toLocaleString()}/yr</td>
+                            <td data-label={f.statusCol}><span className="member-tag">{statusTextMap[m.status] || m.status}</span></td>
                           </tr>
                         );
                       })}

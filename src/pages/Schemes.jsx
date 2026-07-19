@@ -19,6 +19,7 @@ export default function Schemes({
   const [types, setTypes] = useState(['Central', 'State']);
   const [category, setCategory] = useState(initialCategory);
   const [trendingTab, setTrendingTab] = useState('all-trending');
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
 
   // Keep state in sync with parent updates (e.g. milestone redirects)
@@ -269,11 +270,11 @@ export default function Schemes({
       </div>
 
       <div className="schemes-layout-container">
-        {/* Filters Sidebar */}
+        {/* Filters Sidebar (Desktop) */}
         <aside className="filters-sidebar">
           <div className="sidebar-header">
-            <h3><Sliders size={18} /> {t.filtersTitle}</h3>
-            <button className="btn-text text-gold btn-sm" onClick={handleReset}>{t.resetAll}</button>
+            <h3><Sliders size={18} /> {t.filtersTitle || "Filters"}</h3>
+            <button className="btn-text text-gold btn-sm" onClick={handleReset}>{t.resetAll || "Reset"}</button>
           </div>
 
           {/* Type filters */}
@@ -447,6 +448,94 @@ export default function Schemes({
           </div>
         </main>
       </div>
+
+      {/* Mobile Filter FAB */}
+      <button 
+        className="mobile-filter-fab" 
+        onClick={() => setShowMobileFilters(true)}
+        aria-label="Open Filters"
+      >
+        <Sliders size={24} />
+      </button>
+
+      {/* Mobile Filters Bottom Sheet */}
+      <AnimatePresence>
+        {showMobileFilters && (
+          <>
+            <motion.div 
+              className="bottom-sheet-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowMobileFilters(false)}
+            />
+            <motion.div 
+              className="bottom-sheet"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            >
+              <div className="bottom-sheet-handle" onClick={() => setShowMobileFilters(false)} />
+              
+              <div className="sidebar-header">
+                <h3><Sliders size={18} /> {t.filtersTitle || "Filters"}</h3>
+                <button className="btn-text text-gold btn-sm" onClick={() => { handleReset(); setShowMobileFilters(false); }}>{t.resetAll || "Reset"}</button>
+              </div>
+
+              {/* Type filters */}
+              <div className="filter-group">
+                <h4>{t.govType || "Govt Type"}</h4>
+                <div className="filter-options-stack">
+                  <label className="checkbox-container">
+                    <input type="checkbox" checked={types.includes('Central')} onChange={() => handleTypeChange('Central')} />
+                    <span className="checkmark"></span> {t.centralGov || "Central"}
+                  </label>
+                  <label className="checkbox-container">
+                    <input type="checkbox" checked={types.includes('State')} onChange={() => handleTypeChange('State')} />
+                    <span className="checkmark"></span> {t.stateGov || "State"}
+                  </label>
+                </div>
+              </div>
+
+              <div className="filter-group">
+                <h4>{t.stateSelection || "State Selection"}</h4>
+                <select 
+                  className="input-field w-full"
+                  value={stateLocation}
+                  onChange={(e) => setStateLocation(e.target.value)}
+                  style={{ padding: '0.5rem', marginTop: '0.5rem' }}
+                >
+                  <option value="All States">{localizedStates[lang]?.["All States"] || "All States"}</option>
+                  <option value="Rajasthan">{localizedStates[lang]?.["Rajasthan"] || "Rajasthan"}</option>
+                  <option value="Madhya Pradesh">{localizedStates[lang]?.["Madhya Pradesh"] || "Madhya Pradesh"}</option>
+                  <option value="Tamil Nadu">{localizedStates[lang]?.["Tamil Nadu"] || "Tamil Nadu"}</option>
+                  <option value="Maharashtra">{localizedStates[lang]?.["Maharashtra"] || "Maharashtra"}</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <h4>{t.targetCategories || "Categories"}</h4>
+                <div className="filter-tags-grid">
+                  {categories.map(cat => (
+                    <button 
+                      key={cat}
+                      className={`filter-pill ${category === cat ? 'active' : ''}`}
+                      onClick={() => setCategory(cat)}
+                    >
+                      {localizedCategories[lang]?.[cat] || cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <button className="btn btn-primary w-full mt-3" onClick={() => setShowMobileFilters(false)}>
+                Apply Filters
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

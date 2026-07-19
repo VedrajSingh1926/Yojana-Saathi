@@ -430,7 +430,7 @@ export default function AIPlanner({ initialPrompt, user }) {
                     )}
 
                     {msg.sender === 'system' && index > 0 && (
-                      <div className="message-actions" style={{ display: 'flex', gap: '16px', marginTop: '12px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px' }}>
+                      <div className="message-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginTop: '12px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px' }}>
                         <button 
                           className="btn-action-small" 
                           onClick={() => {

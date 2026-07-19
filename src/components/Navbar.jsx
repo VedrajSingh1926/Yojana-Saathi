@@ -59,7 +59,8 @@ export default function Navbar({
     { id: 'planner', label: t.planner || 'Planner' },
     { id: 'schemes', label: t.schemes || 'Schemes' },
     { id: 'family', label: t.family || 'Family' },
-    { id: 'scam-shield', label: t.scamShield || 'Scam Shield' }
+    { id: 'scam-shield', label: t.scamShield || 'Scam Shield' },
+    { id: 'achievements', label: t.achievements || 'Achievements' }
   ].filter(Boolean);
 
   const dropdownVariants = {
@@ -345,12 +346,14 @@ export default function Navbar({
                 </button>
               </div>
 
-            <div className="lux-drawer-links">
+            <div className="lux-drawer-links" style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--lux-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '16px' }}>Primary Navigation</div>
               {navLinks.map((link, i) => (
                 <motion.a
                   key={link.id}
                   href={`#${link.id}`}
                   className={`lux-drawer-link ${activeView === link.id ? 'active' : ''}`}
+                  style={{ display: 'block', marginBottom: '24px' }}
                   onClick={(e) => { e.preventDefault(); onNavigate(link.id); setMobileOpen(false); }}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -359,11 +362,14 @@ export default function Navbar({
                   {link.label}
                 </motion.a>
               ))}
-            </div>
 
-            <div className="lux-drawer-footer">
-              {/* Mobile Drawer State and Language */}
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--lux-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '24px', marginBottom: '16px' }}>Quick Links</div>
+              <motion.a href="#" style={{ display: 'block', marginBottom: '20px', color: 'var(--lux-text)', textDecoration: 'none', fontWeight: 500 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>Gram Panchayat Login</motion.a>
+              <motion.a href="#" style={{ display: 'block', marginBottom: '20px', color: 'var(--lux-text)', textDecoration: 'none', fontWeight: 500 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>CSC Portal</motion.a>
+              <motion.a href="#" style={{ display: 'block', marginBottom: '24px', color: 'var(--lux-text)', textDecoration: 'none', fontWeight: 500 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>Partner Integrations</motion.a>
+
+              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--lux-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '24px', marginBottom: '16px' }}>Preferences</div>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '32px' }}>
                 <select 
                   style={{ flex: 1, padding: '12px', borderRadius: '12px', border: '1px solid var(--lux-border)', background: 'var(--lux-bg)', color: 'var(--lux-text)', outline: 'none' }}
                   value={lang}
@@ -384,6 +390,9 @@ export default function Navbar({
                   ))}
                 </select>
               </div>
+            </div>
+
+            <div className="lux-drawer-footer" style={{ borderTop: '1px solid var(--lux-border)', paddingTop: '24px', marginTop: 'auto' }}>
 
               {!user ? (
                 <>

@@ -368,15 +368,27 @@
   padding: 8px;
 }
 
+/* Mobile Drawer Backdrop */
+.lux-drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1999;
+  backdrop-filter: blur(4px);
+}
+
 /* Mobile Drawer */
 .lux-mobile-drawer {
   position: fixed;
   top: 0;
-  left: 0;
-  width: 100%;
+  right: 0;
+  width: 320px;
   height: 100vh;
-  background: rgba(250, 250, 248, 0.98);
-  backdrop-filter: blur(20px);
+  background: var(--lux-bg);
+  box-shadow: -10px 0 40px rgba(0,0,0,0.1);
   z-index: 2000;
   display: flex;
   flex-direction: column;
@@ -463,9 +475,6 @@
   .lux-container {
     padding: 0 24px;
   }
-  .lux-login-btn, .lux-cta-btn, .lux-actions .lux-icon-btn {
-    display: none;
-  }
 }
 
 @media (max-width: 768px) {
@@ -480,5 +489,8 @@
   }
   .lux-brand-sub {
     display: none;
+  }
+  .lux-mobile-drawer {
+    width: 100%;
   }
 }
