@@ -203,13 +203,13 @@ export default function Schemes({
             <span className="badge badge-tag">{localizedCategories[lang]?.[s.category] || s.category}</span>
           </div>
         </div>
-        <h3 className="break-words">{s.translations?.[lang]?.name || s.name}</h3>
-        <p className="scheme-desc break-words">{s.translations?.[lang]?.description || s.description}</p>
+        <h3 className="break-words">{s.name[lang] || s.name.en}</h3>
+        <p className="scheme-desc break-words">{s.description[lang] || s.description.en}</p>
         
         <div className="scheme-stats">
           <div className="stat-box">
             <span className="stat-label">{t.estimatedBenefit || "Benefit"}</span>
-            <span className="stat-val text-gold">{s.translations?.[lang]?.benefit || s.benefit}</span>
+            <span className="stat-val text-gold">{s.benefit[lang] || s.benefit.en}</span>
           </div>
           <div className="stat-box">
             <span className="stat-label">{verificationTimeText[lang] || verificationTimeText.en}</span>
@@ -226,7 +226,7 @@ export default function Schemes({
               <Sparkles size={12} /> {t.fillWithAI || "Fill with AI"}
             </button>
             <a 
-              href={`https://www.google.com/search?q=${encodeURIComponent(s.name + ' CSC near me')}`}
+              href={`https://www.google.com/search?q=${encodeURIComponent((s.name.en || s.name) + ' CSC near me')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline btn-sm main-btn" 

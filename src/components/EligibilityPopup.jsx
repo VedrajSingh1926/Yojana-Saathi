@@ -131,10 +131,10 @@ export default function EligibilityPopup({ onRegisterLead }) {
               <p className="text-sm text-muted mt-2">You qualify for direct benefits: <strong>{matches.map(m => m.emoji).join(' ')}</strong></p>
 
               <div className="mb-3 mt-3 text-left" style={{ background: 'rgba(255,255,255,0.02)', padding: '0.5rem 0.75rem', borderRadius: 'var(--border-radius-sm)' }}>
-                {matches.slice(0, 3).map((m, idx) => (
+                {matches.slice(0, 3).map((s, idx) => (
                   <div key={idx} className="text-xs font-semibold mb-1" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>{m.name.split('(')[0]}</span>
-                    <span className="text-gold">{m.benefit.split(' ')[0]}</span>
+                    <span className="scheme-name">{s.name[lang] || s.name.en}</span>
+                    <span className="scheme-benefit">{s.benefit[lang] || s.benefit.en}</span>
                   </div>
                 ))}
                 {matches.length > 3 && (
