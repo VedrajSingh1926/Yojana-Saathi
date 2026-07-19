@@ -3696,6 +3696,40 @@ button, input, select, textarea {
 
 /* ==================== FINAL POLISH RESPONSIVE FIXES ==================== */
 
+@media (max-width: 767px) {
+  .scheme-card {
+    padding: 1.25rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .scheme-card h3,
+  .scheme-desc,
+  .scheme-card-header .badge {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+  }
+  
+  .scheme-stats {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .scheme-card-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .scheme-card-actions .compare-checkbox-label {
+    width: 100%;
+    justify-content: center;
+    padding-top: 0.5rem;
+  }
+}
+
 /* Enforce Minimum Touch Targets for Accessibility */
 button, 
 .btn, 
@@ -3768,7 +3802,11 @@ button,
 }
 
 /* Specific Grid Fixes (To be used anywhere inline grids were used) */
-.schemes-cards-grid,
+.schemes-cards-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+}
 .overview-grid,
 .grid-responsive {
   display: grid;
@@ -3777,7 +3815,9 @@ button,
 }
 
 @media (max-width: 1024px) {
-  .schemes-cards-grid,
+  .schemes-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
   .overview-grid,
   .grid-responsive {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
