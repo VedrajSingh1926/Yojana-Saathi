@@ -217,11 +217,10 @@ export default function Schemes({
           </div>
         </div>
 
-        <div className="scheme-card-actions">
-          <div className="action-buttons-group">
+        <div className="scheme-card-actions-wrapper">
+          <div className="main-actions-group">
             <button 
-              className="btn btn-primary btn-sm" 
-              style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+              className="btn btn-primary btn-sm main-btn" 
               onClick={() => onNavigate('form-assistant')}
             >
               <Sparkles size={12} /> {t.fillWithAI || "Fill with AI"}
@@ -230,23 +229,24 @@ export default function Schemes({
               href={`https://www.google.com/search?q=${encodeURIComponent(s.name + ' CSC near me')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-outline btn-sm" 
-              style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+              className="btn btn-outline btn-sm main-btn" 
             >
               📍 {t.findNearbyCsc || "Find Nearby CSC"}
             </a>
-            <a href="#" className="card-learn-more" onClick={(e) => { e.preventDefault(); onNavigate('detail', { schemeId: s.id }); }} style={{ display: 'flex', alignItems: 'center' }}>
+          </div>
+          <div className="secondary-actions-group">
+            <a href="#" className="card-learn-more" onClick={(e) => { e.preventDefault(); onNavigate('detail', { schemeId: s.id }); }}>
               {learnMoreText[lang] || learnMoreText.en} <ArrowRight size={14} />
             </a>
+            <label className="compare-checkbox-label">
+              <input 
+                type="checkbox"
+                checked={isCompared}
+                onChange={() => onToggleCompare(s.id)}
+              />
+              <span>{t.compare || "Compare"}</span>
+            </label>
           </div>
-          <label className="compare-checkbox-label">
-            <input 
-              type="checkbox"
-              checked={isCompared}
-              onChange={() => onToggleCompare(s.id)}
-            />
-            <span>{t.compare || "Compare"}</span>
-          </label>
         </div>
       </motion.div>
     );
