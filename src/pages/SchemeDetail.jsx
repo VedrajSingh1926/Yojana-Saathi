@@ -167,7 +167,7 @@ export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveSchem
               <h3>⚡ AI Unified Summary</h3>
               
               <div className="languages-tabs">
-                <span className="text-muted text-xs">Translated via AI</span>
+                <span className="text-muted text-xs">{t.translatedViaAi || "Translated via AI"}</span>
               </div>
               
               <p>{summaryText}</p>
@@ -175,31 +175,31 @@ export default function SchemeDetail({ schemeId, onBack, onNavigate, onSaveSchem
               <hr className="menu-divider" />
               
               <button className="btn btn-outline w-full" onClick={handleAskAI}>
-                Ask AI Assistant
+                {t.askAiAssistant || "Ask AI Assistant"}
               </button>
               <button className="btn btn-primary w-full" onClick={handleDownload}>
-                <Download size={16} /> Download Checklist
+                <Download size={16} /> {t.downloadChecklist || "Download Checklist"}
               </button>
               <a 
-                href={`https://www.google.com/search?q=${encodeURIComponent(scheme.name + ' CSC service provider near me')}`}
+                href={`https://www.google.com/search?q=${encodeURIComponent((scheme.name.en || scheme.name) + ' CSC service provider near me')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-outline w-full" 
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
               >
-                📍 Find Nearby CSC
+                📍 {t.findNearbyCsc || "Find Nearby CSC"}
               </a>
               <div style={{ textAlign: 'center', marginTop: '1rem', marginBottom: '0.5rem' }}>
-                <span className="text-xs text-muted" style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>Need Legal Help?</span>
+                <span className="text-xs text-muted" style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t.needLegalHelp || "Need Legal Help?"}</span>
               </div>
               <a 
-                href={`https://www.google.com/search?q=${encodeURIComponent(scheme.name + ' consultant near me')}`}
+                href={`https://www.google.com/search?q=${encodeURIComponent((scheme.name.en || scheme.name) + ' consultant near me')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-outline w-full" 
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
               >
-                ⚖️ Find Service Provider
+                ⚖️ {t.findServiceProvider || "Find Service Provider"}
               </a>
             </div>
           </aside>

@@ -65,7 +65,7 @@ export default function EligibilityPopup({ onRegisterLead }) {
       <div className="popup-collapsed-header" onClick={() => setExpanded(!expanded)}>
         <div className="popup-title">
           <span className="popup-pulse"></span>
-          <HelpCircle size={16} className="text-gold" /> Check Your Eligibility
+          <HelpCircle size={16} className="text-gold" /> {t.checkEligibility || "Check Your Eligibility"}
         </div>
         {expanded ? <ChevronDown size={14} className="popup-arrow" /> : <ChevronUp size={14} className="popup-arrow" />}
       </div>
@@ -75,10 +75,10 @@ export default function EligibilityPopup({ onRegisterLead }) {
         <div className="popup-expanded-content">
           {!matches ? (
             <>
-              <p className="text-sm text-muted mb-3">Answer 4 quick questions to see your eligible government schemes. No login required.</p>
+              <p className="text-sm text-muted mb-3">{t.answerFourQuestions || "Answer 4 quick questions to see your eligible government schemes. No login required."}</p>
               <form onSubmit={handleSubmit}>
                 <div className="form-group-sm">
-                  <label>Age</label>
+                  <label>{t.age || "Age"}</label>
                   <input 
                     type="number" 
                     required 
@@ -88,7 +88,7 @@ export default function EligibilityPopup({ onRegisterLead }) {
                   />
                 </div>
                 <div className="form-group-sm">
-                  <label>Annual Income (₹)</label>
+                  <label>{t.annualIncome || "Annual Income (₹)"}</label>
                   <input 
                     type="number" 
                     required 
@@ -98,7 +98,7 @@ export default function EligibilityPopup({ onRegisterLead }) {
                   />
                 </div>
                 <div className="form-group-sm">
-                  <label>Domicile State</label>
+                  <label>{t.domicileState || "Domicile State"}</label>
                   <select value={state} onChange={(e) => setState(e.target.value)}>
                     <option value="Rajasthan">Rajasthan</option>
                     <option value="Maharashtra">Maharashtra</option>
@@ -109,7 +109,7 @@ export default function EligibilityPopup({ onRegisterLead }) {
                   </select>
                 </div>
                 <div className="form-group-sm">
-                  <label>Occupation</label>
+                  <label>{t.occupationTitle || "Occupation"}</label>
                   <select value={occupation} onChange={(e) => setOccupation(e.target.value)}>
                     <option value="Farmer">Farmer</option>
                     <option value="Student">Student</option>
@@ -120,15 +120,15 @@ export default function EligibilityPopup({ onRegisterLead }) {
                   </select>
                 </div>
                 <button type="submit" className="btn btn-primary btn-sm w-full mt-3">
-                  Scan Eligibility
+                  {t.scanEligibility || "Scan Eligibility"}
                 </button>
               </form>
             </>
           ) : (
             <div className="popup-results text-center">
               <CheckCircle2 size={36} className="text-success" style={{ margin: '0 auto 0.5rem' }} />
-              <h3>Found {matches.length} Matching Schemes!</h3>
-              <p className="text-sm text-muted mt-2">You qualify for direct benefits: <strong>{matches.map(m => m.emoji).join(' ')}</strong></p>
+              <h3>{t.foundSchemes ? t.foundSchemes.replace('{n}', matches.length) : `Found ${matches.length} Matching Schemes!`}</h3>
+              <p className="text-sm text-muted mt-2">{t.qualifyDirectBenefits || "You qualify for direct benefits:"} <strong>{matches.map(m => m.emoji).join(' ')}</strong></p>
 
               <div className="mb-3 mt-3 text-left" style={{ background: 'rgba(255,255,255,0.02)', padding: '0.5rem 0.75rem', borderRadius: 'var(--border-radius-sm)' }}>
                 {matches.slice(0, 3).map((s, idx) => (
@@ -138,16 +138,16 @@ export default function EligibilityPopup({ onRegisterLead }) {
                   </div>
                 ))}
                 {matches.length > 3 && (
-                  <div className="text-center text-xs text-muted font-bold">+ {matches.length - 3} more schemes</div>
+                  <div className="text-center text-xs text-muted font-bold">+ {matches.length - 3} {t.moreSchemes || "more schemes"}</div>
                 )}
               </div>
 
-              <p className="text-xs text-muted mb-3">Want complete verified household analysis & auto-fill applications?</p>
+              <p className="text-xs text-muted mb-3">{t.wantVerifiedAnalysis || "Want complete verified household analysis & auto-fill applications?"}</p>
               <button className="btn btn-primary btn-sm w-full mb-2" onClick={handleCreateAccount}>
-                Create Free Account
+                {t.createFreeAccount || "Create Free Account"}
               </button>
               <button className="btn btn-text btn-sm w-full" onClick={handleReset}>
-                Check Again
+                {t.checkAgain || "Check Again"}
               </button>
             </div>
           )}

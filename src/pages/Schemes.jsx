@@ -214,7 +214,7 @@ export default function Schemes({
           </div>
           <div className="stat-box">
             <span className="stat-label">{verificationTimeText[lang] || verificationTimeText.en}</span>
-            <span className="stat-val">2-4 Weeks</span>
+            <span className="stat-val">{t.twoToFourWeeks || "2-4 Weeks"}</span>
           </div>
         </div>
 
